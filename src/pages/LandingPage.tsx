@@ -39,7 +39,7 @@ const LandingPage = () => {
       {/* Main Content */}
       <main className="w-full pt-16 pb-6 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-        <div className="flex flex-col lg:flex-row items-center justify-between relative">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between relative">
           {/* Mobile Image Section */}
           <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[450px] lg:min-h-[550px] p-0 lg:mb-0">
             <img
@@ -55,7 +55,7 @@ const LandingPage = () => {
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 max-w-[600px] lg:max-w-none">
+          <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
             <h1
               className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
               style={{ fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif' }}
@@ -72,7 +72,7 @@ const LandingPage = () => {
               Be the first to grab the exclusive rewards!
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 items-center lg:items-start">
+            <div className="flex flex-row gap-3 items-center justify-center lg:justify-center">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -84,7 +84,7 @@ const LandingPage = () => {
                     setStatus('idle');
                   }
                 }}
-                className={`w-full md:w-[300px] px-6 py-4 bg-white/5 border rounded-lg text-white text-sm tracking-wider text-center placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
+                className={`w-[240px] sm:w-[240px] md:w-[280px] lg:w-[300px] px-4 py-3 bg-white/5 border rounded-lg text-white text-sm tracking-wider text-center placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
                 style={{
                   background:
                     'linear-gradient(#000,#000) padding-box, linear-gradient(to bottom, #F9BB18, #74CFE6, #5ABA52) border-box',
@@ -92,7 +92,7 @@ const LandingPage = () => {
               />
               <button 
                 onClick={handleNotifyMe} 
-                className="px-10 py-4 border-none rounded-lg text-white text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-full md:w-auto"
+                className="px-8 py-3 border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto"
                 style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
               >
                 NOTIFY ME
