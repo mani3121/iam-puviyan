@@ -37,7 +37,7 @@ const LandingPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="w-full pt-24 pb-6 min-h-screen flex items-center">
+      <main className="w-full pt-16 pb-6 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
         <div className="flex flex-col lg:flex-row items-center justify-between relative">
           {/* Mobile Image Section */}
