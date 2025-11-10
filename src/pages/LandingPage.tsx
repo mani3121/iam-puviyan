@@ -20,15 +20,14 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
+    <div className="min-h-screen text-white relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="w-full fixed top-0 left-0 z-50">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-6">
           <div className="flex items-center gap-3 cursor-pointer">
             <img src={puviyanLogo} alt="Puviyan Logo" className="w-4 h-4 object-contain" />
             <span
-              className="text-white font-semibold"
-              style={{ fontFamily: '"Arial Rounded MT Bold", Arial, sans-serif', fontSize: '16px' }}
+              className="text-white font-semibold text-base"
             >
               Puviyan
             </span>
@@ -37,7 +36,7 @@ const LandingPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="w-full pt-16 pb-6 min-h-screen flex items-center">
+      <main className="w-full pt-16 pb-6 flex-1 flex items-center">
         <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
         <div className="flex flex-col-reverse lg:flex-row items-center justify-between relative">
           {/* Mobile Image Section */}
@@ -58,7 +57,6 @@ const LandingPage = () => {
           <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
             <h1
               className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
-              style={{ fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif' }}
             >
               COMING SOON<br />
               TO REWRITE YOUR<br />
@@ -67,12 +65,11 @@ const LandingPage = () => {
             
             <p
               className="text-lg md:text-xl lg:text-2xl text-white/80 mb-10 font-light"
-              style={{ fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif' }}
             >
               Be the first to grab the exclusive rewards!
             </p>
 
-            <div className="flex flex-row gap-3 items-center justify-center lg:justify-center">
+            <div className="flex flex-row gap-3 items-center justify-center lg:justify-start">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -100,14 +97,12 @@ const LandingPage = () => {
             </div>
             {status === 'success' && (
               <div
-                className="mt-4 font-medium text-center lg:text-left"
+                className="mt-4 font-medium text-center lg:text-left text-xl"
                 style={{
                   background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
-                  fontFamily: '"Segoe UI Variable", "Segoe UI", system-ui, sans-serif',
-                  fontSize: '20px',
                 }}
               >
                 {successMsg}
