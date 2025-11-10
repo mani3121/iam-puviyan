@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import puviyanLogo from '../assets/puviyan_logo.avif';
 import mobileImage from '../assets/mobile_coins.png';
-import coinsImage from '../assets/Coins.png';
 import co2Badge from '../assets/Co-2.avif';
 
 const LandingPage = () => {
@@ -41,15 +40,10 @@ const LandingPage = () => {
         <div className="flex flex-col-reverse lg:flex-row items-center justify-between relative">
           {/* Mobile Image Section */}
           <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[450px] lg:min-h-[550px] p-0 lg:mb-0">
-            <img
-              src={coinsImage}
-              alt="Coins Background"
-              className="absolute top-1/2 left-1/2 -translate-x-[64%] -translate-y-1/2 w-[100px] opacity-100 pointer-events-none z-10"
-            />
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
-              className="relative z-20 max-w-full h-auto max-h-[700px]"
+              className="relative z-20 max-w-full h-auto max-h-[600px]"
             />
           </div>
 
@@ -81,7 +75,7 @@ const LandingPage = () => {
                     setStatus('idle');
                   }
                 }}
-                className={`w-[240px] sm:w-[240px] md:w-[280px] lg:w-[300px] px-4 py-3 bg-white/5 border rounded-lg text-white text-sm tracking-wider text-center placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
+                className={`w-[170px] sm:w-[180px] md:w-[220px] lg:w-[240px] px-4 py-3 md:px-5 md:py-4 bg-white/5 border rounded-lg text-white text-sm tracking-wider text-center placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
                 style={{
                   background:
                     'linear-gradient(#000,#000) padding-box, linear-gradient(to bottom, #F9BB18, #74CFE6, #5ABA52) border-box',
@@ -89,7 +83,7 @@ const LandingPage = () => {
               />
               <button 
                 onClick={handleNotifyMe} 
-                className="px-8 py-3 border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto"
+                className="px-5 py-3 md:px-6 md:py-4 border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto"
                 style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
               >
                 NOTIFY ME
@@ -97,7 +91,7 @@ const LandingPage = () => {
             </div>
             {status === 'success' && (
               <div
-                className="mt-4 font-medium text-center lg:text-left text-xl"
+                className="mt-4 font-small text-center lg:text-left text-xl w-full max-w-none mx-auto lg:mx-0"
                 style={{
                   background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
                   WebkitBackgroundClip: 'text',
