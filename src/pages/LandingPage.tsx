@@ -35,35 +35,26 @@ const LandingPage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="w-full pt-12 sm:pt-14 md:pt-16 pb-2 sm:pb-4 md:pb-6 flex-1 flex items-center">
+      <main className="w-full pt-12 sm:pt-14 md:pt-16 pb-2 sm:pb-4 md:pb-6 flex-1 flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between relative">
-          {/* Mobile Image Section */}
-          <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
-            <img 
-              src={mobileImage} 
-              alt="Mobile App Preview" 
-              className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px]"
-            />
-          </div>
-
-          {/* Text and CTA Section */}
-          <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
+        <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between relative">
+          {/* Text and CTA Section - Mobile First */}
+          <div className="w-full max-w-md mx-auto lg:mx-0 lg:flex-1 lg:pl-12 flex flex-col justify-center text-left relative z-10 mb-6 lg:mb-0 ml-12">
             <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-4 sm:mb-5 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
             >
-              COMING SOON<br />
-              TO REWRITE YOUR<br />
+              COMING SOON TO<br />
+              REWRITE YOUR<br />
               ECOSTORY
             </h1>
             
             <p
-              className="text-sm sm:text-base md:text-lg lg:text-2xl text-white/80 mb-4 sm:mb-6 md:mb-10 font-light"
+              className="text-sm sm:text-base md:text-lg lg:text-2xl text-white/80 mb-4 sm:mb-5 md:mb-10 font-light"
             >
               Be the first to grab the exclusive rewards!
             </p>
 
-            <div className="flex flex-row gap-2 sm:gap-3 items-stretch justify-center lg:justify-start">
+            <div className="flex flex-row gap-2 sm:gap-3 items-stretch justify-start self-start mb-4 lg:mb-0">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -91,7 +82,7 @@ const LandingPage = () => {
             </div>
             {status === 'success' && (
               <div
-                className="mt-2 sm:mt-3 md:mt-4 font-small text-center lg:text-left text-sm sm:text-base md:text-lg lg:text-xl w-full max-w-none mx-auto lg:mx-0"
+                className="mt-2 sm:mt-3 md:mt-4 font-small text-left text-sm sm:text-base md:text-lg lg:text-xl w-full max-w-none mx-auto lg:mx-0"
                 style={{
                   background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
                   WebkitBackgroundClip: 'text',
@@ -103,12 +94,21 @@ const LandingPage = () => {
               </div>
             )}
           </div>
+
+          {/* Mobile Image Section */}
+          <div className="w-full max-w-md mx-auto lg:mx-0 lg:flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0">
+            <img 
+              src={mobileImage} 
+              alt="Mobile App Preview" 
+              className="relative z-20 max-w-[92%] sm:max-w-[95%] h-auto max-h-[320px] sm:max-h-[360px] md:max-h-[420px] lg:max-h-[600px]"
+            />
+          </div>
         </div>
         </div>
       </main>
 
       {/* Carbon Badge */}
-      <div className="fixed bottom-28 sm:bottom-32 md:bottom-36 lg:bottom-24 right-2 sm:right-6 md:right-12 flex items-center gap-1 sm:gap-2 md:gap-3 px-2 py-1 sm:px-3 sm:py-2 md:px-5 md:py-3 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
+      <div className="absolute bottom-12 sm:bottom-12 md:bottom-12 right-2 sm:right-6 md:right-12 lg:fixed lg:bottom-24 lg:right-12 flex items-center gap-1 sm:gap-2 md:gap-3 px-1 py-0.5 sm:px-3 sm:py-2 md:px-5 md:py-3 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
         style={{
           border: '2px solid transparent',
           backgroundImage:
@@ -119,12 +119,12 @@ const LandingPage = () => {
           minWidth: '50px',
           minHeight: '20px',
          }}>
-          <img src={co2Badge} alt="CO2 Footprint Icon" className="w-5 h-5 sm:w-7 sm:h-7 md:w-9 md:h-9" style={{ transform: 'rotate(-19deg)' }} />
+          <img src={co2Badge} alt="CO2 Footprint Icon" className="w-4 h-4 sm:w-7 sm:h-7 md:w-9 md:h-9" style={{ transform: 'rotate(-19deg)' }} />
         <div className="co2-text flex flex-col justify-center">
-          <div className="main font-bold text-[0.5rem] sm:text-[0.6rem] md:text-[0.73rem] text-white leading-tight">
+          <div className="main font-bold text-[0.44rem] sm:text-[0.6rem] md:text-[0.73rem] text-white leading-tight">
             0.03 g of CO2e per page view
           </div>
-          <div className="sub text-[0.5rem] sm:text-[0.6rem] md:text-[0.73rem] text-gray-300 mt-0.5">
+          <div className="sub text-[0.44rem] sm:text-[0.6rem] md:text-[0.73rem] text-gray-300 mt-0.5">
             98% lower than global average
           </div>
         </div>
@@ -134,14 +134,14 @@ const LandingPage = () => {
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-2 sm:py-3 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 sm:gap-4 md:gap-6">
           <div className="flex flex-col lg:flex-row items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 text-center lg:text-left">
-            <span className="text-xs sm:text-sm text-white/60">© 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</span>
-            <div className="flex gap-3 sm:gap-4 md:gap-6">
+            <span className="text-[0.6rem] sm:text-xs md:text-sm text-white/60">© 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</span>
+            <div className="hidden lg:flex gap-3 sm:gap-4 md:gap-6">
               <a href="/privacy" className="text-xs sm:text-sm text-white/60 hover:text-primary">Privacy Policy</a>
               <a href="/terms" className="text-xs sm:text-sm text-white/60 hover:text-primary">Terms of Service</a>
             </div>
           </div>
           
-          <div className="flex gap-3 sm:gap-4 md:gap-5">
+          <div className="hidden lg:flex gap-3 sm:gap-4 md:gap-5">
             <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary flex items-center justify-center">
               <svg width="16" height="16" className="sm:w-5 sm:h-5 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
