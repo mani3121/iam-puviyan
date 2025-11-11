@@ -83,7 +83,7 @@ const MobileLandingPage = () => {
 
             {/* Mobile image at bottom */}
             <div className="w-full flex justify-center items-center min-h-[200px] mt-6 sm:mt-8 mb-1">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[92%] sm:w-[94%] h-auto max-h-[44vh] sm:max-h-[50vh]" />
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] sm:w-[88%] h-auto max-h-[44vh] sm:max-h-[50vh]" />
             </div>
           </div>
         </div>
