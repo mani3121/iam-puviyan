@@ -43,14 +43,14 @@ const LandingPage = () => {
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
-              className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px]"
+              className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px] transition-all duration-500 hover:scale-105 hover:rotate-2 cursor-pointer"
             />
           </div>
 
           {/* Text and CTA Section */}
           <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
             <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 hover:tracking-wide cursor-pointer"
             >
               COMING SOON<br />
               TO REWRITE YOUR<br />
