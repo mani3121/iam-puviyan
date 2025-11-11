@@ -43,7 +43,7 @@ const MobileLandingPage = () => {
               <div className="flex w-full gap-2 items-stretch justify-start">
                 <input
                   type="email"
-                  placeholder="Email"
+                  placeholder="Enter your mail id"
                   value={email}
                   onChange={(e) => {
                     const v = e.target.value;
