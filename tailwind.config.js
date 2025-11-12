@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      maxWidth: {
+        '8xl': '1440px',
+      },
       colors: {
         primary: '#4dd4ac',
         'primary-dark': '#3ba886',

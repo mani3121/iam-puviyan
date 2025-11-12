@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import puviyanLogo from '../assets/puviyan_logo.avif';
 import mobileImage from '../assets/mobile_coins.png';
 import co2Badge from '../assets/Co-2.avif';
@@ -7,6 +7,8 @@ const LandingPage = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [successMsg, setSuccessMsg] = useState('');
+  const tiltCardRef = useRef<HTMLDivElement>(null);
+  const tiltImageRef = useRef<HTMLImageElement>(null);
 
   const handleNotifyMe = () => {
     if (email && email.trim().length > 0) {
@@ -18,11 +20,70 @@ const LandingPage = () => {
     }
   };
 
+  useEffect(() => {
+    const card = tiltCardRef.current;
+    const image = tiltImageRef.current;
+    if (!card || !image) return;
+
+    let rafId: number | null = null;
+    let targetRotateX = 0;
+    let targetRotateY = 0;
+    let currentRotateX = 0;
+    let currentRotateY = 0;
+    let isHovering = false;
+
+    const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
+
+    const animate = () => {
+      currentRotateX = lerp(currentRotateX, targetRotateX, 0.1);
+      currentRotateY = lerp(currentRotateY, targetRotateY, 0.1);
+
+      image.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${isHovering ? 1.03 : 1})`;
+
+      rafId = requestAnimationFrame(animate);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateY = ((x - centerX) / centerX) * 10;
+      const rotateX = ((centerY - y) / centerY) * 10;
+
+      targetRotateX = rotateX;
+      targetRotateY = rotateY;
+    };
+
+    const handlePointerEnter = () => {
+      isHovering = true;
+    };
+
+    const handlePointerLeave = () => {
+      isHovering = false;
+      targetRotateX = 0;
+      targetRotateY = 0;
+    };
+
+    card.addEventListener('pointermove', handlePointerMove);
+    card.addEventListener('pointerenter', handlePointerEnter);
+    card.addEventListener('pointerleave', handlePointerLeave);
+    rafId = requestAnimationFrame(animate);
+
+    return () => {
+      card.removeEventListener('pointermove', handlePointerMove);
+      card.removeEventListener('pointerenter', handlePointerEnter);
+      card.removeEventListener('pointerleave', handlePointerLeave);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, []);
+
   return (
     <div className="h-screen text-white relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="w-full fixed top-0 left-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-3 sm:py-4 md:py-6">
+        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-3 sm:py-4 md:py-6">
           <div className="flex items-center gap-2 sm:gap-3 cursor-pointer">
             <img src={puviyanLogo} alt="Puviyan Logo" className="w-3 h-3 sm:w-4 sm:h-4 object-contain" />
             <span
@@ -36,21 +97,33 @@ const LandingPage = () => {
 
       {/* Main Content */}
       <main className="w-full pt-12 sm:pt-14 md:pt-16 pb-2 sm:pb-4 md:pb-6 flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between relative">
+        <div className="max-w-8xl mx-auto px-6 lg:px-20 w-full">
+        <div className="flex flex-col-reverse lg:flex-row items-center relative">
           {/* Mobile Image Section */}
           <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
-            <img 
-              src={mobileImage} 
-              alt="Mobile App Preview" 
-              className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px] transition-all duration-500 hover:scale-105 hover:rotate-2 cursor-pointer"
-            />
+            <div 
+              ref={tiltCardRef}
+              className="relative"
+              style={{ perspective: '1000px' }}
+            >
+              <img 
+                ref={tiltImageRef}
+                src={mobileImage} 
+                alt="Mobile App Preview" 
+                className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px]"
+                style={{ 
+                  transform: 'scale(1.2)',
+                  transition: 'transform 0.1s ease-out',
+                  willChange: 'transform'
+                }}
+              />
+            </div>
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 lg:pl-12 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
+          <div className="flex-1 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
             <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent transition-all duration-300 hover:scale-105 hover:tracking-wide cursor-pointer"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
             >
               COMING SOON<br />
               TO REWRITE YOUR<br />
@@ -132,7 +205,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-2 sm:py-3 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 sm:gap-4 md:gap-6">
+        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-2 sm:py-3 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 sm:gap-4 md:gap-6">
           <div className="flex flex-col lg:flex-row items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 text-center lg:text-left">
             <span className="text-xs sm:text-sm text-white/60">© 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</span>
             <div className="flex gap-3 sm:gap-4 md:gap-6">
