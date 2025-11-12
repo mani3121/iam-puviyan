@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import puviyanLogo from '../assets/puviyan_logo.avif';
-import mobileImage from '../assets/mobile_coins.png';
+import mobileImage from '../assets/Puvi_Image.png';
+import backgroundCoins from '../assets/puvi_coins.png';
 import co2Badge from '../assets/Co-2.avif';
 
 const LandingPage = () => {
@@ -8,7 +9,7 @@ const LandingPage = () => {
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [successMsg, setSuccessMsg] = useState('');
   const tiltCardRef = useRef<HTMLDivElement>(null);
-  const tiltImageRef = useRef<HTMLImageElement>(null);
+  const tiltCoinsRef = useRef<HTMLImageElement>(null);
 
   const handleNotifyMe = () => {
     if (email && email.trim().length > 0) {
@@ -22,8 +23,8 @@ const LandingPage = () => {
 
   useEffect(() => {
     const card = tiltCardRef.current;
-    const image = tiltImageRef.current;
-    if (!card || !image) return;
+    const coins = tiltCoinsRef.current;
+    if (!card || !coins) return;
 
     let rafId: number | null = null;
     let targetRotateX = 0;
@@ -38,7 +39,7 @@ const LandingPage = () => {
       currentRotateX = lerp(currentRotateX, targetRotateX, 0.1);
       currentRotateY = lerp(currentRotateY, targetRotateY, 0.1);
 
-      image.style.transform = `rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${isHovering ? 1.03 : 1})`;
+      coins.style.transform = `translate(-50%, -50%) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${isHovering ? 0.75 : 0.75})`;
 
       rafId = requestAnimationFrame(animate);
     };
@@ -103,20 +104,36 @@ const LandingPage = () => {
           <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
             <div 
               ref={tiltCardRef}
-              className="relative"
+              className="relative w-full h-full flex justify-center items-center"
               style={{ perspective: '1000px' }}
             >
-              <img 
-                ref={tiltImageRef}
-                src={mobileImage} 
-                alt="Mobile App Preview" 
-                className="relative z-20 max-w-full h-auto max-h-[250px] sm:max-h-[320px] md:max-h-[400px] lg:max-h-[600px]"
-                style={{ 
-                  transform: 'scale(1.2)',
-                  transition: 'transform 0.1s ease-out',
-                  willChange: 'transform'
-                }}
-              />
+              {/* Background coins with tilt effect */}
+              <div className="absolute inset-0 pointer-events-none">
+                <img 
+                  ref={tiltCoinsRef}
+                  src={backgroundCoins}
+                  alt="Background Coins"
+                  className="absolute w-[150%] h-[150%] object-contain"
+                  style={{ 
+                    top: '45%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%) scale(0.75)',
+                    opacity: 0.9,
+                    zIndex: 10,
+                    transition: 'transform 0.1s ease-out',
+                    willChange: 'transform'
+                  }}
+                />
+              </div>
+              {/* Main image - static */}
+              <div className="relative z-20" style={{ marginTop: '30px' }}>
+                <img 
+                  src={mobileImage} 
+                  alt="Mobile App Preview" 
+                  className="relative max-w-full h-auto max-h-[250px] sm:max-h-[550px] md:max-h-[650px] lg:max-h-[600px]"
+                  style={{ transform: 'scale(1.0)' }}
+                />
+              </div>
             </div>
           </div>
 
