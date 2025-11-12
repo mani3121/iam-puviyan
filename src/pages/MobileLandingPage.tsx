@@ -30,7 +30,7 @@ const MobileLandingPage = () => {
       </header>
 
       <main className="w-full pt-10 sm:pt-14 pb-0 flex-1 flex items-start">
-        <div className="max-w-7xl mx-auto px-4 w-full">
+        <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[1.05] sm:scale-100">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
             <div className="w-full max-w-[300px] sm:max-w-[320px] mx-auto self-center text-left translate-x-6 sm:translate-x-8">
