@@ -98,10 +98,10 @@ const LandingPage = () => {
 
       {/* Main Content */}
       <main className="w-full pt-12 sm:pt-14 md:pt-16 pb-2 sm:pb-4 md:pb-6 flex-1 flex items-center">
-        <div className="max-w-8xl mx-auto px-6 lg:px-20 w-full">
+        <div className="max-w-8xl mx-auto px-2 lg:px-20 w-full">
         <div className="flex flex-col-reverse lg:flex-row items-center relative">
           {/* Mobile Image Section */}
-          <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
+          <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] lg:-mr-4 xl:-mr-6 p-0 lg:mb-0">
             <div 
               ref={tiltCardRef}
               className="relative w-full h-full flex justify-center items-center"
@@ -126,7 +126,7 @@ const LandingPage = () => {
                 />
               </div>
               {/* Main image - static */}
-              <div className="relative z-20" style={{ marginTop: '30px' }}>
+              <div className="relative z-20 mt-1 sm:mt-1 md:mt-2 lg:mt-0">
                 <img 
                   src={mobileImage} 
                   alt="Mobile App Preview" 
@@ -138,7 +138,7 @@ const LandingPage = () => {
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
+          <div className="flex-1 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none lg:-ml-24 xl:-ml-28">
             <h1
               className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
             >
