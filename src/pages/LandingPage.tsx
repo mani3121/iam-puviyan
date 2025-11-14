@@ -81,7 +81,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="h-screen text-white relative overflow-hidden flex flex-col">
+    <div className="min-h-screen text-white relative overflow-x-hidden flex flex-col">
       {/* Header */}
       <header className="w-full fixed top-0 left-0 z-50">
         <div className="max-w-8xl mx-auto px-6 lg:px-20 py-3 sm:py-4 md:py-6">
@@ -101,37 +101,41 @@ const LandingPage = () => {
         <div className="max-w-8xl mx-auto px-2 lg:px-20 w-full">
         <div className="flex flex-col-reverse lg:flex-row items-center relative gap-6">
           {/* Mobile Image Section */}
-          <div className="flex-1 relative z-20 flex justify-center items-center overflow-visible min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
+          <div className="flex-1 relative z-20 flex justify-center items-center min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
             <div 
               ref={tiltCardRef}
               className="relative w-full h-full flex justify-center items-center"
               style={{ perspective: '1000px' }}
             >
-              {/* Background coins with tilt effect */}
-              <div className="absolute inset-0 pointer-events-none">
+              {/* Unified container for both images */}
+              <div className="relative flex justify-center items-center w-full h-full">
+                {/* Background coins with tilt effect */}
                 <img 
                   ref={tiltCoinsRef}
                   src={backgroundCoins}
                   alt="Background Coins"
-                  className="absolute object-contain w-[220%] h-[220%] sm:w-[180%] sm:h-[180%] md:w-[150%] md:h-[150%] lg:w-[140%] lg:h-[140%]"
+                  className="absolute max-w-none object-contain pointer-events-none"
                   style={{ 
-                    top: '45%',
+                    top: '44%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%) scale(0.75)',
+                    // Viewport-based sizing keeps coverage consistent at every breakpoint
+                    width: 'min(75.65vw, 750px)',
+                    height: 'auto',
+                    transform: 'translate(-50%, -50%) scale(0.1)',
                     opacity: 0.9,
                     zIndex: 10,
                     transition: 'transform 0.1s ease-out',
-                    willChange: 'transform'
+                    willChange: 'transform',
+                    backfaceVisibility: 'hidden',     // prevent GPU flicker on 3D tilt
+                    transformOrigin: '50% 50%'
                   }}
                 />
-              </div>
-              {/* Main image - static */}
-              <div className="relative z-20 mt-1 sm:mt-1 md:mt-2 lg:mt-0">
+                {/* Main mobile image - static */}
                 <img 
                   src={mobileImage} 
                   alt="Mobile App Preview" 
-                  className="relative max-w-full h-auto max-h-[250px] sm:max-h-[550px] md:max-h-[650px] lg:max-h-[600px]"
-                  style={{ transform: 'scale(1.0)' }}
+                  className="relative max-w-full h-auto max-h-[250px] sm:max-h-[550px] md:max-h-[650px] lg:max-h-[600px] mt-1 sm:mt-1 md:mt-2 lg:mt-0"
+                  style={{ transform: 'scale(1.0)', zIndex: 20 }}
                 />
               </div>
             </div>
