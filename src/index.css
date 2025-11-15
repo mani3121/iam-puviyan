@@ -15,7 +15,7 @@ body {
     /* Teal/cyan glow center-right (bigger, softer) */
     radial-gradient(40% 40% at 35% 45%, rgba(20, 184, 166, 0.28) 0%, rgba(56, 189, 248, 0.22) 25%, rgba(16, 185, 129, 0.16) 45%, rgba(0, 0, 0, 0) 80%),
     /* Amber/yellow glow bottom-left (bigger, softer) */
-    radial-gradient(35% 35% at 12% 88%, rgba(217, 119, 6, 0.18) 0%, rgba(249, 187, 24, 0.10) 28%, rgba(0, 0, 0, 0) 65%);
+    radial-gradient(0% 0% at 12% 88%, rgba(217, 119, 6, 0.18) 0%, rgba(249, 187, 24, 0.10) 28%, rgba(0, 0, 0, 0) 65%);
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
