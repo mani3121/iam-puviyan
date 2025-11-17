@@ -1,20 +1,40 @@
 import { useState } from 'react';
+import { submitEmail } from '../services/firebaseService';
 import puviyanLogo from '../assets/puviyan_logo.avif';
 import mobileImage from '../assets/mobile_coins.png';
 import co2Badge from '../assets/Co-2.avif';
 
 const TabletLandingPage = () => {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const handleNotifyMe = () => {
-    if (email && email.trim().length > 0) {
-      setStatus('success');
-      setSuccessMsg('Awesome! You are now first in the list.');
-    } else {
+  const handleNotifyMe = async () => {
+    if (!email || email.trim().length === 0) {
       setStatus('error');
       setSuccessMsg('');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setStatus('error');
+      setSuccessMsg('Please enter a valid email address.');
+      return;
+    }
+
+    setStatus('loading');
+    
+    const result = await submitEmail(email);
+    
+    if (result.success) {
+      setStatus('success');
+      setSuccessMsg(result.message);
+      setEmail('');
+    } else {
+      setStatus('error');
+      setSuccessMsg(result.message);
     }
   };
 
@@ -60,13 +80,14 @@ const TabletLandingPage = () => {
                 />
                 <button
                   onClick={handleNotifyMe}
-                  className="px-5 md:px-6 py-3 md:py-3.5 border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center"
+                  disabled={status === 'loading'}
+                  className="px-5 md:px-6 py-3 md:py-3.5 border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
                 >
-                  NOTIFY ME
+                  {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
                 </button>
               </div>
-              {status === 'success' && (
+              {(status === 'success' || status === 'error') && successMsg && (
                 <div
                   className="mt-3 md:mt-4 font-small text-center text-base md:text-lg w-full"
                   style={{

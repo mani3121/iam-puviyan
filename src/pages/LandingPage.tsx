@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { submitEmail } from '../services/firebaseService';
 import puviyanLogo from '../assets/puviyan_logo.avif';
 import mobileImage from '../assets/Puvi_Image.png';
 import backgroundCoins from '../assets/puvi_coins.png';
@@ -6,18 +7,37 @@ import co2Badge from '../assets/Co-2.avif';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
   const [successMsg, setSuccessMsg] = useState('');
   const tiltCardRef = useRef<HTMLDivElement>(null);
   const tiltCoinsRef = useRef<HTMLImageElement>(null);
 
-  const handleNotifyMe = () => {
-    if (email && email.trim().length > 0) {
-      setStatus('success');
-      setSuccessMsg('Awesome! You are now first in the list.');
-    } else {
+  const handleNotifyMe = async () => {
+    if (!email || email.trim().length === 0) {
       setStatus('error');
       setSuccessMsg('');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setStatus('error');
+      setSuccessMsg('Please enter a valid email address.');
+      return;
+    }
+
+    setStatus('loading');
+    
+    const result = await submitEmail(email);
+    
+    if (result.success) {
+      setStatus('success');
+      setSuccessMsg(result.message);
+      setEmail('');
+    } else {
+      setStatus('error');
+      setSuccessMsg(result.message);
     }
   };
 
@@ -177,21 +197,22 @@ const LandingPage = () => {
               />
               <button 
                 onClick={handleNotifyMe} 
-                className="px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-3 lg:px-6 lg:py-4 border-none rounded-lg text-white text-xs sm:text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center"
+                disabled={status === 'loading'}
+                className="px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-3 lg:px-6 lg:py-4 border-none rounded-lg text-white text-xs sm:text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
               >
-                NOTIFY ME
+                {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
               </button>
             </div>
-            {status === 'success' && (
+            {(status === 'success' || status === 'error') && successMsg && (
               <div
-                className="mt-2 sm:mt-3 md:mt-4 font-small text-center lg:text-left text-sm sm:text-base md:text-lg lg:text-xl w-full max-w-none mx-auto lg:mx-0"
-                style={{
+                className={`mt-2 sm:mt-3 md:mt-4 font-small text-center lg:text-left text-sm sm:text-base md:text-lg lg:text-xl w-full max-w-none mx-auto lg:mx-0 ${status === 'error' ? 'text-red-500' : ''}`}
+                style={status === 'success' ? {
                   background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
-                }}
+                } : {}}
               >
                 {successMsg}
               </div>
