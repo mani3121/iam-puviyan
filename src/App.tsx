@@ -16,7 +16,7 @@ function App() {
     return <MobileLandingPage />
   }
 
-  if (width < 1024) {
+  if (width < 1200) {
     return <TabletLandingPage />
   }
 
