@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
-import { submitEmail } from '../services/firebaseService';
-import puviyanLogo from '../assets/puviyan_logo.avif';
+import { useEffect, useRef, useState } from 'react';
+import co2Badge from '../assets/Co-2.avif';
+import puviyanLogo from '../assets/Logo.png';
 import mobileImage from '../assets/Puvi_Image.png';
 import backgroundCoins from '../assets/puvi_coins.png';
-import co2Badge from '../assets/Co-2.avif';
+import { submitEmail } from '../services/firebaseService';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
@@ -103,23 +103,20 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen text-white relative overflow-x-hidden flex flex-col">
       {/* Header */}
-      <header className="w-full fixed top-0 left-0 z-50">
-        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-3 sm:py-4 md:py-6">
-          <div className="flex items-center gap-2 sm:gap-3 cursor-pointer">
-            <img src={puviyanLogo} alt="Puviyan Logo" className="w-3 h-3 sm:w-4 sm:h-4 object-contain" />
-            <span
-              className="text-white font-semibold text-sm sm:text-base"
-            >
-              Puviyan
-            </span>
+      <header className="w-full fixed top-0 left-0 z-50 bg-gradient-to-b from-black via-black/95 to-transparent">
+        <div className="w-full py-3 sm:py-4">
+          <div className="flex items-center justify-center cursor-pointer">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <img src={puviyanLogo} alt="Puviyan Logo" className="h-8 sm:h-12 md:h-16 w-auto object-contain" />
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="w-full pt-12 sm:pt-14 md:pt-16 pb-2 sm:pb-4 md:pb-6 flex-1 flex items-center">
-        <div className="max-w-8xl mx-auto px-2 lg:px-20 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center relative gap-6">
+      <main className="w-full pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-10 md:pb-12 flex-1 flex items-center">
+        <div className="max-w-8xl mx-auto px-4 lg:px-20 w-full">
+        <div className="flex flex-col-reverse lg:flex-row items-center relative gap-8 lg:gap-12">
           {/* Mobile Image Section */}
           <div className="flex-1 relative z-20 flex justify-center items-center min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
             <div 
@@ -163,21 +160,18 @@ const LandingPage = () => {
 
           {/* Text and CTA Section */}
           <div className="flex-1 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
-            <h1
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black leading-tight mb-3 sm:mb-4 md:mb-6 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent"
-            >
-              COMING SOON<br />
-              TO REWRITE YOUR<br />
-              ECOSTORY
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide">
+              <span className="text-white font-light">COMING SOON</span><br />
+              <span className="text-white font-light">TO EMPOWER</span><br />
+              <span className="text-[#5ABA52] font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
             </h1>
             
-            <p
-              className="text-sm sm:text-base md:text-lg lg:text-2xl text-white/80 mb-4 sm:mb-6 md:mb-10 font-light"
-            >
-              Be the first to grab the exclusive rewards!
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 md:mb-8 font-medium max-w-2xl">
+              Inviting changemakers to integrate the app into homes,<br className="hidden lg:block" />
+              workplaces, institutions, businesses, & communities everywhere.
             </p>
 
-            <div className="flex flex-row gap-2 sm:gap-3 items-stretch justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch justify-center lg:justify-start max-w-2xl">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -189,33 +183,20 @@ const LandingPage = () => {
                     setStatus('idle');
                   }
                 }}
-                className={`w-[140px] sm:w-[160px] md:w-[200px] lg:w-[240px] px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 lg:px-5 lg:py-4 bg-white/5 border rounded-lg text-white text-xs sm:text-sm tracking-wider text-center placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
-                style={{
-                  background:
-                    'linear-gradient(#000,#000) padding-box, linear-gradient(to bottom, #F9BB18, #74CFE6, #5ABA52) border-box',
-                }}
+                className={`w-full sm:w-auto sm:min-w-[250px] md:min-w-[280px] px-4 py-3 sm:px-5 sm:py-4 bg-transparent border-2 rounded-lg text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#5ABA52]'}`}
               />
               <button 
                 onClick={handleNotifyMe} 
                 disabled={status === 'loading'}
-                className="px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-3 lg:px-6 lg:py-4 border-none rounded-lg text-white text-xs sm:text-sm md:text-base font-bold tracking-wider cursor-pointer shadow-[0_4px_20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
+                className="px-6 py-3 sm:px-8 sm:py-4 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white text-sm sm:text-base font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
               >
                 {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
               </button>
             </div>
-            {(status === 'success' || status === 'error') && successMsg && (
-              <div
-                className={`mt-2 sm:mt-3 md:mt-4 font-small text-center lg:text-left text-sm sm:text-base md:text-lg lg:text-xl w-full max-w-none mx-auto lg:mx-0 ${status === 'error' ? 'text-red-500' : ''}`}
-                style={status === 'success' ? {
-                  background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                } : {}}
-              >
-                {successMsg}
-              </div>
+            {status === 'success' && (
+              <p className="mt-4 sm:mt-5 text-sm sm:text-base text-[#5ABA52] font-light text-center lg:text-left">
+                Thank you for joining us. You'll hear from us soon.
+              </p>
             )}
           </div>
         </div>
@@ -235,7 +216,7 @@ const LandingPage = () => {
           minHeight: '20px',
          }}>
           <img src={co2Badge} alt="CO2 Footprint Icon" className="w-5 h-5 sm:w-7 sm:h-7 md:w-9 md:h-9" style={{ transform: 'rotate(-19deg)' }} />
-        <div className="co2-text flex flex-col justify-center">
+        <div className="co2-text flex flex-col justify-center" style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}>
           <div className="main font-bold text-[0.5rem] sm:text-[0.6rem] md:text-[0.73rem] text-white leading-tight">
             0.03 g of CO2e per page view
           </div>
@@ -247,36 +228,36 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
-        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-2 sm:py-3 md:py-4 flex flex-col lg:flex-row justify-between items-center gap-3 sm:gap-4 md:gap-6">
-          <div className="flex flex-col lg:flex-row items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 text-center lg:text-left">
-            <span className="text-xs sm:text-sm text-white/60">© 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</span>
-            <div className="flex gap-3 sm:gap-4 md:gap-6">
-              <a href="/privacy" className="text-xs sm:text-sm text-white/60 hover:text-primary">Privacy Policy</a>
-              <a href="/terms" className="text-xs sm:text-sm text-white/60 hover:text-primary">Terms of Service</a>
+        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center lg:text-left">
+            <div className="flex gap-4 sm:gap-6">
+              <a href="/terms" className="text-xs sm:text-sm text-white/60 hover:text-white transition-colors">Terms of Service</a>
+              <a href="/privacy" className="text-xs sm:text-sm text-white/60 hover:text-white transition-colors">Privacy Policy</a>
             </div>
+            <span className="text-xs sm:text-sm text-white/60">All rights reserved © 2025 Puviyan Digital Solutions Private Limited</span>
           </div>
           
-          <div className="flex gap-3 sm:gap-4 md:gap-5">
-            <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary flex items-center justify-center">
-              <svg width="16" height="16" className="sm:w-5 sm:h-5 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+          <div className="flex gap-4 sm:gap-5">
+            <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+              <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
-            <a href="https://www.facebook.com/people/Puviyan-Digital-Solutions/61577303789280/#" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary flex items-center justify-center">
-              <svg width="16" height="16" className="sm:w-5 sm:h-5 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+            <a href="https://www.facebook.com/people/Puviyan-Digital-Solutions/61577303789280/#" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+              <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="https://www.linkedin.com/company/puviyandigitalsolutions/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary flex items-center justify-center">
-              <svg width="16" height="16" className="sm:w-5 sm:h-5 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-            </a>
-            <a href="https://www.instagram.com/puviyandigitalsolutions/" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-primary flex items-center justify-center">
-              <svg width="16" height="16" className="sm:w-5 sm:h-5 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <a href="https://www.instagram.com/puviyandigitalsolutions/" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+              <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
                 <circle cx="12" cy="12" r="4"></circle>
                 <circle cx="17.5" cy="6.5" r="1"></circle>
+              </svg>
+            </a>
+            <a href="https://www.linkedin.com/company/puviyandigitalsolutions/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+              <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
             </a>
           </div>

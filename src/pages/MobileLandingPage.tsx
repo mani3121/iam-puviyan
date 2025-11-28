@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { submitEmail } from '../services/firebaseService';
-import puviyanLogo from '../assets/puviyan_logo.avif';
-import mobileImage from '../assets/mobile_coins.png';
 import co2Badge from '../assets/Co-2.avif';
+import puviyanLogo from '../assets/Logo.png';
+import mobileImage from '../assets/Puvi_Image.png';
+import { submitEmail } from '../services/firebaseService';
 
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -40,11 +40,10 @@ const MobileLandingPage = () => {
 
   return (
     <div className="h-screen text-white relative overflow-hidden flex flex-col">
-      <header className="w-full top-0 left-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-2 cursor-pointer">
-            <img src={puviyanLogo} alt="Puviyan Logo" className="w-3 h-3 object-contain" />
-            <span className="text-white font-semibold text-sm">Puviyan</span>
+      <header className="w-full top-0 left-0 z-50 bg-gradient-to-b from-black via-black/95 to-transparent">
+        <div className="w-full py-3">
+          <div className="flex items-center justify-center cursor-pointer">
+            <img src={puviyanLogo} alt="Puviyan Logo" className="h-8 w-auto object-contain" />
           </div>
         </div>
       </header>
@@ -53,17 +52,16 @@ const MobileLandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[1.08] sm:scale-100">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
-            <div className="w-full max-w-[300px] sm:max-w-[320px] mx-auto self-center text-left translate-x-6 sm:translate-x-8">
-              <h1 className="text-2xl font-black leading-tight mb-2 tracking-tight bg-gradient-to-br from-white to-gray-300 bg-clip-text text-transparent">
-                COMING SOON TO<br />
-                REWRITE YOUR<br />
-                ECOSTORY
+            <div className="w-full max-w-[300px] mx-auto self-center text-center">
+              <h1 className="font-light leading-tight mb-2 tracking-wide">
+                <span className="text-white font-light text-sm whitespace-nowrap">COMING SOON TO EMPOWER</span><br />
+                <span className="text-[#5ABA52] font-bold text-xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-xs text-white/80 mb-3 font-light">Be the first to grab the exclusive rewards!</p>
-              <div className="flex w-full gap-2 items-stretch justify-start">
+              <p className="text-xs text-white/70 mb-3 font-medium">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
+              <div className="flex flex-row gap-2 items-stretch justify-center">
                 <input
                   type="email"
-                  placeholder="Enter your mail id"
+                  placeholder="ENTER YOUR EMAIL ID"
                   value={email}
                   onChange={(e) => {
                     const v = e.target.value;
@@ -72,39 +70,26 @@ const MobileLandingPage = () => {
                       setStatus('idle');
                     }
                   }}
-                  className={`w-[150px] sm:w-[160px] px-2 py-1.5 bg-white/5 border rounded-lg text-white text-[10px] tracking-wider text-left placeholder:text-[9px] placeholder:text-white focus:outline-none focus:bg-white/8 transition-all ${status === 'error' ? 'border-red-500' : 'border-transparent'}`}
-                  style={{
-                    background:
-                      'linear-gradient(#000,#000) padding-box, linear-gradient(to bottom, #F9BB18, #74CFE6, #5ABA52) border-box',
-                  }}
+                  className={`w-[150px] px-2 py-2 bg-transparent border-2 rounded-lg text-white text-[10px] placeholder:text-white/40 focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#5ABA52]'}`}
                 />
                 <button
                   onClick={handleNotifyMe}
                   disabled={status === 'loading'}
-                  className="px-2 py-1 border-none rounded-lg text-white text-[9px] font-bold tracking-wider cursor-pointer shadow-[0_4px-20px_rgba(249,187,24,0.3)] hover:shadow-[0_6px_30px_rgba(249,187,24,0.5)] w-auto flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ background: 'linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)' }}
+                  className="px-3 py-2 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white text-[10px] font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                 >
                   {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
                 </button>
               </div>
-              {(status === 'success' || status === 'error') && successMsg && (
-                <div
-                  className="mt-2 font-small text-left text-sm w-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #FABB15 0%, rgba(99, 222, 243, 0.99) 50%, #51B157 100%)',
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    color: 'transparent',
-                  }}
-                >
-                  {successMsg}
-                </div>
+              {status === 'success' && (
+                <p className="mt-3 text-xs text-[#5ABA52] font-light text-center">
+                  Thank you for joining us. You'll hear from us soon.
+                </p>
               )}
             </div>
 
             {/* Mobile image at bottom */}
-            <div className="w-full flex justify-center items-center min-h-[200px] mt-6 sm:mt-8 mb-1">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] sm:w-[88%] h-auto max-h-[44vh] sm:max-h-[50vh]" />
+            <div className="w-full flex justify-center items-center min-h-[200px] mt-4 mb-1">
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto max-h-[45vh]" />
             </div>
           </div>
         </div>
@@ -112,7 +97,7 @@ const MobileLandingPage = () => {
 
       {/* Carbon Badge (compact) */}
       <div
-        className="fixed bottom-16 right-2 sm:bottom-20 sm:right-4 flex items-center gap-1 px-2 py-1 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
+        className="fixed bottom-16 right-2 flex items-center gap-1 px-2 py-1 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
         style={{
           border: '1.5px solid transparent',
           backgroundImage:
@@ -127,14 +112,14 @@ const MobileLandingPage = () => {
         <img
           src={co2Badge}
           alt="CO2 Footprint Icon"
-          className="w-4 h-4 sm:w-5 sm:h-5"
+          className="w-4 h-4"
           style={{ transform: 'rotate(-19deg)' }}
         />
-        <div className="co2-text flex flex-col justify-center">
-          <div className="main font-bold text-[9px] sm:text-[10px] text-white leading-tight">
+        <div className="co2-text flex flex-col justify-center" style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}>
+          <div className="main font-bold text-[8px] text-white leading-tight">
             0.03 g of CO2e per page view
           </div>
-          <div className="sub text-[8px] sm:text-[9px] text-gray-300 mt-0.5">
+          <div className="sub text-[7px] text-gray-300 mt-0.5">
             98% lower than global average
           </div>
         </div>
@@ -142,8 +127,12 @@ const MobileLandingPage = () => {
 
       {/* Footer: copyright only for mobile */}
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md mt-auto">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-center items-center">
-          <span className="text-[10px] text-white/60 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">© 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</span>
+        <div className="max-w-7xl mx-auto px-4 py-2 flex flex-col items-center gap-2">
+          <div className="flex gap-3">
+            <a href="/terms" className="text-[9px] text-white/60 hover:text-white transition-colors">Terms of Service</a>
+            <a href="/privacy" className="text-[9px] text-white/60 hover:text-white transition-colors">Privacy Policy</a>
+          </div>
+          <span className="text-[9px] text-white/60 text-center">All rights reserved © 2025 Puviyan Digital Solutions Private Limited</span>
         </div>
       </footer>
     </div>
