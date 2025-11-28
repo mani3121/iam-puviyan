@@ -7,12 +7,10 @@ import { submitEmail } from '../services/firebaseService';
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
-  const [successMsg, setSuccessMsg] = useState('');
 
   const handleNotifyMe = async () => {
     if (!email || email.trim().length === 0) {
       setStatus('error');
-      setSuccessMsg('');
       return;
     }
 
@@ -20,7 +18,6 @@ const MobileLandingPage = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setStatus('error');
-      setSuccessMsg('Please enter a valid email address.');
       return;
     }
 
@@ -30,11 +27,9 @@ const MobileLandingPage = () => {
     
     if (result.success) {
       setStatus('success');
-      setSuccessMsg(result.message);
       setEmail('');
     } else {
       setStatus('error');
-      setSuccessMsg(result.message);
     }
   };
 
