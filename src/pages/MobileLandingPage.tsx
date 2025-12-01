@@ -1,12 +1,21 @@
-import { useState } from 'react';
-import mobileImage from '../assets/iamPuviyan_mobile.png';
+import { useEffect, useState } from 'react';
 import downshade from '../assets/downshade.png';
-import { submitEmail } from '../services/firebaseService';
+import mobileImage from '../assets/iamPuviyan_mobile.png';
 import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
+import { submitEmail } from '../services/firebaseService';
 
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
+
+  useEffect(() => {
+    if (status === 'success' || status === 'error') {
+      const timer = setTimeout(() => {
+        setStatus('idle');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   const handleNotifyMe = async () => {
     if (!email || email.trim().length === 0) {
@@ -39,11 +48,11 @@ const MobileLandingPage = () => {
       </header>
 
       <main className="w-full pt-10 sm:pt-14 pb-0 flex-1 flex items-start">
-        <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[1.08] sm:scale-100">
+        <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[0.955] sm:scale-95">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
-            <div className="w-full max-w-[300px] mx-auto self-center text-center flex flex-col gap-4">
-              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-4 items-center">
+            <div className="w-full max-w-[300px] mx-auto self-center text-center flex flex-col gap-1">
+              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-1 items-center">
                 <span className="text-[#E0F8FD] font-light text-xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>COMING SOON TO EMPOWER</span>
                 <span className="text-[#48C84F] font-black text-2xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 950 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
@@ -78,7 +87,7 @@ const MobileLandingPage = () => {
             </div>
 
             {/* Mobile image at bottom */}
-            <div className="w-full flex justify-center items-center min-h-[200px] mt-4 mb-1">
+            <div className="w-full flex justify-center items-center min-h-[180px] mb-0">
               <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto max-h-[45vh] scale-125" />
               <img 
                 src={downshade} 
