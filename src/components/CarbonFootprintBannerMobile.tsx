@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { compareToBaseline, simplifiedCO2PerView } from '../utils/carbon';
 import co2Badge from '../assets/Co-2.avif';
+import { compareToBaseline, simplifiedCO2PerView } from '../utils/carbon';
 
 interface CarbonFootprintBannerMobileProps {
   co2Estimate: number;

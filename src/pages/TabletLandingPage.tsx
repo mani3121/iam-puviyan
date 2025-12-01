@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import mobileImage from '../assets/iamPuviyan.png';
+import CarbonFootprintBannerMobile from '../components/CarbonFootprintBanner';
 import { submitEmail } from '../services/firebaseService';
-import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
 
 const TabletLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -37,15 +37,15 @@ const TabletLandingPage = () => {
       
 
       <main className="w-full pt-8 md:pt-10 pb-0 flex-1 flex items-start">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full h-full">
-          <div className="flex flex-col items-center justify-start gap-0 md:gap-2 h-full">
-            {/* CTA on top */}
-            <div className="w-full text-center mt-0">
-              <h1 className="text-2xl md:text-4xl font-light leading-tight mb-2 md:mb-4 tracking-wide">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full h-full flex flex-col">
+          {/* Top section - CTA */}
+          <div className="flex-shrink-0">
+            <div className="w-full text-center mt-0 mb-0">
+              <h1 className="text-2xl md:text-4xl font-light leading-tight mb-1 md:mb-2 tracking-wide">
                 <span className="text-white font-light whitespace-nowrap">COMING SOON TO EMPOWER</span><br />
                 <span className="text-[#5ABA52] font-bold text-xl md:text-3xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-sm md:text-lg text-white/70 mb-3 md:mb-4 font-medium max-w-2xl mx-auto">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
+              <p className="text-sm md:text-lg text-white/70 mb-2 md:mb-3 font-medium max-w-2xl mx-auto">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center">
                 <input
                   type="email"
@@ -65,26 +65,26 @@ const TabletLandingPage = () => {
                   disabled={status === 'loading'}
                   className="px-5 md:px-7 py-3 md:py-3.5 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white text-sm md:text-base font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
                 >
-                  {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
+                  {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
                 </button>
               </div>
               {status === 'success' && (
-                <p className="mt-3 md:mt-4 text-sm md:text-base text-[#5ABA52] font-light text-center">
+                <p className="mt-1 md:mt-2 text-sm md:text-base text-[#5ABA52] font-light text-center">
                   Thank you for joining us. You'll hear from us soon.
                 </p>
               )}
             </div>
+          </div>
 
-            {/* Image at bottom */}
-            <div className="w-full relative flex justify-center items-end flex-1 mt-0 pb-0">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] h-auto max-h-[50vh] md:max-h-[55vh] object-contain" />
-            </div>
+          {/* Bottom section - Image */}
+          <div className="flex-1 flex justify-center">
+            <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] h-auto max-h-[70vh] md:max-h-[90vh] object-contain" />
           </div>
         </div>
       </main>
 
       {/* Carbon Footprint Banner Mobile */}
-      <CarbonFootprintBannerMobile co2Estimate={0} />
+      <CarbonFootprintBannerMobile />
 
       {/* Footer: full footer for tablet */}
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
