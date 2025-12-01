@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import co2Badge from '../assets/Co-2.avif';
 import puviyanLogo from '../assets/Logo.png';
-import mobileImage from '../assets/Puvi_Image.png';
+import mobileImage from '../assets/IamPuviyan_mobile.png';
 import { submitEmail } from '../services/firebaseService';
 
 const TabletLandingPage = () => {
@@ -84,7 +84,7 @@ const TabletLandingPage = () => {
 
             {/* Image at bottom */}
             <div className="w-full relative flex justify-center items-end min-h-[320px] mt-auto pb-1 md:pb-2">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[70%] h-auto max-h-[420px] md:max-h-[500px]" />
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[75%] h-auto max-h-[640px] md:max-h-[800px]" />
 
               {/* Carbon Badge (compact) */}
               <div

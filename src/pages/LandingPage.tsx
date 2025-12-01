@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import co2Badge from '../assets/Co-2.avif';
-import mobileImage from '../assets/mobile_new.png';
+import mobileImage from '../assets/iamPuviyan.png';
 import { submitEmail } from '../services/firebaseService';
+import CarbonFootprintBanner from '../components/CarbonFootprintBanner';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
@@ -33,26 +33,27 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-x-hidden flex flex-col">
+    <div className="h-screen text-white relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="w-full fixed top-0 left-0 z-50 h-16 sm:h-20 md:h-24" style={{ backgroundColor: '#1a1a1a' }}>
       </header>
 
       {/* Main Content */}
-      <main className="w-full flex-1 flex items-center justify-center min-h-[calc(100vh-80px)]">
-        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 xl:px-20">
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16">
+      <main className="w-full flex-1 flex items-center justify-center overflow-hidden">
+        <div className="w-full max-w-[1540px] mx-auto px-6 lg:px-12 xl:px-20">
+        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center gap-8 lg:gap-12 xl:gap-16 h-[80vh]">
           {/* Mobile Image Section */}
-          <div className="flex justify-center items-center">
+          <div className="flex-1 flex justify-center items-start w-full overflow-hidden">
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
-              className="h-auto w-[294px] sm:w-[336px] md:w-[399px] lg:w-[441px] xl:w-[504px]"
+              className="w-auto h-full object-cover object-top"
             />
           </div>
 
           {/* Text and CTA Section */}
-          <div className="w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[600px] flex flex-col justify-center text-center lg:text-left relative z-10">
+          <div className="flex-1 w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[700px] flex flex-col justify-center text-center lg:text-left relative z-10">
+            <br/><br/><br/><br/>
             <h1 
               className="text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.5rem] xl:text-[3rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
               style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}
@@ -104,27 +105,7 @@ const LandingPage = () => {
       </main>
 
       {/* Carbon Badge */}
-      <div className="fixed bottom-28 sm:bottom-32 md:bottom-36 lg:bottom-24 right-2 sm:right-6 md:right-12 flex items-center gap-1 sm:gap-2 md:gap-3 px-2 py-1 sm:px-3 sm:py-2 md:px-5 md:py-3 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
-        style={{
-          border: '2px solid transparent',
-          backgroundImage:
-            'linear-gradient(#1f2937,rgb(12, 12, 12)), linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)',
-          backgroundOrigin: 'border-box',
-          backgroundClip: 'padding-box, border-box',
-          borderRadius: '36px 14px 14px 36px',
-          minWidth: '50px',
-          minHeight: '20px',
-         }}>
-          <img src={co2Badge} alt="CO2 Footprint Icon" className="w-5 h-5 sm:w-7 sm:h-7 md:w-9 md:h-9" style={{ transform: 'rotate(-19deg)' }} />
-        <div className="co2-text flex flex-col justify-center" style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}>
-          <div className="main font-bold text-[0.5rem] sm:text-[0.6rem] md:text-[0.73rem] text-white leading-tight">
-            0.03 g of CO2e per page view
-          </div>
-          <div className="sub text-[0.5rem] sm:text-[0.6rem] md:text-[0.73rem] text-gray-300 mt-0.5">
-            98% lower than global average
-          </div>
-        </div>
-      </div>
+      <CarbonFootprintBanner />
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10" style={{ backgroundColor: '#1a1a1a' }}>

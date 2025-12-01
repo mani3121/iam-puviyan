@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import co2Badge from '../assets/Co-2.avif';
-import mobileImage from '../assets/shade.png';
+import mobileImage from '../assets/iamPuviyan_mobile.png';
 import downshade from '../assets/downshade.png';
 import { submitEmail } from '../services/firebaseService';
 

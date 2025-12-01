@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import MobileLandingPage from './pages/MobileLandingPage'
 import TabletLandingPage from './pages/TabletLandingPage'
-import ContactPage from './pages/ContactPage'
 
 function Home() {
   const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -29,7 +28,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/contact" element={<ContactPage />} />
     </Routes>
   )
 }
