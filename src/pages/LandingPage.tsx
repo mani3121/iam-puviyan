@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import mobileImage from '../assets/iamPuviyan.png';
+import downshade from '../assets/downshade.png';
 import { submitEmail } from '../services/firebaseService';
 import CarbonFootprintBanner from '../components/CarbonFootprintBanner';
 
@@ -40,14 +41,19 @@ const LandingPage = () => {
 
       {/* Main Content */}
       <main className="w-full flex-1 flex items-center justify-center overflow-hidden">
-        <div className="w-full max-w-[1540px] mx-auto px-6 lg:px-12 xl:px-20">
-        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center gap-8 lg:gap-12 xl:gap-16 h-[80vh]">
+        <div className="w-full max-w-[1540px] mx-auto px-28 lg:px-28 xl:px-32">
+        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center h-[80vh]">
           {/* Mobile Image Section */}
-          <div className="flex-1 flex justify-center items-start w-full overflow-hidden">
+          <div className="flex-1 flex justify-center items-start w-full overflow-hidden relative">
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
               className="w-auto h-full object-cover object-top"
+            />
+            <img 
+              src={downshade} 
+              alt="" 
+              className="absolute bottom-0 left-0 w-full h-[40%] object-cover pointer-events-none" 
             />
           </div>
 
