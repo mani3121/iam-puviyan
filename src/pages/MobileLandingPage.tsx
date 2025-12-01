@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import co2Badge from '../assets/Co-2.avif';
 import mobileImage from '../assets/iamPuviyan_mobile.png';
 import downshade from '../assets/downshade.png';
 import { submitEmail } from '../services/firebaseService';
+import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
 
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -90,37 +90,8 @@ const MobileLandingPage = () => {
         </div>
       </main>
 
-      {/* Carbon Badge (compact) */}
-      <div className="w-full flex justify-end px-2 py-2">
-        <div
-          className="flex items-center gap-1 px-2 py-1 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md"
-          style={{
-            border: '1.5px solid transparent',
-            backgroundImage:
-              'linear-gradient(#1f2937,rgb(12, 12, 12)), linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)',
-            backgroundOrigin: 'border-box',
-            backgroundClip: 'padding-box, border-box',
-            borderRadius: '28px 10px 10px 28px',
-            minWidth: '44px',
-            minHeight: '18px',
-          }}
-        >
-          <img
-            src={co2Badge}
-            alt="CO2 Footprint Icon"
-            className="w-4 h-4"
-            style={{ transform: 'rotate(-19deg)' }}
-          />
-          <div className="co2-text flex flex-col justify-center" style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}>
-            <div className="main font-bold text-[8px] text-white leading-tight">
-              0.03 g of CO2e per page view
-            </div>
-            <div className="sub text-[7px] text-gray-300 mt-0.5">
-              98% lower than global average
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Carbon Footprint Banner Mobile */}
+      <CarbonFootprintBannerMobile co2Estimate={0} />
 
       {/* Footer */}
       <footer className="w-full bg-[#1a1a1a] mt-auto">
@@ -149,14 +120,14 @@ const MobileLandingPage = () => {
               </svg>
             </a>
           </div>
-          <div className="flex items-center gap-2 text-[10px] text-white/40">
+          <div className="flex items-center gap-2 text-[8px] text-white/40">
             <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
             <span>|</span>
             <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <span>|</span>
             <span>All rights reserved</span>
           </div>
-          <span className="text-[10px] text-white/40">© 2025 Puviyan Digital Solutions Private Limited</span>
+          <span className="text-[8px] text-white/40">© 2025 Puviyan Digital Solutions Private Limited</span>
         </div>
       </footer>
     </div>

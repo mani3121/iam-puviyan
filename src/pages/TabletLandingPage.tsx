@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import co2Badge from '../assets/Co-2.avif';
 import mobileImage from '../assets/iamPuviyan.png';
 import { submitEmail } from '../services/firebaseService';
+import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
 
 const TabletLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -33,19 +33,19 @@ const TabletLandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden flex flex-col">
+    <div className="h-screen text-white relative overflow-hidden flex flex-col">
       
 
-      <main className="w-full pt-16 md:pt-20 pb-4 md:pb-6 flex-1 flex items-start">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-          <div className="flex flex-col items-center justify-start gap-6 md:gap-8">
+      <main className="w-full pt-8 md:pt-10 pb-0 flex-1 flex items-start">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full h-full">
+          <div className="flex flex-col items-center justify-start gap-0 md:gap-2 h-full">
             {/* CTA on top */}
-            <div className="w-full text-center mt-2 md:mt-3">
-              <h1 className="text-2xl md:text-4xl font-light leading-tight mb-4 md:mb-6 tracking-wide">
+            <div className="w-full text-center mt-0">
+              <h1 className="text-2xl md:text-4xl font-light leading-tight mb-2 md:mb-4 tracking-wide">
                 <span className="text-white font-light whitespace-nowrap">COMING SOON TO EMPOWER</span><br />
                 <span className="text-[#5ABA52] font-bold text-xl md:text-3xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-sm md:text-lg text-white/70 mb-6 md:mb-8 font-medium max-w-2xl mx-auto">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
+              <p className="text-sm md:text-lg text-white/70 mb-3 md:mb-4 font-medium max-w-2xl mx-auto">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center">
                 <input
                   type="email"
@@ -76,72 +76,45 @@ const TabletLandingPage = () => {
             </div>
 
             {/* Image at bottom */}
-            <div className="w-full relative flex justify-center items-end min-h-[320px] mt-auto pb-1 md:pb-2">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[75%] h-auto max-h-[640px] md:max-h-[800px]" />
-
-              {/* Carbon Badge (compact) */}
-              <div
-                className="absolute bottom-1 right-3 md:bottom-2 md:right-6 flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-2 bg-black/60 border border-primary/30 rounded-full backdrop-blur-md z-40"
-                style={{
-                  border: '1.5px solid transparent',
-                  backgroundImage:
-                    'linear-gradient(#1f2937,rgb(12, 12, 12)), linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)',
-                  backgroundOrigin: 'border-box',
-                  backgroundClip: 'padding-box, border-box',
-                  borderRadius: '30px 12px 12px 30px',
-                  minWidth: '48px',
-                  minHeight: '20px',
-                }}
-              >
-                <img
-                  src={co2Badge}
-                  alt="CO2 Footprint Icon"
-                  className="w-5 h-5 md:w-7 md:h-7"
-                  style={{ transform: 'rotate(-19deg)' }}
-                />
-                <div className="co2-text flex flex-col justify-center" style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}>
-                  <div className="main font-bold text-[9px] md:text-[11px] text-white leading-tight">
-                    0.03 g of CO2e per page view
-                  </div>
-                  <div className="sub text-[8px] md:text-[10px] text-gray-300 mt-0.5">
-                    98% lower than global average
-                  </div>
-                </div>
-              </div>
+            <div className="w-full relative flex justify-center items-end flex-1 mt-0 pb-0">
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] h-auto max-h-[50vh] md:max-h-[55vh] object-contain" />
             </div>
           </div>
         </div>
       </main>
 
+      {/* Carbon Footprint Banner Mobile */}
+      <CarbonFootprintBannerMobile co2Estimate={0} />
+
       {/* Footer: full footer for tablet */}
       <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-3 md:py-4 flex flex-col md:flex-row flex-nowrap justify-between items-center gap-4 md:gap-6">
-          <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4 lg:gap-6 flex-nowrap text-center md:text-left">
-            <div className="flex gap-4 md:gap-6 whitespace-nowrap">
-              <a href="/terms" className="text-xs md:text-sm text-white/60 hover:text-white transition-colors">Terms of Service</a>
-              <a href="/privacy" className="text-xs md:text-sm text-white/60 hover:text-white transition-colors">Privacy Policy</a>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-2 md:py-3 flex flex-col md:flex-row flex-nowrap justify-between items-center gap-3 md:gap-4">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 lg:gap-4 flex-nowrap text-center md:text-left">
+            <div className="flex gap-3 md:gap-4 whitespace-nowrap">
+              <a href="/terms" className="text-[10px] md:text-xs text-white/60 hover:text-white transition-colors">Terms of Service</a>
+              <a href="/privacy" className="text-[10px] md:text-xs text-white/60 hover:text-white transition-colors">Privacy Policy</a>
             </div>
-            <span className="text-xs md:text-sm text-white/60 whitespace-nowrap overflow-hidden text-ellipsis">All rights reserved © 2025 Puviyan Digital Solutions Private Limited</span>
+            <span className="text-[10px] md:text-xs text-white/60 whitespace-nowrap overflow-hidden text-ellipsis">All rights reserved © 2025 Puviyan Digital Solutions Private Limited</span>
           </div>
 
-          <div className="flex gap-4 md:gap-5 whitespace-nowrap">
+          <div className="flex gap-3 md:gap-4 whitespace-nowrap">
             <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
-              <svg width="20" height="20" className="md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="18" height="18" className="md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
             <a href="https://www.facebook.com/people/Puviyan-Digital-Solutions/61577303789280/#" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
-              <svg width="20" height="20" className="md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="18" height="18" className="md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
             <a href="https://www.instagram.com/puviyandigitalsolutions/" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
-              <svg width="20" height="20" className="md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="18" height="18" className="md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.46c.49-.9 1.65-1.85 3.38-1.85 3.6 0 4.27 2.37 4.27 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
             </a>
             <a href="https://www.linkedin.com/company/puviyandigitalsolutions/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
-              <svg width="20" height="20" className="md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" className="md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
                 <circle cx="12" cy="12" r="4"></circle>
                 <circle cx="17.5" cy="6.5" r="1"></circle>
