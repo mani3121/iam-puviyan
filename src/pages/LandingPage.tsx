@@ -53,7 +53,7 @@ const LandingPage = () => {
             <img 
               src={downshade} 
               alt="" 
-              className="absolute bottom-0 left-0 w-full h-[40%] object-cover pointer-events-none" 
+              className="absolute top-[45%] left-0 w-full h-[50%] object-cover pointer-events-none" 
             />
           </div>
 
