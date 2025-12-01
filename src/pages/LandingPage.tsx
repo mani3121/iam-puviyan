@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import co2Badge from '../assets/Co-2.avif';
-import puviyanLogo from '../assets/Logo.png';
-import mobileImage from '../assets/Puvi_Image.png';
-import backgroundCoins from '../assets/puvi_coins.png';
+import mobileImage from '../assets/mobile_new.png';
 import { submitEmail } from '../services/firebaseService';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
-  const tiltCardRef = useRef<HTMLDivElement>(null);
-  const tiltCoinsRef = useRef<HTMLImageElement>(null);
 
   const handleNotifyMe = async () => {
     if (!email || email.trim().length === 0) {
@@ -36,137 +32,44 @@ const LandingPage = () => {
     }
   };
 
-  useEffect(() => {
-    const card = tiltCardRef.current;
-    const coins = tiltCoinsRef.current;
-    if (!card || !coins) return;
-
-    let rafId: number | null = null;
-    let targetRotateX = 0;
-    let targetRotateY = 0;
-    let currentRotateX = 0;
-    let currentRotateY = 0;
-    let isHovering = false;
-
-    const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
-
-    const animate = () => {
-      currentRotateX = lerp(currentRotateX, targetRotateX, 0.1);
-      currentRotateY = lerp(currentRotateY, targetRotateY, 0.1);
-
-      coins.style.transform = `translate(-50%, -50%) rotateX(${currentRotateX}deg) rotateY(${currentRotateY}deg) scale(${isHovering ? 0.75 : 0.75})`;
-
-      rafId = requestAnimationFrame(animate);
-    };
-
-    const handlePointerMove = (e: PointerEvent) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateY = ((x - centerX) / centerX) * 10;
-      const rotateX = ((centerY - y) / centerY) * 10;
-
-      targetRotateX = rotateX;
-      targetRotateY = rotateY;
-    };
-
-    const handlePointerEnter = () => {
-      isHovering = true;
-    };
-
-    const handlePointerLeave = () => {
-      isHovering = false;
-      targetRotateX = 0;
-      targetRotateY = 0;
-    };
-
-    card.addEventListener('pointermove', handlePointerMove);
-    card.addEventListener('pointerenter', handlePointerEnter);
-    card.addEventListener('pointerleave', handlePointerLeave);
-    rafId = requestAnimationFrame(animate);
-
-    return () => {
-      card.removeEventListener('pointermove', handlePointerMove);
-      card.removeEventListener('pointerenter', handlePointerEnter);
-      card.removeEventListener('pointerleave', handlePointerLeave);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   return (
     <div className="min-h-screen text-white relative overflow-x-hidden flex flex-col">
       {/* Header */}
-      <header className="w-full fixed top-0 left-0 z-50 bg-gradient-to-b from-black via-black/95 to-transparent">
-        <div className="w-full py-3 sm:py-4">
-          <div className="flex items-center justify-center cursor-pointer">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <img src={puviyanLogo} alt="Puviyan Logo" className="h-8 sm:h-12 md:h-16 w-auto object-contain" />
-            </div>
-          </div>
-        </div>
+      <header className="w-full fixed top-0 left-0 z-50 h-16 sm:h-20 md:h-24" style={{ backgroundColor: '#1a1a1a' }}>
       </header>
 
       {/* Main Content */}
-      <main className="w-full pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-10 md:pb-12 flex-1 flex items-center">
-        <div className="max-w-8xl mx-auto px-4 lg:px-20 w-full">
-        <div className="flex flex-col-reverse lg:flex-row items-center relative gap-8 lg:gap-12">
+      <main className="w-full flex-1 flex items-center justify-center min-h-[calc(100vh-80px)]">
+        <div className="w-full max-w-[1440px] mx-auto px-6 lg:px-12 xl:px-20">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-center gap-8 lg:gap-12 xl:gap-16">
           {/* Mobile Image Section */}
-          <div className="flex-1 relative z-20 flex justify-center items-center min-h-[200px] sm:min-h-[280px] md:min-h-[350px] lg:min-h-[550px] p-0 lg:mb-0">
-            <div 
-              ref={tiltCardRef}
-              className="relative w-full h-full flex justify-center items-center"
-              style={{ perspective: '1000px' }}
-            >
-              {/* Unified container for both images */}
-              <div className="relative flex justify-center items-center w-full h-full">
-                {/* Background coins with tilt effect */}
-                <img 
-                  ref={tiltCoinsRef}
-                  src={backgroundCoins}
-                  alt="Background Coins"
-                  className="absolute max-w-none object-contain pointer-events-none"
-                  style={{ 
-                    top: '44%',
-                    left: '50%',
-                    // Viewport-based sizing keeps coverage consistent at every breakpoint
-                    width: 'min(75.65vw, 750px)',
-                    height: 'auto',
-                    transform: 'translate(-50%, -50%) scale(0.1)',
-                    opacity: 0.9,
-                    zIndex: 10,
-                    transition: 'transform 0.1s ease-out',
-                    willChange: 'transform',
-                    backfaceVisibility: 'hidden',     // prevent GPU flicker on 3D tilt
-                    transformOrigin: '50% 50%'
-                  }}
-                />
-                {/* Main mobile image - static */}
-                <img 
-                  src={mobileImage} 
-                  alt="Mobile App Preview" 
-                  className="relative max-w-full h-auto max-h-[250px] sm:max-h-[550px] md:max-h-[650px] lg:max-h-[600px] mt-1 sm:mt-1 md:mt-2 lg:mt-0"
-                  style={{ transform: 'scale(1.0)', zIndex: 20 }}
-                />
-              </div>
-            </div>
+          <div className="flex justify-center items-center">
+            <img 
+              src={mobileImage} 
+              alt="Mobile App Preview" 
+              className="h-auto w-[294px] sm:w-[336px] md:w-[399px] lg:w-[441px] xl:w-[504px]"
+            />
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 flex flex-col justify-center text-center lg:text-left relative z-10 w-full lg:max-w-none">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide">
-              <span className="text-white font-light">COMING SOON</span><br />
-              <span className="text-white font-light">TO EMPOWER</span><br />
-              <span className="text-[#5ABA52] font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
+          <div className="w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[600px] flex flex-col justify-center text-center lg:text-left relative z-10">
+            <h1 
+              className="text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.5rem] xl:text-[3rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
+              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}
+            >
+              <span className="text-white">COMING SOON</span><br />
+              <span className="text-white">TO EMPOWER</span>
+              <span className="text-[#48C84F] font-extrabold text-[1.2rem] sm:text-[1.4rem] md:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.6rem] whitespace-nowrap block mt-4">A SUSTAINABLE LIFESTYLE</span>
             </h1>
             
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 mb-4 sm:mb-6 md:mb-8 font-medium max-w-2xl">
-              Inviting changemakers to integrate the app into homes,<br className="hidden lg:block" />
-              workplaces, institutions, businesses, & communities everywhere.
+            <p 
+              className="text-[0.875rem] sm:text-[1rem] md:text-[1.1rem] lg:text-[1.3rem] xl:text-[1.5rem] text-white font-extralight leading-tight mb-4 md:mb-8"
+              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.33 }}
+            >
+              Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch justify-center lg:justify-start max-w-2xl">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch justify-center lg:justify-start">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -178,14 +81,16 @@ const LandingPage = () => {
                     setStatus('idle');
                   }
                 }}
-                className={`w-full sm:w-auto sm:min-w-[250px] md:min-w-[280px] px-4 py-3 sm:px-5 sm:py-4 bg-transparent border-2 rounded-lg text-white text-sm sm:text-base placeholder:text-white/40 focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#5ABA52]'}`}
+                className={`w-full sm:w-[200px] md:w-[240px] lg:w-[280px] xl:w-[320px] px-4 py-2 bg-transparent border-[1.5px] rounded-lg text-sm md:text-base text-center placeholder:text-[#DAF4DC] focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#3AA03F]'}`}
+                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 400, lineHeight: 1.25 }}
               />
               <button 
                 onClick={handleNotifyMe} 
                 disabled={status === 'loading'}
-                className="px-6 py-3 sm:px-8 sm:py-4 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white text-sm sm:text-base font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="px-4 md:px-6 lg:px-8 py-3 md:py-4 hover:brightness-110 border-none rounded-lg text-white text-sm md:text-base font-semibold cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: 1.25, backgroundColor: '#48C84F' }}
               >
-                {status === 'loading' ? 'SAVING...' : 'NOTIFY ME'}
+                {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
               </button>
             </div>
             {status === 'success' && (
@@ -222,35 +127,39 @@ const LandingPage = () => {
       </div>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/10 bg-black/50 backdrop-blur-md">
+      <footer className="w-full border-t border-white/10" style={{ backgroundColor: '#1a1a1a' }}>
         <div className="max-w-8xl mx-auto px-6 lg:px-20 py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center lg:text-left">
-            <div className="flex gap-4 sm:gap-6">
-              <a href="/terms" className="text-xs sm:text-sm text-white/60 hover:text-white transition-colors">Terms of Service</a>
-              <a href="/privacy" className="text-xs sm:text-sm text-white/60 hover:text-white transition-colors">Privacy Policy</a>
+          <div className="flex justify-center items-center gap-3">
+            <div className="flex justify-center items-center gap-3">
+              <a href="/terms" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Terms of Service</a>
+              <div className="w-px h-4 bg-stone-300"></div>
+              <a href="/privacy" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Privacy Policy</a>
             </div>
-            <span className="text-xs sm:text-sm text-white/60">All rights reserved © 2025 Puviyan Digital Solutions Private Limited</span>
+          </div>
+          <div className="flex justify-center items-center gap-1">
+            <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>All rights reserved</span>
+            <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>© 2025 Puviyan Digital Solutions Private Limited</span>
           </div>
           
           <div className="flex gap-4 sm:gap-5">
-            <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+            <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/100 transition-colors flex items-center justify-center">
               <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
-            <a href="https://www.facebook.com/people/Puviyan-Digital-Solutions/61577303789280/#" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+            <a href="https://www.facebook.com/people/Puviyan-Digital-Solutions/61577303789280/#" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/100 transition-colors flex items-center justify-center">
               <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="https://www.instagram.com/puviyandigitalsolutions/" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+            <a href="https://www.instagram.com/puviyandigitalsolutions/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/100 transition-colors flex items-center justify-center">
               <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
                 <circle cx="12" cy="12" r="4"></circle>
                 <circle cx="17.5" cy="6.5" r="1"></circle>
               </svg>
             </a>
-            <a href="https://www.linkedin.com/company/puviyandigitalsolutions/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="text-white/60 hover:text-white transition-colors flex items-center justify-center">
+            <a href="https://www.linkedin.com/company/puviyandigitalsolutions/posts/?feedView=all" target="_blank" rel="noopener noreferrer" className="text-white hover:text-white/100 transition-colors flex items-center justify-center">
               <svg width="20" height="20" className="sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
