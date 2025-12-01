@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 import LandingPage from './pages/LandingPage'
 import MobileLandingPage from './pages/MobileLandingPage'
 import TabletLandingPage from './pages/TabletLandingPage'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsConditions from './pages/TermsConditions'
 
 function Home() {
   const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -28,6 +30,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsConditions />} />
     </Routes>
   )
 }
