@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import co2Badge from '../assets/Co-2.avif';
 import puviyanLogo from '../assets/Logo.png';
-import mobileImage from '../assets/IamPuviyan_mobile.png';
+import mobileImage from '../assets/iamPuviyan.png';
 import { submitEmail } from '../services/firebaseService';
 
 const TabletLandingPage = () => {
