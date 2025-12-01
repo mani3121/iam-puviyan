@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import co2Badge from '../assets/Co-2.avif';
-import puviyanLogo from '../assets/Logo.png';
 import mobileImage from '../assets/iamPuviyan.png';
 import { submitEmail } from '../services/firebaseService';
 
@@ -35,13 +34,7 @@ const TabletLandingPage = () => {
 
   return (
     <div className="min-h-screen text-white relative overflow-hidden flex flex-col">
-      <header className="w-full fixed top-0 left-0 z-50 bg-gradient-to-b from-black via-black/95 to-transparent">
-        <div className="w-full py-3 md:py-4">
-          <div className="flex items-center justify-center cursor-pointer">
-            <img src={puviyanLogo} alt="Puviyan Logo" className="h-10 md:h-14 w-auto object-contain" />
-          </div>
-        </div>
-      </header>
+      
 
       <main className="w-full pt-16 md:pt-20 pb-4 md:pb-6 flex-1 flex items-start">
         <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">

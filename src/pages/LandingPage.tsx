@@ -58,7 +58,7 @@ const LandingPage = () => {
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[700px] flex flex-col justify-center text-center lg:text-left relative z-10">
+          <div className="flex-1 w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[700px] flex flex-col justify-center text-center lg:text-left relative z-10 lg:-ml-12 xl:-ml-12">
             <br/><br/><br/><br/>
             <h1 
               className="text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.5rem] xl:text-[3rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
