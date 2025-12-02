@@ -35,11 +35,11 @@ const CarbonFootprintBannerMobile: React.FC<CarbonFootprintBannerMobileProps> = 
   }, []);
 
   return (
-    <div className="w-full flex justify-end px-2 py-1">
+    <div className="fixed bottom-20 right-2 z-50">
       <div 
-        className="co2-badge flex items-center gap-1.5 pl-2 py-1 bg-black text-center pr-2 md:w-[180px] md:h-[45px]"
+        className="co2-badge flex items-center gap-1.5 pl-2 py-1 bg-black text-center pr-2"
         style={{
-          width: '155px',
+          width: 'auto',
           height: '38px',
           border: '2px solid transparent',
           backgroundImage: 'linear-gradient(black, black), linear-gradient(to right, #F9BB18, #74CFE6, #5ABA52)',
@@ -51,9 +51,9 @@ const CarbonFootprintBannerMobile: React.FC<CarbonFootprintBannerMobileProps> = 
       <div className="co2-icon flex flex-col items-center flex-shrink-0">
         <img src={co2Badge} alt="CO2 Icon" style={{ width: '18px', height: '22px', transform: 'rotate(-14.596deg)' }} />
       </div>
-      <div className="co2-text flex flex-col overflow-hidden flex-1 min-w-0">
-        <div className="main font-bold text-[8px] md:text-[10px] text-white leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{co2Estimate.toFixed(2)}g of CO2e per page view</div>
-        <div className="sub text-[7.75px] md:text-[9px] text-gray-300 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">{comparison}</div>
+      <div className="co2-text flex flex-col">
+        <div className="main font-bold text-[8px] text-white leading-tight whitespace-nowrap">{co2Estimate.toFixed(2)}g of CO2e per page view</div>
+        <div className="sub text-[7px] text-gray-300 leading-tight whitespace-nowrap">{comparison}</div>
       </div>
       </div>
     </div>

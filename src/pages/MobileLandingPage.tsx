@@ -47,17 +47,17 @@ const MobileLandingPage = () => {
       <header className="w-full top-0 left-0 z-50 bg-[#1a1a1a] h-10">
       </header>
 
-      <main className="w-full pt-10 sm:pt-14 pb-0 flex-1 flex items-start">
+      <main className="w-full pt-05 sm:pt-14 pb-0 flex-1 flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[0.955] sm:scale-95">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
-            <div className="w-full max-w-[300px] mx-auto self-center text-center flex flex-col gap-1">
-              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-1 items-center">
-                <span className="text-[#E0F8FD] font-light text-xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>COMING SOON TO EMPOWER</span>
+            <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
+              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-2 items-center">
+                <span className="text-white font-light text-xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>COMING SOON TO EMPOWER</span>
                 <span className="text-[#48C84F] font-black text-2xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 950 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-sm text-white font-light leading-5" style={{ fontFamily: "'Segoe UI Variable', sans-serif" }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
-              <div className="flex flex-row gap-2 items-stretch justify-center">
+              <p className="text-sm text-white font-vlight leading-6 mt-1" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
+              <div className="flex flex-row gap-3 items-stretch justify-center w-full mt-2">
                 <input
                   type="email"
                   placeholder="ENTER YOUR EMAIL ID"
@@ -69,12 +69,14 @@ const MobileLandingPage = () => {
                       setStatus('idle');
                     }
                   }}
-                  className={`w-[150px] px-2 py-2 bg-transparent border-2 rounded-lg text-white text-[10px] placeholder:text-white/40 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#48c84f]'}`}
+                  className={`w-[60%] px-4 py-3 bg-transparent border rounded-md text-white text-xs text-center placeholder:text-white/60 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#B6E9B9]'}`}
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif" }}
                 />
                 <button
                   onClick={handleNotifyMe}
                   disabled={status === 'loading'}
-                  className="px-3 py-2 bg-[#48c84f] hover:bg-[#48c84f] border-none rounded-lg text-white text-[10px] font-light tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                  className="w-[40%] px-3 py-1.5 bg-[#48c84f] hover:bg-[#48c84f] border-none rounded-md text-white text-[10px] font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}
                 >
                   {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
                 </button>
@@ -92,7 +94,7 @@ const MobileLandingPage = () => {
               <img 
                 src={downshade} 
                 alt="" 
-                className="absolute top-[75%] left-0 w-full h-[30%] object-cover pointer-events-none" 
+                className="absolute top-[78%] left-0 w-full h-[30%] object-cover pointer-events-none" 
               />
             </div>
           </div>
