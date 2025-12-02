@@ -47,7 +47,7 @@ const MobileLandingPage = () => {
       <header className="w-full top-0 left-0 z-50 bg-[#1a1a1a] h-10">
       </header>
 
-      <main className="w-full pt-05 sm:pt-14 pb-0 flex-1 flex items-center justify-center">
+      <main className="w-full pt-05 sm:pt-14 pb-0 flex-1 flex items-center justify-center overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[0.955] sm:scale-95">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
@@ -76,7 +76,7 @@ const MobileLandingPage = () => {
                   onClick={handleNotifyMe}
                   disabled={status === 'loading'}
                   className="w-[40%] px-3 py-1.5 bg-[#48c84f] hover:bg-[#48c84f] border-none rounded-md text-white text-[10px] font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 100 }}
                 >
                   {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
                 </button>
@@ -89,8 +89,8 @@ const MobileLandingPage = () => {
             </div>
 
             {/* Mobile image at bottom */}
-            <div className="w-full flex justify-center items-center flex-1 mb-0">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto max-h-[85vh] scale-125" />
+            <div className="w-full flex justify-center items-start flex-1 mb-0 overflow-hidden">
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto scale-125" />
               <img 
                 src={downshade} 
                 alt="" 
