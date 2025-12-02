@@ -44,10 +44,7 @@ const MobileLandingPage = () => {
 
   return (
     <div className="h-screen text-white relative overflow-hidden flex flex-col">
-      <header className="w-full top-0 left-0 z-50 bg-[#1a1a1a] h-10">
-      </header>
-
-      <main className="w-full pt-05 sm:pt-14 pb-0 flex-1 flex items-center justify-center overflow-hidden">
+      <main className="w-full pt-[10vh] pb-16 flex-1 flex items-start justify-center overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[0.955] sm:scale-95">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
@@ -105,7 +102,7 @@ const MobileLandingPage = () => {
       <CarbonFootprintBannerMobile co2Estimate={0} />
 
       {/* Footer */}
-      <footer className="w-full bg-[#1a1a1a] mt-auto">
+      <footer className="w-full bg-[#1a1a1a] fixed bottom-0 left-0">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col items-center gap-2">
           <div className="flex gap-4">
             <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
