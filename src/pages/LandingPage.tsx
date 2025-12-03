@@ -34,15 +34,15 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="h-screen text-white relative overflow-hidden flex flex-col">
+    <div className="min-h-screen text-white relative overflow-hidden flex flex-col">
       {/* Header */}
       <header className="w-full fixed top-0 left-0 z-50 h-16 sm:h-20 md:h-24" style={{ backgroundColor: '#1a1a1a' }}>
       </header>
 
       {/* Main Content */}
       <main className="w-full flex-1 flex items-center justify-center overflow-hidden">
-        <div className="w-full max-w-[1540px] mx-auto px-28 lg:px-28 xl:px-32">
-        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center h-[80vh]">
+        <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center min-h-[80vh] py-8 lg:py-12">
           {/* Mobile Image Section */}
           <div className="flex-1 flex justify-center items-start w-full overflow-hidden relative">
             <img 
@@ -115,7 +115,7 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10" style={{ backgroundColor: '#1a1a1a' }}>
-        <div className="max-w-8xl mx-auto px-6 lg:px-20 py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
           <div className="flex justify-center items-center gap-3">
             <div className="flex justify-center items-center gap-3">
               <a href="/terms" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Terms of Service</a>
