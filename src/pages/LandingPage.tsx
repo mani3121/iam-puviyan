@@ -3,6 +3,8 @@ import mobileImage from '../assets/iamPuviyan.png';
 import downshade from '../assets/downshade.png';
 import { submitEmail } from '../services/firebaseService';
 import CarbonFootprintBanner from '../components/CarbonFootprintBanner';
+import PageLayout from '../components/PageLayout';
+import ContentWrapper from '../components/ContentWrapper';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
@@ -28,21 +30,23 @@ const LandingPage = () => {
     if (result.success) {
       setStatus('success');
       setEmail('');
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setStatus('idle');
+      }, 5000);
     } else {
       setStatus('error');
     }
   };
 
   return (
-    <div className="min-h-screen text-white relative overflow-hidden flex flex-col">
+    <PageLayout>
       {/* Header */}
-      <header className="w-full fixed top-0 left-0 z-50 h-16 sm:h-20 md:h-24" style={{ backgroundColor: '#1a1a1a' }}>
-      </header>
 
       {/* Main Content */}
       <main className="w-full flex-1 flex items-center justify-center overflow-hidden">
-        <div className="w-full max-w-[1440px] mx-auto px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
-        <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center min-h-[80vh] py-8 lg:py-12">
+        <ContentWrapper maxWidth="desktop">
+          <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center min-h-[90vh] py-8 lg:py-12">
           {/* Mobile Image Section */}
           <div className="flex-1 flex justify-center items-start w-full overflow-hidden relative">
             <img 
@@ -59,14 +63,14 @@ const LandingPage = () => {
 
           {/* Text and CTA Section */}
           <div className="flex-1 w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[700px] flex flex-col justify-center text-center lg:text-left relative z-10 lg:-ml-12 xl:-ml-12">
-            <br/><br/><br/><br/>
+            <br/><br/>
             <h1 
-              className="text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.5rem] xl:text-[3rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
+              className="text-[1.6rem] sm:text-[1.8rem] md:text-[2.2rem] lg:text-[2.8rem] xl:text-[3.4rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
               style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}
             >
               <span className="text-white">COMING SOON</span><br />
               <span className="text-white">TO EMPOWER</span>
-              <span className="text-[#48C84F] font-extrabold text-[1.2rem] sm:text-[1.4rem] md:text-[1.8rem] lg:text-[2.2rem] xl:text-[2.6rem] whitespace-nowrap block mt-4">A SUSTAINABLE LIFESTYLE</span>
+              <span className="text-[#48C84F] font-extrabold text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.4rem] xl:text-[2.8rem] whitespace-nowrap block mt-4">A SUSTAINABLE LIFESTYLE</span>
             </h1>
             
             <p 
@@ -76,7 +80,7 @@ const LandingPage = () => {
               Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch justify-center lg:justify-start relative">
               <input
                 type="email"
                 placeholder="ENTER YOUR EMAIL ID"
@@ -99,15 +103,15 @@ const LandingPage = () => {
               >
                 {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
               </button>
+              {status === 'success' && (
+                <p className="absolute top-full left-0 right-0 mt-2 text-sm sm:text-base text-[#5ABA52] font-light text-center lg:text-left">
+                  Thank you for joining us. You'll hear from us soon.
+                </p>
+              )}
             </div>
-            {status === 'success' && (
-              <p className="mt-4 sm:mt-5 text-sm sm:text-base text-[#5ABA52] font-light text-center lg:text-left">
-                Thank you for joining us. You'll hear from us soon.
-              </p>
-            )}
           </div>
         </div>
-        </div>
+        </ContentWrapper>
       </main>
 
       {/* Carbon Badge */}
@@ -115,7 +119,8 @@ const LandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full border-t border-white/10" style={{ backgroundColor: '#1a1a1a' }}>
-        <div className="max-w-[1440px] mx-auto px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
+        <ContentWrapper maxWidth="desktop">
+          <div className="py-4 sm:py-5 flex flex-col lg:flex-row justify-between items-center gap-4 sm:gap-6">
           <div className="flex justify-center items-center gap-3">
             <div className="flex justify-center items-center gap-3">
               <a href="/terms" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Terms of Service</a>
@@ -153,8 +158,9 @@ const LandingPage = () => {
             </a>
           </div>
         </div>
+        </ContentWrapper>
       </footer>
-    </div>
+    </PageLayout>
   );
 };
 

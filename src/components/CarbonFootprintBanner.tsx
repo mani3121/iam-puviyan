@@ -59,6 +59,7 @@ const CarbonFootprintBanner = () => {
 
     // Also recalculate when page is fully loaded
     window.addEventListener('load', calculateCarbonFootprint);
+    
 
     return () => {
       clearTimeout(timer);
@@ -69,8 +70,10 @@ const CarbonFootprintBanner = () => {
   return (
     <div
       ref={bannerRef}
-      className="fixed bottom-28 sm:bottom-32 md:bottom-36 lg:bottom-24 right-2 sm:right-6 md:right-12 z-40"
-      style={{ fontFamily: 'Segoe UI Variable, system-ui, sans-serif' }}
+      className="fixed bottom-28 sm:bottom-32 md:bottom-36 lg:bottom-24 right-6 sm:right-8 md:right-12 lg:right-16 xl:right-20 z-40"
+      style={{ 
+        fontFamily: 'Segoe UI Variable, system-ui, sans-serif',
+      }}
     >
       {/* Desktop & Tablet */}
       <div

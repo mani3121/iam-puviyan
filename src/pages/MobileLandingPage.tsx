@@ -3,6 +3,8 @@ import downshade from '../assets/downshade.png';
 import mobileImage from '../assets/iamPuviyan_mobile.png';
 import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
 import { submitEmail } from '../services/firebaseService';
+import PageLayout from '../components/PageLayout';
+import ContentWrapper from '../components/ContentWrapper';
 
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -43,9 +45,9 @@ const MobileLandingPage = () => {
   };
 
   return (
-    <div className="h-screen text-white relative overflow-hidden flex flex-col">
+    <PageLayout>
       <main className="w-full pt-[10vh] pb-16 flex-1 flex items-start justify-center overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 w-full origin-top scale-[0.955] sm:scale-95">
+        <ContentWrapper maxWidth="mobile" className="origin-top scale-[0.955] sm:scale-95">
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
             <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
@@ -95,7 +97,7 @@ const MobileLandingPage = () => {
               />
             </div>
           </div>
-        </div>
+        </ContentWrapper>
       </main>
 
       {/* Carbon Footprint Banner Mobile */}
@@ -103,7 +105,8 @@ const MobileLandingPage = () => {
 
       {/* Footer */}
       <footer className="w-full bg-[#1a1a1a] fixed bottom-0 left-0">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col items-center gap-2">
+        <ContentWrapper maxWidth="mobile">
+          <div className="py-3 flex flex-col items-center gap-2">
           <div className="flex gap-4">
             <a href="https://x.com/PuviyanDigital" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -135,10 +138,11 @@ const MobileLandingPage = () => {
             <span>|</span>
             <span>All rights reserved</span>
           </div>
-          <span className="text-[8px] text-white/40">© 2025 Puviyan Digital Solutions Private Limited</span>
+          <span className="text-[8px] text-white/40"> 2025 Puviyan Digital Solutions Private Limited</span>
         </div>
-      </footer>
-    </div>
+      </ContentWrapper>
+    </footer>
+  </PageLayout>
   );
 };
 
