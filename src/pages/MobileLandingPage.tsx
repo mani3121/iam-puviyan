@@ -51,11 +51,11 @@ const MobileLandingPage = () => {
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
             <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
-              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-2 items-center">
-                <span className="text-white font-light text-xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>COMING SOON TO EMPOWER</span>
-                <span className="text-[#48C84F] font-black text-2xl whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 950 }}>A SUSTAINABLE LIFESTYLE</span>
+              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center">
+                <span className="text-white font-light whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50, fontSize: 'clamp(1rem, 5vw, 1.5rem)' }}>COMING SOON TO EMPOWER</span>
+                <span className="text-[#48C84F] font-black whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 950, fontSize: 'clamp(1.2rem, 6vw, 1.8rem)' }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-sm text-white font-vlight leading-6 mt-1" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50 }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
+              <p className="text-white font-vlight leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50, fontSize: 'clamp(0.7rem, 3.5vw, 1rem)' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center w-full mt-2">
                 <input
                   type="email"
@@ -68,14 +68,14 @@ const MobileLandingPage = () => {
                       setStatus('idle');
                     }
                   }}
-                  className={`w-[60%] px-4 py-3 bg-transparent border rounded-md text-white text-xs text-center placeholder:text-white/60 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#B6E9B9]'}`}
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif" }}
+                  className={`w-[60%] px-[3vw] py-[1.5vh] bg-transparent border rounded-md text-white text-center placeholder:text-white/60 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#B6E9B9]'}`}
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontSize: 'clamp(0.6rem, 3vw, 0.875rem)' }}
                 />
                 <button
                   onClick={handleNotifyMe}
                   disabled={status === 'loading'}
-                  className="w-[40%] px-3 py-1.5 bg-[#48c84f] hover:bg-[#48c84f] border-none rounded-md text-white text-[10px] font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 100 }}
+                  className="w-[40%] px-[2vw] py-[1vh] border-none rounded-md text-white font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 350, backgroundColor: '#48C84F', fontSize: 'clamp(0.5rem, 2.5vw, 0.75rem)' }}
                 >
                   {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
                 </button>
@@ -93,7 +93,7 @@ const MobileLandingPage = () => {
               <img 
                 src={downshade} 
                 alt="" 
-                className="absolute top-[78%] left-0 w-full h-[30%] object-cover pointer-events-none" 
+                className="absolute top-[75%] left-0 w-full h-[30%] object-cover pointer-events-none" 
               />
             </div>
           </div>

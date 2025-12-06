@@ -41,41 +41,38 @@ const LandingPage = () => {
 
   return (
     <PageLayout>
-      {/* Header */}
-
       {/* Main Content */}
-      <main className="w-full flex-1 flex items-center justify-center overflow-hidden">
+      <main className="w-full flex-1 flex items-start justify-center overflow-hidden">
         <ContentWrapper maxWidth="desktop">
-          <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center min-h-[90vh] py-8 lg:py-12">
+          <div className="flex flex-col-reverse lg:flex-row items-stretch justify-center min-h-[85vh] py-2 lg:py-4">
           {/* Mobile Image Section */}
           <div className="flex-1 flex justify-center items-start w-full overflow-hidden relative">
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
-              className="w-auto h-full object-cover object-top"
+              className="w-auto h-[125%] object-cover object-top -mt-[12%]"
             />
             <img 
               src={downshade} 
               alt="" 
-              className="absolute top-[45%] left-0 w-full h-[50%] object-cover pointer-events-none" 
+              className="absolute top-[40%] left-0 w-full h-[65%] object-cover pointer-events-none" 
             />
           </div>
 
           {/* Text and CTA Section */}
-          <div className="flex-1 w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[700px] flex flex-col justify-center text-center lg:text-left relative z-10 lg:-ml-12 xl:-ml-12">
-            <br/><br/>
+          <div className="flex-1 w-full max-w-[90vw] lg:max-w-[45vw] flex flex-col justify-start pt-[15vh] lg:pt-[20vh] text-center lg:text-left relative z-10 lg:-ml-12 xl:-ml-12">
             <h1 
-              className="text-[1.6rem] sm:text-[1.8rem] md:text-[2.2rem] lg:text-[2.8rem] xl:text-[3.4rem] font-light leading-tight mb-3 sm:mb-4 md:mb-6 tracking-wide"
-              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}
+              className="font-light leading-tight mb-[2vh] tracking-wide"
+              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25, fontSize: 'clamp(1.5rem, 4vw, 4.2rem)' }}
             >
               <span className="text-white">COMING SOON</span><br />
               <span className="text-white">TO EMPOWER</span>
-              <span className="text-[#48C84F] font-extrabold text-[1.4rem] sm:text-[1.6rem] md:text-[2rem] lg:text-[2.4rem] xl:text-[2.8rem] whitespace-nowrap block mt-4">A SUSTAINABLE LIFESTYLE</span>
+              <span className="text-[#48C84F] font-extrabold whitespace-nowrap block mt-[1.5vh]" style={{ fontSize: 'clamp(1.4rem, 3vw, 3.0rem)' }}>A SUSTAINABLE LIFESTYLE</span>
             </h1>
             
             <p 
-              className="text-[0.875rem] sm:text-[1rem] md:text-[1.1rem] lg:text-[1.3rem] xl:text-[1.5rem] text-white font-extralight leading-tight mb-4 md:mb-8"
-              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.33 }}
+              className="text-white font-extralight leading-tight mb-[2vh] tracking-wide"
+              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 50, lineHeight: 1.33, fontSize: 'clamp(0.75rem, 1.5vw, 1.5rem)' }}
             >
               Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.
             </p>
