@@ -46,8 +46,8 @@ const TabletLandingPage = () => {
                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: '44px', fontStyle: 'normal', fontWeight: 300, lineHeight: '52px' }}>COMING SOON TO EMPOWER</span>
                 <span className="text-[#5ABA52] whitespace-nowrap" style={{ display: 'block', fontSize: '52px', fontStyle: 'normal', fontWeight: 700, lineHeight: '62px' }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
-              <div className="flex flex-row gap-3 items-stretch justify-center">
+              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces,<br/> institutions, businesses, & communities everywhere.</p>
+              <div className="flex flex-row gap-3 items-stretch justify-center mt-6">
                 <input
                   type="email"
                   placeholder="ENTER YOUR EMAIL ID"
@@ -78,7 +78,7 @@ const TabletLandingPage = () => {
           </div>
 
           {/* Bottom section - Image */}
-          <div className="flex-1 flex justify-center mt-6 md:mt-8 relative overflow-hidden">
+          <div className="flex-1 flex justify-center mt-4 md:mt-6 relative overflow-hidden">
             <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] max-h-[90vh] md:max-h-[100vh] object-contain scale-125 transition-transform duration-300 ease-out" />
             <img
               src={downshade}
