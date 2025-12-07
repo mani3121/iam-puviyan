@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import mobileImage from '../assets/iamPuviyan.png';
+import downshade from '../assets/downshade.png';
 import CarbonFootprintBannerMobile from '../components/CarbonFootprintBanner';
 import { submitEmail } from '../services/firebaseService';
 import PageLayout from '../components/PageLayout';
@@ -36,16 +37,16 @@ const TabletLandingPage = () => {
 
   return (
     <PageLayout>
-      <main className="w-full pt-8 md:pt-10 pb-0 flex-1 flex items-start">
+      <main className="w-full pt-16 md:pt-20 pb-0 flex-1 flex items-start">
         <ContentWrapper maxWidth="tablet" className="h-full flex flex-col">
           {/* Top section - CTA */}
           <div className="flex-shrink-0">
             <div className="w-full text-center mt-0 mb-0">
-              <h1 className="text-2xl md:text-4xl font-light leading-tight mb-1 md:mb-2 tracking-wide">
-                <span className="text-white font-light whitespace-nowrap">COMING SOON TO EMPOWER</span><br />
-                <span className="text-[#5ABA52] font-bold text-xl md:text-3xl whitespace-nowrap">A SUSTAINABLE LIFESTYLE</span>
+              <h1 className="font-light leading-tight mb-4 md:mb-4 tracking-wide" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif" }}>
+                <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: '44px', fontStyle: 'normal', fontWeight: 300, lineHeight: '52px' }}>COMING SOON TO EMPOWER</span>
+                <span className="text-[#5ABA52] whitespace-nowrap" style={{ display: 'block', fontSize: '52px', fontStyle: 'normal', fontWeight: 700, lineHeight: '62px' }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-sm md:text-lg text-white/70 mb-2 md:mb-3 font-medium max-w-2xl mx-auto">Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
+              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center">
                 <input
                   type="email"
@@ -77,8 +78,13 @@ const TabletLandingPage = () => {
           </div>
 
           {/* Bottom section - Image */}
-          <div className="flex-1 flex justify-center">
-            <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] h-auto max-h-[70vh] md:max-h-[90vh] object-contain" />
+          <div className="flex-1 flex justify-center mt-6 md:mt-8 relative overflow-hidden">
+            <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] max-h-[90vh] md:max-h-[100vh] object-contain scale-125 transition-transform duration-300 ease-out" />
+            <img
+              src={downshade}
+              alt=""
+              className="absolute top-[70%] left-0 w-full h-[30%] object-cover pointer-events-none"
+            />
           </div>
         </ContentWrapper>
       </main>
