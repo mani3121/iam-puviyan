@@ -51,11 +51,11 @@ const MobileLandingPage = () => {
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
             <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
-              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center">
-                <span className="text-white font-light whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50, fontSize: 'clamp(1rem, 5vw, 1.5rem)' }}>COMING SOON TO EMPOWER</span>
-                <span className="text-[#48C84F] font-black whitespace-nowrap" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 950, fontSize: 'clamp(1.2rem, 6vw, 1.8rem)' }}>A SUSTAINABLE LIFESTYLE</span>
+              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}>
+                <span className="text-white font-light whitespace-nowrap" style={{ fontSize: 'clamp(1rem, 5vw, 1.5rem)' }}>COMING SOON TO EMPOWER</span>
+                <span className="text-[#48C84F] font-extrabold whitespace-nowrap" style={{ fontWeight: 900, fontSize: 'clamp(1.2rem, 6vw, 1.8rem)' }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-white font-vlight leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 50, fontSize: 'clamp(0.7rem, 3.5vw, 1rem)' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
+              <p className="text-white font-extralight leading-tight mt-[0.5vh] tracking-wide" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 50, lineHeight: 1.33, fontSize: 'clamp(0.7rem, 3.5vw, 1rem)' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center w-full mt-2">
                 <input
                   type="email"
