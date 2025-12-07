@@ -52,10 +52,10 @@ const MobileLandingPage = () => {
             {/* CTA on top */}
             <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
               <h1 className="font-light leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}>
-                <span className="text-white font-light whitespace-nowrap" style={{ fontSize: 'clamp(1rem, 5vw, 1.5rem)' }}>COMING SOON TO EMPOWER</span>
-                <span className="text-[#48C84F] font-extrabold whitespace-nowrap" style={{ fontWeight: 900, fontSize: 'clamp(1.2rem, 6vw, 1.8rem)' }}>A SUSTAINABLE LIFESTYLE</span>
+                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: '24px', fontWeight: 300, lineHeight: '28px', marginBottom: '8px' }}>COMING SOON TO EMPOWER</span>
+                 <span className="text-[#48C84F] whitespace-nowrap" style={{ display: 'block', fontSize: '27px', fontWeight: 700, lineHeight: '30px' }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-white font-extralight leading-tight mt-[0.5vh] tracking-wide" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 50, lineHeight: 1.33, fontSize: 'clamp(0.7rem, 3.5vw, 1rem)' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
+                <p className="text-white leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '14px', fontWeight: 300, lineHeight: '20px' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center w-full mt-2">
                 <input
                   type="email"
