@@ -30,10 +30,10 @@ const LandingPage = () => {
     if (result.success) {
       setStatus('success');
       setEmail('');
-      // Clear success message after 5 seconds
+      // Clear success message after 3 seconds
       setTimeout(() => {
         setStatus('idle');
-      }, 5000);
+      }, 3000);
     } else {
       setStatus('error');
     }
@@ -89,14 +89,14 @@ const LandingPage = () => {
                     setStatus('idle');
                   }
                 }}
-                className={`w-full sm:w-[200px] md:w-[240px] lg:w-[280px] xl:w-[320px] px-4 py-2 bg-transparent border-[1.5px] rounded-lg text-sm md:text-base text-center placeholder:text-[#DAF4DC] focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#3AA03F]'}`}
-                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 400, lineHeight: 1.25 }}
+                className={`w-full sm:w-[200px] md:w-[240px] lg:w-[280px] xl:w-[320px] px-4 py-2 bg-transparent border-[1.5px] rounded-lg text-center placeholder:text-[#DAF4DC] focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#3AA03F]'}`}
+                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 400, lineHeight: 1.25, fontSize: 'clamp(0.65rem, 1.2vw, 1rem)' }}
               />
               <button 
                 onClick={handleNotifyMe} 
                 disabled={status === 'loading'}
-                className="px-4 md:px-6 lg:px-8 py-3 md:py-4 hover:brightness-110 border-none rounded-lg text-white text-sm md:text-base font-semibold cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: 1.25, backgroundColor: '#48C84F' }}
+                className="hover:brightness-110 border-none rounded-lg text-white font-semibold cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: 1.25, backgroundColor: '#48C84F', fontSize: 'clamp(0.65rem, 1.2vw, 1rem)', padding: 'clamp(0.7rem, 1.2vw, 1.1rem) clamp(0.6rem, 1.8vw, 1.8rem)' }}
               >
                 {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
               </button>

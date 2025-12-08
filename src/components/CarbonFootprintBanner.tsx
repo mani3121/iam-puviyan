@@ -70,7 +70,7 @@ const CarbonFootprintBanner = () => {
   return (
     <div
       ref={bannerRef}
-      className="fixed bottom-28 sm:bottom-32 md:bottom-24 lg:bottom-24 right-6 sm:right-8 md:right-4 lg:right-16 xl:right-20 z-40"
+      className="fixed bottom-28 sm:bottom-32 md:bottom-24 lg:bottom-24 right-6 sm:right-8 md:right-4 lg:right-16 xl:right-20 z-40 origin-bottom-right scale-[0.75] sm:scale-[0.8] md:scale-[0.85] lg:scale-[0.9] xl:scale-100"
       style={{ 
         fontFamily: 'Segoe UI Variable, system-ui, sans-serif',
       }}

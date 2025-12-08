@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import downshade from '../assets/downshade.png';
-import mobileImage from '../assets/iamPuviyan_mobile.png';
+import mobileImage from '../assets/iamPuviyan.png';
 import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobile';
 import { submitEmail } from '../services/firebaseService';
 import PageLayout from '../components/PageLayout';
@@ -14,7 +14,7 @@ const MobileLandingPage = () => {
     if (status === 'success' || status === 'error') {
       const timer = setTimeout(() => {
         setStatus('idle');
-      }, 5000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [status]);
@@ -51,12 +51,12 @@ const MobileLandingPage = () => {
           <div className="flex flex-col items-center justify-between gap-2">
             {/* CTA on top */}
             <div className="w-full max-w-[350px] mx-auto self-center text-center flex flex-col gap-2">
-              <h1 className="font-light leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}>
-                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: '24px', fontWeight: 300, lineHeight: '28px', marginBottom: '8px' }}>COMING SOON TO EMPOWER</span>
-                 <span className="text-[#48C84F] whitespace-nowrap" style={{ display: 'block', fontSize: '27px', fontWeight: 700, lineHeight: '30px' }}>A SUSTAINABLE LIFESTYLE</span>
+              <h1 className="font-thin leading-tight tracking-wide flex flex-col gap-[0.5vh] items-center" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 100, lineHeight: 1.25 }}>
+                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(1.1rem, 5.5vw, 1.5rem)', fontWeight: 100, lineHeight: 1.2, marginBottom: '6px', letterSpacing: '0.1em' }}>COMING SOON TO EMPOWER</span>
+                 <span className="text-[#48C84F] whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(1.2rem, 6.5vw, 1.75rem)', fontWeight: 700, lineHeight: 1.2 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-                <p className="text-white leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '14px', fontWeight: 300, lineHeight: '20px' }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
-              <div className="flex flex-row gap-3 items-stretch justify-center w-full mt-2">
+                <p className="text-white leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: 'clamp(0.65rem, 3vw, 0.875rem)', fontWeight: 100, lineHeight: 1.4 }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
+              <div className="flex flex-row gap-2 items-stretch justify-center mt-2" style={{ width: 'fit-content', margin: '0.5rem auto 0' }}>
                 <input
                   type="email"
                   placeholder="ENTER YOUR EMAIL ID"
@@ -68,14 +68,14 @@ const MobileLandingPage = () => {
                       setStatus('idle');
                     }
                   }}
-                  className={`w-[60%] px-[3vw] py-[1.5vh] bg-transparent border rounded-md text-white text-center placeholder:text-white/60 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#B6E9B9]'}`}
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontSize: 'clamp(0.6rem, 3vw, 0.875rem)' }}
+                  className={`flex-1 px-3 py-2 bg-transparent border-[0.5px] rounded-md text-white text-center placeholder:text-white/80 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#48c84f]'}`}
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontSize: 'clamp(0.5rem, 2.5vw, 0.75rem)', minWidth: '70%' }}
                 />
                 <button
                   onClick={handleNotifyMe}
                   disabled={status === 'loading'}
-                  className="w-[40%] px-[2vw] py-[1vh] border-none rounded-md text-white font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 350, backgroundColor: '#48C84F', fontSize: 'clamp(0.5rem, 2.5vw, 0.75rem)' }}
+                  className="px-6 py-2 border-none rounded-md text-white font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 400, backgroundColor: '#48C84F', fontSize: 'clamp(0.45rem, 2.2vw, 0.7rem)' }}
                 >
                   {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
                 </button>
@@ -89,11 +89,11 @@ const MobileLandingPage = () => {
 
             {/* Mobile image at bottom */}
             <div className="w-full flex justify-center items-start flex-1 mb-0 overflow-hidden">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto scale-125" />
+              <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] max-h-[50vh] h-auto object-contain scale-110" />
               <img 
                 src={downshade} 
                 alt="" 
-                className="absolute top-[75%] left-0 w-full h-[30%] object-cover pointer-events-none" 
+                className="absolute top-[69%] left-0 w-full h-[30%] object-cover pointer-events-none" 
               />
             </div>
           </div>
