@@ -46,7 +46,7 @@ const TabletLandingPage = () => {
                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(1.75rem, 5.5vw, 2.75rem)', fontStyle: 'normal', fontWeight: 100, lineHeight: 1.2, letterSpacing: '0.06em' }}>COMING SOON TO EMPOWER</span>
                 <span className="text-[#5ABA52] whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(2rem, 6.5vw, 3.25rem)', fontStyle: 'normal', fontWeight: 700, lineHeight: 1.2 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: 'clamp(0.875rem, 2.5vw, 1.25rem)', fontStyle: 'normal', fontWeight: 300, lineHeight: 1.4 }}>Inviting changemakers to integrate the app into homes, workplaces,<br/> institutions, businesses, & communities everywhere.</p>
+              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces,<br/>d  institutions, businesses, & communities everywhere.</p>
               <div className="flex flex-row gap-3 items-stretch justify-center mt-6">
                 <input
                   type="email"
