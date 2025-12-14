@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Mail, Linkedin, Chrome, User, Lock, Eye, EyeOff } from 'lucide-react'
+import { LinkedInAuthService } from '../services/linkedInAuthService'
 
 interface CarouselSlide {
   id: number
@@ -38,6 +39,39 @@ export default function AuthPage() {
     password: '',
     name: ''
   })
+  const [authLoading, setAuthLoading] = useState(false)
+
+  useEffect(() => {
+    // Check if this is a LinkedIn OAuth callback
+    if (LinkedInAuthService.isLinkedInCallback()) {
+      const params = LinkedInAuthService.extractOAuthParams()
+      if (params) {
+        handleLinkedInCallback(params.code, params.state)
+      }
+    }
+  }, [])
+
+  const handleLinkedInCallback = async (code: string, state: string) => {
+    setAuthLoading(true)
+    try {
+      const result = await LinkedInAuthService.handleAuthCallback(code, state)
+      if (result.success && result.user) {
+        console.log('LinkedIn user authenticated:', result.user)
+        // You can redirect to dashboard or update UI state here
+        alert(`Welcome ${result.user.firstName} ${result.user.lastName}!`)
+      } else {
+        console.error('LinkedIn auth failed:', result.message)
+        alert(`Authentication failed: ${result.message}`)
+      }
+    } catch (error) {
+      console.error('LinkedIn callback error:', error)
+      alert('An error occurred during authentication')
+    } finally {
+      setAuthLoading(false)
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -60,7 +94,19 @@ export default function AuthPage() {
   }
 
   const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`)
+    if (provider === 'LinkedIn') {
+      setAuthLoading(true)
+      try {
+        LinkedInAuthService.initiateLinkedInAuth()
+      } catch (error) {
+        console.error('LinkedIn auth initiation failed:', error)
+        setAuthLoading(false)
+        alert('Failed to initiate LinkedIn authentication')
+      }
+    } else {
+      console.log(`Login with ${provider}`)
+      // TODO: Implement other providers (Microsoft, Google)
+    }
   }
 
   return (
@@ -136,10 +182,11 @@ export default function AuthPage() {
               
               <button
                 onClick={() => handleSocialLogin('LinkedIn')}
-                className="w-full flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
+                disabled={authLoading}
+                className="w-full flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Linkedin className="w-5 h-5" />
-                <span>Continue with LinkedIn</span>
+                <span>{authLoading ? 'Connecting...' : 'Continue with LinkedIn'}</span>
               </button>
               
               <button
@@ -252,13 +299,13 @@ export default function AuthPage() {
       </div>
 
       {/* Mobile & Tablet Layout */}
-      <div className="lg:hidden min-h-screen flex flex-col justify-center p-6 md:p-8 relative z-10">
+      <div className="lg:hidden h-screen flex flex-col justify-center p-4 md:p-6 relative z-10 overflow-hidden">
         {/* Carousel Content Overlay */}
-        <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">{carouselSlides[currentSlide].title}</h2>
-          <p className="text-lg md:text-xl text-gray-300 mb-6">{carouselSlides[currentSlide].description}</p>
+        <div className="text-center mb-4">
+          <h2 className="text-xl md:text-2xl font-bold mb-2">{carouselSlides[currentSlide].title}</h2>
+          <p className="text-base md:text-lg text-gray-300 mb-4">{carouselSlides[currentSlide].description}</p>
           
-          <div className="flex justify-center space-x-2 mb-6">
+          <div className="flex justify-center space-x-2 mb-4">
             {carouselSlides.map((_, index) => (
               <button
                 key={index}
@@ -272,9 +319,9 @@ export default function AuthPage() {
         </div>
 
         {/* Auth Form Container */}
-        <div className="bg-[#1a1a1a]/90 backdrop-blur-md rounded-2xl p-6 md:p-8 shadow-2xl">
-          <div className="max-w-xl mx-auto w-full">
-            <div className="mb-6">
+        <div className="bg-[#1a1a1a]/95 backdrop-blur-md rounded-xl p-4 md:p-6 shadow-2xl flex-1 overflow-y-auto">
+          <div className="max-w-md mx-auto w-full">
+            <div className="mb-4">
               <h1 className="text-2xl md:text-3xl font-bold mb-2">
                 {isLogin ? 'Welcome Back' : 'Create Account'}
               </h1>
@@ -284,7 +331,7 @@ export default function AuthPage() {
             </div>
 
           {/* Social Login Buttons */}
-          <div className="space-y-3 mb-6">
+          <div className="space-y-3 mb-4">
             <button
               onClick={() => handleSocialLogin('Microsoft')}
               className="w-full flex items-center justify-center space-x-3 bg-gray-800 hover:bg-gray-700 text-white py-3 px-4 rounded-lg transition-colors border border-gray-700"
@@ -310,7 +357,7 @@ export default function AuthPage() {
             </button>
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-700"></div>
             </div>

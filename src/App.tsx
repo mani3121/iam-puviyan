@@ -6,6 +6,7 @@ import TabletLandingPage from './pages/TabletLandingPage'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsConditions from './pages/TermsConditions'
 import AuthPage from './pages/AuthPage'
+import SignupPage from './pages/SignupPage'
 
 function Home() {
   const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -32,6 +33,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<AuthPage />} />
+      <Route path="/signup" element={<SignupPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsConditions />} />
     </Routes>
