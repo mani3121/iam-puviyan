@@ -21,8 +21,8 @@ interface AuthResult {
  * Handles LinkedIn login flow and user data storage
  */
 export class LinkedInAuthService {
-  private static readonly CLIENT_ID = 'YOUR_LINKEDIN_CLIENT_ID'; // Replace with actual LinkedIn Client ID
-  private static readonly CLIENT_SECRET = 'YOUR_LINKEDIN_CLIENT_SECRET'; // Replace with actual Client Secret
+  private static readonly CLIENT_ID = '86ys3b1c4locyh'; // Replace with actual LinkedIn Client ID
+  private static readonly CLIENT_SECRET = 'WPL_AP1.rDUYUEGgs6dykyWG.Lgh42Q=='; // Replace with actual Client Secret
   private static readonly REDIRECT_URI = `${window.location.origin}/auth/linkedin/callback`;
   private static readonly SCOPES = 'openid profile email';
 
