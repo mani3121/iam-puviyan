@@ -56,6 +56,8 @@ Make sure your redirect URI matches exactly what you configured in LinkedIn:
 - Development: `http://localhost:5175/login`
 - Production: `https://yourdomain.com/login`
 
+**Important**: The redirect URI in your LinkedIn app settings must exactly match `${window.location.origin}/login` in the code.
+
 ## Step 6: Test the Integration
 
 1. Start your development server

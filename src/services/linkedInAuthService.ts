@@ -23,7 +23,7 @@ interface AuthResult {
 export class LinkedInAuthService {
   private static readonly CLIENT_ID = '86ys3b1c4locyh'; // Replace with actual LinkedIn Client ID
   private static readonly CLIENT_SECRET = 'WPL_AP1.rDUYUEGgs6dykyWG.Lgh42Q=='; // Replace with actual Client Secret
-  private static readonly REDIRECT_URI = `${window.location.origin}/auth/linkedin/callback`;
+  private static readonly REDIRECT_URI = `${window.location.origin}/login`;
   private static readonly SCOPES = 'openid profile email';
 
   /**
