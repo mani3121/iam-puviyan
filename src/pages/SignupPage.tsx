@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, User, Building, Briefcase, Mail, Phone, MapPin, Lock, Eye, EyeOff, Calendar, GraduationCap } from 'lucide-react'
+import { User, Building, Briefcase, Mail, Phone, MapPin, Lock, Eye, EyeOff, Calendar, GraduationCap } from 'lucide-react'
 
 interface FormData {
   // Personal Information
@@ -35,34 +35,6 @@ interface FormData {
   linkedinProfile: string
   bio: string
 }
-
-interface CarouselSlide {
-  id: number
-  title: string
-  description: string
-  image: string
-}
-
-const carouselSlides: CarouselSlide[] = [
-  {
-    id: 1,
-    title: "Join Our Community",
-    description: "Become part of a network of changemakers and innovators.",
-    image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
-  },
-  {
-    id: 2,
-    title: "Build Your Profile",
-    description: "Create a comprehensive profile that showcases your expertise.",
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
-  },
-  {
-    id: 3,
-    title: "Connect & Grow",
-    description: "Connect with organizations and opportunities that matter.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
-  }
-]
 
 const organizationTypes = [
   'Startup',
