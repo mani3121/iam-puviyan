@@ -20,17 +20,17 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        const userId = searchParams.get('userId')
+        const uuid = searchParams.get('uuid')
         const email = searchParams.get('email')
 
-        if (!userId || !email) {
+        if (!uuid || !email) {
           setStatus('error')
           setMessage('Invalid verification link. Missing required parameters.')
           return
         }
 
         // Check if user exists and get their data
-        const userDoc = doc(db, 'org_login_details', userId)
+        const userDoc = doc(db, 'org_login_details', uuid)
         const userSnapshot = await getDoc(userDoc)
 
         if (!userSnapshot.exists()) {
@@ -70,7 +70,6 @@ export default function VerifyEmailPage() {
         }, 3000)
 
       } catch (error) {
-        console.error('Email verification error:', error)
         setStatus('error')
         setMessage('Failed to verify email. Please try again or contact support.')
       }

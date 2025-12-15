@@ -61,7 +61,6 @@ export default function AuthPage() {
     try {
       const result = await LinkedInAuthService.handleAuthCallback(code, state)
       if (result.success && result.user) {
-        console.log('LinkedIn user authenticated:', result.user)
         // You can redirect to dashboard or update UI state here
         alert(`Welcome ${result.user.firstName} ${result.user.lastName}!`)
       } else {
@@ -142,7 +141,6 @@ export default function AuthPage() {
       }
     } else {
       // Handle login logic here (for now just log to console)
-      console.log('Login attempted:', formData.email)
       alert('Login functionality will be implemented soon')
     }
   }
@@ -158,7 +156,6 @@ export default function AuthPage() {
         alert('Failed to initiate LinkedIn authentication')
       }
     } else {
-      console.log(`Login with ${provider}`)
       // TODO: Implement other providers (Microsoft, Google)
     }
   }

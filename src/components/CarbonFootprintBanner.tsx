@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import CarbonFootprintBannerMobile from './CarbonFootprintBannerMobile';
-import { simplifiedCO2PerView, compareToBaseline, getTransferredBytes } from '../utils/carbon';
+import { simplifiedCO2PerView, compareToBaseline } from '../utils/carbon';
 import co2Badge from '../assets/Co-2.avif';
 
 // Constant page weight in MB (28KB = 0.028MB)
@@ -15,7 +15,6 @@ const CarbonFootprintBanner = () => {
 
   const calculateCarbonFootprint = () => {
     const effectiveMB = getPageWeightMB();
-    const calculatedPageWeightKB = Number((effectiveMB * 1024).toFixed(2));
 
     const { gramsCO2 } = simplifiedCO2PerView(effectiveMB, {
       energyPerGB_kWh: 0.405,
@@ -28,13 +27,9 @@ const CarbonFootprintBanner = () => {
     setCo2Estimate(gramsCO2);
     setComparison(label);
 
-    // Log in development
-    if (import.meta.env.DEV) {
-      const actualBytes = getTransferredBytes();
-      console.log('[Carbon] Using constant page weight:', calculatedPageWeightKB, 'KB');
-      console.log('[Carbon] Actual transferred (all resources):', (actualBytes / 1024).toFixed(2), 'KB');
-      console.log('[Carbon] CO2 estimate:', gramsCO2.toFixed(3), 'g');
-    }
+    // Optional: Calculate page weight for future use
+    // const calculatedPageWeightKB = Number((effectiveMB * 1024).toFixed(2));
+    // const actualBytes = getTransferredBytes();
   };
 
   useEffect(() => {

@@ -150,7 +150,11 @@ export const EMAILJS_VARIABLES = {
 
 // Initialize EmailJS
 export const initializeEmailJS = () => {
-  emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+  try {
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+  } catch (error) {
+    console.error('EmailJS initialization failed:', error);
+  }
 };
 
 // Send verification email using EmailJS
@@ -162,7 +166,7 @@ export const sendVerificationEmailViaEmailJS = async (
   try {
     const templateParams = {
       to_name: userName || toEmail.split('@')[0], // Use email prefix as name if not provided
-      to_email: toEmail,
+      email: toEmail,
       verification_link: verificationLink
     };
 
@@ -184,10 +188,10 @@ export const sendVerificationEmailViaEmailJS = async (
       };
     }
   } catch (error) {
-    console.error('Error sending verification email via EmailJS:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
-      message: 'Failed to send verification email. Please try again later.'
+      message: `Failed to send verification email: ${errorMessage}`
     };
   }
 };

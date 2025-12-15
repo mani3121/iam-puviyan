@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { User, Building, Briefcase, Mail, Phone, MapPin, Lock, Eye, EyeOff, Calendar, GraduationCap } from 'lucide-react'
+import CustomPopup from '../components/CustomPopup'
 
 interface FormData {
   // Personal Information
@@ -103,6 +104,12 @@ const educationLevels = [
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupConfig, setPopupConfig] = useState({
+    title: '',
+    message: '',
+    type: 'success' as 'success' | 'error' | 'info'
+  })
   const [formData, setFormData] = useState<FormData>({
     // Personal Information
     firstName: '',
@@ -156,16 +163,20 @@ export default function SignupPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      console.log('Form submitted:', formData)
       // TODO: Save to Firebase and navigate to success page
-      alert('Account created successfully! Please check your email for verification.')
+      setPopupConfig({
+        title: 'Account Created Successfully!',
+        message: 'Your account has been created. Please check your email for verification.',
+        type: 'success'
+      })
+      setShowPopup(true)
     }
   }
 
   return (
-    <div className="text-white" style={{ backgroundColor: '#1a1a1a' }}>
+    <div className="text-white min-h-screen" style={{ backgroundColor: '#1a1a1a' }}>
       {/* Simple Background */}
-      <div className="fixed inset-0 overflow-hidden" style={{ zIndex: -1 }}>
+      <div className="fixed inset-0" style={{ zIndex: -1 }}>
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20"></div>
       </div>
 
@@ -574,6 +585,15 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+      
+      {/* Custom Popup */}
+      <CustomPopup
+        isOpen={showPopup}
+        onClose={() => setShowPopup(false)}
+        title={popupConfig.title}
+        message={popupConfig.message}
+        type={popupConfig.type}
+      />
     </div>
   )
 }
