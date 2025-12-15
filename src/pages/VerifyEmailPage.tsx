@@ -20,17 +20,37 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const verifyEmail = async () => {
       try {
-        const uuid = searchParams.get('uuid')
+        const userId = searchParams.get('userId')
         const email = searchParams.get('email')
 
-        if (!uuid || !email) {
+        // Validate required parameters
+        if (!userId || !email) {
           setStatus('error')
           setMessage('Invalid verification link. Missing required parameters.')
           return
         }
 
+        // Decode email parameter (handles URL encoding)
+        const decodedEmail = decodeURIComponent(email)
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(decodedEmail)) {
+          setStatus('error')
+          setMessage('Invalid email format in verification link.')
+          return
+        }
+
+        // Validate userId format (should be a UUID)
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+        if (!uuidRegex.test(userId)) {
+          setStatus('error')
+          setMessage('Invalid verification link format.')
+          return
+        }
+
         // Check if user exists and get their data
-        const userDoc = doc(db, 'org_login_details', uuid)
+        const userDoc = doc(db, 'org_login_details', userId)
         const userSnapshot = await getDoc(userDoc)
 
         if (!userSnapshot.exists()) {
@@ -41,8 +61,8 @@ export default function VerifyEmailPage() {
 
         const userData = userSnapshot.data()
 
-        // Check if email matches
-        if (userData.email !== email) {
+        // Check if email matches (case-insensitive)
+        if (userData.email.toLowerCase() !== decodedEmail.toLowerCase()) {
           setStatus('error')
           setMessage('Email mismatch. Please use the correct verification link.')
           return
@@ -52,6 +72,21 @@ export default function VerifyEmailPage() {
         if (userData.emailVerified) {
           setStatus('success')
           setMessage('Your email has already been verified. You can now log in.')
+          // Redirect to login after 3 seconds for already verified users
+          setTimeout(() => {
+            navigate('/login')
+          }, 3000)
+          return
+        }
+
+        // Check if verification link has expired (24 hours)
+        const createdAt = new Date(userData.createdAt)
+        const now = new Date()  
+        const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60)
+        
+        if (hoursDiff > 24) {
+          setStatus('error')
+          setMessage('Verification link has expired. Please request a new verification email.')
           return
         }
 
