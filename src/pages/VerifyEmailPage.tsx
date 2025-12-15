@@ -62,11 +62,11 @@ export default function VerifyEmailPage() {
         })
 
         setStatus('success')
-        setMessage('Email verified successfully! You can now log in to your account.')
+        setMessage('Email verified, click Signup button to continue')
 
-        // Redirect to login after 3 seconds
+        // Redirect to signup after 3 seconds
         setTimeout(() => {
-          navigate('/login')
+          navigate('/signup')
         }, 3000)
 
       } catch (error) {
@@ -85,29 +85,29 @@ export default function VerifyEmailPage() {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#1a1a1a'
   } : {
     padding: '40px',
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8fafc'
+    backgroundColor: '#1a1a1a'
   }
 
   const cardStyles = isMobile ? {
-    backgroundColor: 'white',
+    backgroundColor: '#2a2a2a',
     borderRadius: '12px',
     padding: '24px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)',
     maxWidth: '400px',
     width: '100%',
     textAlign: 'center' as const
   } : {
-    backgroundColor: 'white',
+    backgroundColor: '#2a2a2a',
     borderRadius: '16px',
     padding: '48px',
-    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.3)',
     maxWidth: '500px',
     width: '100%',
     textAlign: 'center' as const
@@ -123,18 +123,18 @@ export default function VerifyEmailPage() {
     fontSize: '24px',
     fontWeight: 'bold',
     marginBottom: '16px',
-    color: '#1a1a1a'
+    color: '#ffffff'
   } : {
     fontSize: '32px',
     fontWeight: 'bold',
     marginBottom: '24px',
-    color: '#1a1a1a'
+    color: '#ffffff'
   }
 
   const messageStyles = {
     fontSize: '16px',
     lineHeight: '1.6',
-    color: '#666',
+    color: '#9ca3af',
     marginBottom: '32px'
   }
 
@@ -196,11 +196,11 @@ export default function VerifyEmailPage() {
             <p style={messageStyles}>{message}</p>
             <button 
               style={buttonStyles}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/signup')}
               onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5ABA52'}
               onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#48C84F'}
             >
-              Go to Login
+              Go to Signup
             </button>
           </>
         )}
