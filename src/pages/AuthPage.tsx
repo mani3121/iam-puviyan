@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Mail, Linkedin, Chrome, User, Lock, Eye, EyeOff } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Mail, Linkedin, Chrome, Lock, Eye, EyeOff } from 'lucide-react'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
+import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
+import PageLayout from '../components/PageLayout'
+import ContentWrapper from '../components/ContentWrapper'
 
 interface CarouselSlide {
   id: number
@@ -12,21 +15,21 @@ interface CarouselSlide {
 const carouselSlides: CarouselSlide[] = [
   {
     id: 1,
-    title: "Welcome to Your Journey",
-    description: "Discover amazing features and possibilities that await you.",
-    image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+    title: "Sustainable Living",
+    description: "Join the movement towards a greener, more sustainable future for everyone.",
+    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
   },
   {
     id: 2,
-    title: "Connect & Collaborate",
-    description: "Join a community of innovators and creators.",
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+    title: "Green Communities",
+    description: "Connect with changemakers building sustainable communities worldwide.",
+    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
   },
   {
     id: 3,
-    title: "Achieve Your Goals",
-    description: "Transform your ideas into reality with powerful tools.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
+    title: "Eco-Innovation",
+    description: "Transform your environmental impact with powerful sustainable tools.",
+    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
   }
 ]
 
@@ -34,12 +37,14 @@ export default function AuthPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: ''
+    confirmPassword: ''
   })
   const [authLoading, setAuthLoading] = useState(false)
+  const [signupLoading, setSignupLoading] = useState(false)
 
   useEffect(() => {
     // Check if this is a LinkedIn OAuth callback
@@ -88,9 +93,58 @@ export default function AuthPage() {
     setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
+    
+    // For signup, validate that passwords match
+    if (!isLogin && formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match')
+      return
+    }
+    
+    // If signing up, store user data in Firestore
+    if (!isLogin) {
+      setSignupLoading(true)
+      try {
+        const result = await storeUserSignup(formData.email, formData.password)
+        
+        if (!result.success) {
+          alert(result.message)
+          return
+        }
+        
+        // Send verification email
+        if (result.verificationLink) {
+          const emailResult = await sendVerificationEmail(formData.email, result.verificationLink)
+          
+          if (emailResult.success) {
+            alert(`${result.message} ${emailResult.message}`)
+          } else {
+            alert(`${result.message} However, there was an issue sending the verification email: ${emailResult.message}`)
+          }
+        } else {
+          alert(result.message)
+        }
+        
+        // Optionally switch to login mode after successful signup
+        setIsLogin(true)
+        // Clear form
+        setFormData({
+          email: '',
+          password: '',
+          confirmPassword: ''
+        })
+      } catch (error) {
+        console.error('Signup error:', error)
+        alert('An error occurred during signup. Please try again.')
+      } finally {
+        setSignupLoading(false)
+      }
+    } else {
+      // Handle login logic here (for now just log to console)
+      console.log('Login attempted:', formData.email)
+      alert('Login functionality will be implemented soon')
+    }
   }
 
   const handleSocialLogin = (provider: string) => {
@@ -110,7 +164,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white relative">
+    <PageLayout>
+      <ContentWrapper maxWidth="desktop">
+        <div className="min-h-screen bg-gray-900 text-white relative">
       {/* Background Carousel for all devices */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900 to-purple-900">
@@ -209,23 +265,6 @@ export default function AuthPage() {
 
             {/* Email Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white"
-                      placeholder="Enter your full name"
-                      required={!isLogin}
-                    />
-                  </div>
-                </div>
-              )}
-              
               <div>
                 <label className="block text-sm font-medium mb-2">Email Address</label>
                 <div className="relative">
@@ -234,7 +273,7 @@ export default function AuthPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white"
+                    className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
                     placeholder="Enter your email"
                     required
                   />
@@ -249,7 +288,7 @@ export default function AuthPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                    className="w-full pl-10 pr-12 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
                     placeholder="Enter your password"
                     required
                   />
@@ -262,6 +301,30 @@ export default function AuthPage() {
                   </button>
                 </div>
               </div>
+
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">Confirm Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      className="w-full pl-10 pr-12 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
+                      placeholder="Confirm your password"
+                      required={!isLogin}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+              )}
               
               {isLogin && (
                 <div className="flex items-center justify-between">
@@ -277,9 +340,20 @@ export default function AuthPage() {
               
               <button
                 type="submit"
-                className="w-full bg-[#48C84F] hover:bg-[#5ABA52] text-white py-3 px-4 rounded-lg transition-colors font-medium"
+                disabled={signupLoading}
+                className="w-full bg-[#48C84F] hover:bg-[#5ABA52] text-white py-3 px-4 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {isLogin ? 'Sign In' : 'Sign Up'}
+                {signupLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Account...
+                  </>
+                ) : (
+                  isLogin ? 'Sign In' : 'Sign Up'
+                )}
               </button>
             </form>
             
@@ -368,23 +442,6 @@ export default function AuthPage() {
 
           {/* Email Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium mb-2">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white"
-                    placeholder="Enter your full name"
-                    required={!isLogin}
-                  />
-                </div>
-              </div>
-            )}
-            
             <div>
               <label className="block text-sm font-medium mb-2">Email Address</label>
               <div className="relative">
@@ -393,7 +450,7 @@ export default function AuthPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                  className="w-full pl-10 pr-4 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
                   placeholder="Enter your email"
                   required
                 />
@@ -408,7 +465,7 @@ export default function AuthPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-12 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-white"
+                  className="w-full pl-10 pr-12 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
                   placeholder="Enter your password"
                   required
                 />
@@ -421,6 +478,30 @@ export default function AuthPage() {
                 </button>
               </div>
             </div>
+
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-medium mb-2">Confirm Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    className="w-full pl-10 pr-12 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:border-[#5ABA52] text-white focus:bg-[#1a1a1a] autofill:bg-[#1a1a1a] autofill:text-white autofill:shadow-[inset_0_0_0px_1000px_#1a1a1a] [&:autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:bg-[#1a1a1a] [&:-webkit-autofill]:text-white [&:-webkit-autofill]:-webkit-text-fill-color-white [&:-webkit-autofill]:-webkit-box-shadow-[inset_0_0_0_1000px_#1a1a1a]"
+                    placeholder="Confirm your password"
+                    required={!isLogin}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            )}
             
             {isLogin && (
               <div className="flex items-center justify-between">
@@ -436,9 +517,20 @@ export default function AuthPage() {
             
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors font-medium"
+              disabled={signupLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
-              {isLogin ? 'Sign In' : 'Sign Up'}
+              {signupLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Account...
+                </>
+              ) : (
+                isLogin ? 'Sign In' : 'Sign Up'
+              )}
             </button>
           </form>
           
@@ -472,5 +564,7 @@ export default function AuthPage() {
         </button>
       </div>
     </div>
+      </ContentWrapper>
+    </PageLayout>
   )
 }
