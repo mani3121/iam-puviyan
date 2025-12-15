@@ -8,6 +8,7 @@ import TermsConditions from './pages/TermsConditions'
 import AuthPage from './pages/AuthPage'
 import SignupPage from './pages/SignupPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
+import Login from './pages/Login'
 
 function Home() {
   const [width, setWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 1024)
@@ -33,7 +34,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<AuthPage />} />
+      <Route path="/Authpage" element={<AuthPage />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
