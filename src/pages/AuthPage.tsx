@@ -4,6 +4,7 @@ import { LinkedInAuthService } from '../services/linkedInAuthService'
 import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
+import CustomPopup from '../components/CustomPopup'
 
 interface CarouselSlide {
   id: number
@@ -38,6 +39,12 @@ export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupConfig, setPopupConfig] = useState({
+    title: '',
+    message: '',
+    type: 'success' as 'success' | 'error' | 'info'
+  })
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -62,14 +69,27 @@ export default function AuthPage() {
       const result = await LinkedInAuthService.handleAuthCallback(code, state)
       if (result.success && result.user) {
         // You can redirect to dashboard or update UI state here
-        alert(`Welcome ${result.user.firstName} ${result.user.lastName}!`)
+        setPopupConfig({
+          title: 'Authentication Successful!',
+          message: `Welcome ${result.user.firstName} ${result.user.lastName}!`,
+          type: 'success'
+        })
+        setShowPopup(true)
       } else {
-        console.error('LinkedIn auth failed:', result.message)
-        alert(`Authentication failed: ${result.message}`)
+        setPopupConfig({
+          title: 'Authentication Failed',
+          message: result.message || 'LinkedIn authentication failed. Please try again.',
+          type: 'error'
+        })
+        setShowPopup(true)
       }
     } catch (error) {
-      console.error('LinkedIn callback error:', error)
-      alert('An error occurred during authentication')
+      setPopupConfig({
+        title: 'Authentication Error',
+        message: 'An error occurred during authentication. Please try again.',
+        type: 'error'
+      })
+      setShowPopup(true)
     } finally {
       setAuthLoading(false)
       // Clean up URL
@@ -97,7 +117,12 @@ export default function AuthPage() {
     
     // For signup, validate that passwords match
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match')
+      setPopupConfig({
+        title: 'Password Mismatch',
+        message: 'Passwords do not match. Please try again.',
+        type: 'error'
+      })
+      setShowPopup(true)
       return
     }
     
@@ -108,7 +133,12 @@ export default function AuthPage() {
         const result = await storeUserSignup(formData.email, formData.password)
         
         if (!result.success) {
-          alert(result.message)
+          setPopupConfig({
+            title: 'Signup Failed',
+            message: result.message,
+            type: 'error'
+          })
+          setShowPopup(true)
           return
         }
         
@@ -117,12 +147,27 @@ export default function AuthPage() {
           const emailResult = await sendVerificationEmail(formData.email, result.verificationLink)
           
           if (emailResult.success) {
-            alert(`${result.message} ${emailResult.message}`)
+            setPopupConfig({
+              title: 'Signup Successful',
+              message: `${result.message} ${emailResult.message}`,
+              type: 'success'
+            })
+            setShowPopup(true)
           } else {
-            alert(`${result.message} However, there was an issue sending the verification email: ${emailResult.message}`)
+            setPopupConfig({
+              title: 'Email Verification Issue',
+              message: `${result.message} However, there was an issue sending the verification email: ${emailResult.message}`,
+              type: 'error'
+            })
+            setShowPopup(true)
           }
         } else {
-          alert(result.message)
+          setPopupConfig({
+            title: 'Signup Successful',
+            message: result.message,
+            type: 'success'
+          })
+          setShowPopup(true)
         }
         
         // Optionally switch to login mode after successful signup
@@ -135,13 +180,23 @@ export default function AuthPage() {
         })
       } catch (error) {
         console.error('Signup error:', error)
-        alert('An error occurred during signup. Please try again.')
+        setPopupConfig({
+          title: 'Signup Error',
+          message: 'An error occurred during signup. Please try again.',
+          type: 'error'
+        })
+        setShowPopup(true)
       } finally {
         setSignupLoading(false)
       }
     } else {
       // Handle login logic here (for now just log to console)
-      alert('Login functionality will be implemented soon')
+      setPopupConfig({
+        title: 'Login Coming Soon',
+        message: 'Login functionality will be implemented soon.',
+        type: 'info'
+      })
+      setShowPopup(true)
     }
   }
 
@@ -152,8 +207,12 @@ export default function AuthPage() {
         LinkedInAuthService.initiateLinkedInAuth()
       } catch (error) {
         console.error('LinkedIn auth initiation failed:', error)
-        setAuthLoading(false)
-        alert('Failed to initiate LinkedIn authentication')
+        setPopupConfig({
+          title: 'Authentication Error',
+          message: 'Failed to initiate LinkedIn authentication. Please try again.',
+          type: 'error'
+        })
+        setShowPopup(true)
       }
     } else {
       // TODO: Implement other providers (Microsoft, Google)
@@ -561,6 +620,15 @@ export default function AuthPage() {
         </button>
       </div>
     </div>
+      
+      {/* Custom Popup */}
+      <CustomPopup
+        isOpen={showPopup}
+        onClose={() => setShowPopup(false)}
+        title={popupConfig.title}
+        message={popupConfig.message}
+        type={popupConfig.type}
+      />
       </ContentWrapper>
     </PageLayout>
   )

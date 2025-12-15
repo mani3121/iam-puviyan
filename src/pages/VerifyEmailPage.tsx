@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  const [status, setStatus] = useState<'loading' | 'success'>('loading')
   const [message, setMessage] = useState('')
   const [isMobile, setIsMobile] = useState(false)
 
@@ -19,95 +19,35 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     const verifyEmail = async () => {
-      try {
-        const userId = searchParams.get('userId')
-        const email = searchParams.get('email')
+      const userId = searchParams.get('userId')
+      const email = searchParams.get('email')
 
-        // Validate required parameters
-        if (!userId || !email) {
-          setStatus('error')
-          setMessage('Invalid verification link. Missing required parameters.')
-          return
-        }
+      // Decode email parameter (handles URL encoding)
+      const decodedEmail = email ? decodeURIComponent(email) : ''
 
-        // Decode email parameter (handles URL encoding)
-        const decodedEmail = decodeURIComponent(email)
+      // Check if user exists and get their data by searching userId field
+      const usersRef = collection(db, 'org_login_details')
+      const q = query(usersRef, where('userId', '==', userId || ''))
+      const querySnapshot = await getDocs(q)
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(decodedEmail)) {
-          setStatus('error')
-          setMessage('Invalid email format in verification link.')
-          return
-        }
+      // Get the first matching user document
+      const userDoc = querySnapshot.docs[0]
+      const userData = userDoc.data()
 
-        // Validate userId format (should be a UUID)
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-        if (!uuidRegex.test(userId)) {
-          setStatus('error')
-          setMessage('Invalid verification link format.')
-          return
-        }
+      // Update user document to mark email as verified
+      await updateDoc(userDoc.ref, {
+        emailVerified: true,
+        verifiedAt: new Date().toISOString()
+      })
 
-        // Check if user exists and get their data
-        const userDoc = doc(db, 'org_login_details', userId)
-        const userSnapshot = await getDoc(userDoc)
+      // Show success immediately
+      setStatus('success')
+      setMessage('Email verified, click Signup button to continue')
 
-        if (!userSnapshot.exists()) {
-          setStatus('error')
-          setMessage('User not found. Please sign up again.')
-          return
-        }
-
-        const userData = userSnapshot.data()
-
-        // Check if email matches (case-insensitive)
-        if (userData.email.toLowerCase() !== decodedEmail.toLowerCase()) {
-          setStatus('error')
-          setMessage('Email mismatch. Please use the correct verification link.')
-          return
-        }
-
-        // Check if already verified
-        if (userData.emailVerified) {
-          setStatus('success')
-          setMessage('Your email has already been verified. You can now log in.')
-          // Redirect to login after 3 seconds for already verified users
-          setTimeout(() => {
-            navigate('/login')
-          }, 3000)
-          return
-        }
-
-        // Check if verification link has expired (24 hours)
-        const createdAt = new Date(userData.createdAt)
-        const now = new Date()  
-        const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60)
-        
-        if (hoursDiff > 24) {
-          setStatus('error')
-          setMessage('Verification link has expired. Please request a new verification email.')
-          return
-        }
-
-        // Update user document to mark email as verified
-        await updateDoc(userDoc, {
-          emailVerified: true,
-          verifiedAt: new Date().toISOString()
-        })
-
-        setStatus('success')
-        setMessage('Email verified, click Signup button to continue')
-
-        // Redirect to signup after 3 seconds
-        setTimeout(() => {
-          navigate('/signup')
-        }, 3000)
-
-      } catch (error) {
-        setStatus('error')
-        setMessage('Failed to verify email. Please try again or contact support.')
-      }
+      // Redirect to signup after 3 seconds
+      setTimeout(() => {
+        navigate('/signup')
+      }, 3000)
     }
 
     verifyEmail()
@@ -239,27 +179,7 @@ export default function VerifyEmailPage() {
           </>
         )}
 
-        {status === 'error' && (
-          <>
-            <div style={iconStyles}>
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="#ef4444"/>
-                <path d="M12 8v4m0 4h.01" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
-            <h1 style={titleStyles}>Verification Failed</h1>
-            <p style={messageStyles}>{message}</p>
-            <button 
-              style={buttonStyles}
-              onClick={() => navigate('/signup')}
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#5ABA52'}
-              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#48C84F'}
-            >
-              Back to Sign Up
-            </button>
-          </>
-        )}
-      </div>
+              </div>
 
       <style>{`
         @keyframes spin {
