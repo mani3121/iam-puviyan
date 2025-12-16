@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
+import {  updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 
 export default function VerifyEmailPage() {
@@ -20,10 +20,7 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const verifyEmail = async () => {
       const userId = searchParams.get('userId')
-      const email = searchParams.get('email')
-
-      // Decode email parameter (handles URL encoding)
-      const decodedEmail = email ? decodeURIComponent(email) : ''
+      //const email = searchParams.get('email')
 
       // Check if user exists and get their data by searching userId field
       const usersRef = collection(db, 'org_login_details')
@@ -32,7 +29,7 @@ export default function VerifyEmailPage() {
 
       // Get the first matching user document
       const userDoc = querySnapshot.docs[0]
-      const userData = userDoc.data()
+      //const userData = userDoc.data()
 
       // Update user document to mark email as verified
       await updateDoc(userDoc.ref, {

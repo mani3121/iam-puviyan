@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Mail, Linkedin, Chrome, Lock, Eye, EyeOff, Building } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Mail, Linkedin, Lock, Eye, EyeOff, Building } from 'lucide-react'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
 import PageLayout from '../components/PageLayout'
