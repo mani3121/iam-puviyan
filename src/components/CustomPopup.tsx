@@ -1,5 +1,57 @@
 import { useEffect, useState } from 'react'
 import { X, CheckCircle, AlertCircle } from 'lucide-react'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  IconButton,
+  Typography,
+  Box,
+  Avatar,
+  Fade,
+  createTheme,
+  ThemeProvider
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
+
+// Material UI Dark Theme
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      paper: '#1a1a1a',
+    },
+    primary: {
+      main: '#48C84F',
+    },
+    success: {
+      main: '#4CAF50',
+    },
+    error: {
+      main: '#CF6679',
+    },
+    info: {
+      main: '#2196F3',
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+})
+
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+  '& .MuiBackdrop-root': {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backdropFilter: 'blur(4px)',
+  },
+  '& .MuiDialog-paper': {
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    boxShadow: theme.shadows[24],
+  },
+}))
 
 interface CustomPopupProps {
   isOpen: boolean
@@ -44,80 +96,111 @@ export default function CustomPopup({
   }
 
   const getIcon = () => {
+    const iconProps = { size: 24 }
     switch (type) {
       case 'success':
-        return <CheckCircle className="w-6 h-6 text-green-400" />
+        return (
+          <Avatar sx={{ bgcolor: 'success.main' }}>
+            <CheckCircle {...iconProps} />
+          </Avatar>
+        )
       case 'error':
-        return <AlertCircle className="w-6 h-6 text-red-400" />
+        return (
+          <Avatar sx={{ bgcolor: 'error.main' }}>
+            <AlertCircle {...iconProps} />
+          </Avatar>
+        )
       default:
-        return <AlertCircle className="w-6 h-6 text-blue-400" />
+        return (
+          <Avatar sx={{ bgcolor: 'info.main' }}>
+            <AlertCircle {...iconProps} />
+          </Avatar>
+        )
     }
   }
 
   const getBorderColor = () => {
     switch (type) {
       case 'success':
-        return 'border-green-500/30'
+        return 'success.main'
       case 'error':
-        return 'border-red-500/30'
+        return 'error.main'
       default:
-        return 'border-blue-500/30'
+        return 'info.main'
     }
   }
 
   if (!isVisible) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-          isExiting ? 'opacity-0' : 'opacity-100'
-        }`}
-        onClick={handleClose}
-      />
-      
-      {/* Popup */}
-      <div
-        className={`relative max-w-md w-full bg-[#1a1a1a] border rounded-2xl shadow-2xl transform transition-all duration-300 ${
-          getBorderColor()
-        } ${
-          isExiting 
-            ? 'scale-95 opacity-0 translate-y-4' 
-            : 'scale-100 opacity-100 translate-y-0'
-        }`}
+    <ThemeProvider theme={darkTheme}>
+      <StyledDialog
+        open={isVisible}
+        onClose={handleClose}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Fade}
+        TransitionProps={{
+          timeout: 300,
+        }}
+        PaperProps={{
+          sx: {
+            border: 2,
+            borderColor: getBorderColor(),
+            transform: isExiting ? 'scale(0.95) translateY(16px)' : 'scale(1) translateY(0)',
+            opacity: isExiting ? 0 : 1,
+            transition: 'all 0.3s ease',
+          }
+        }}
       >
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="absolute top-4 right-4 p-1 rounded-lg hover:bg-white/10 transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-400 hover:text-white" />
-        </button>
-
-        {/* Content */}
-        <div className="p-6">
-          {/* Icon and Title */}
-          <div className="flex items-center gap-3 mb-4">
+        <DialogTitle sx={{ pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {getIcon()}
-            <h3 className="text-xl font-semibold text-white">{title}</h3>
-          </div>
-
-          {/* Message */}
-          <p className="text-gray-300 leading-relaxed mb-6">{message}</p>
-
-          {/* Action Button */}
-          <button
+            <Typography variant="h6" component="h3" sx={{ fontWeight: 600, color: 'white' }}>
+              {title}
+            </Typography>
+          </Box>
+          <IconButton
             onClick={handleClose}
-            className="w-full py-3 px-4 bg-[#48C84F] hover:bg-[#5ABA52] text-white rounded-lg font-medium transition-colors duration-200"
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+              }
+            }}
+          >
+            <X fontSize={20} />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent sx={{ pt: 1 }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+            {message}
+          </Typography>
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button
+            onClick={handleClose}
+            variant="contained"
+            fullWidth
+            sx={{
+              py: 1.5,
+              fontWeight: 600,
+              textTransform: 'none',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+              }
+            }}
           >
             Got it
-          </button>
-        </div>
-
-        {/* Animated border effect */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 animate-pulse" />
-      </div>
-    </div>
+          </Button>
+        </DialogActions>
+      </StyledDialog>
+    </ThemeProvider>
   )
 }

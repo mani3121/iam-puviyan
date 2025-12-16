@@ -5,26 +5,116 @@ import { storeUserSignup, sendVerificationEmail } from '../services/firebaseServ
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Box,
+  Typography,
+  TextField,
+  IconButton,
+  Button,
+  Checkbox,
+  Link,
+  CircularProgress,
+  Card,
+  CardMedia,
+  CardContent,
+  Fade,
+  Chip
+} from '@mui/material'
+import { styled } from '@mui/material/styles'
 
-// Material Design Colors (Dark Theme with Green Accents)
-const mdColors = {
-  primary: '#4CAF50',
-  primaryDark: '#388E3C',
-  primaryLight: '#66BB6A',
-  secondary: '#FFC107',
-  surface: '#1e1e1e',
-  background: '#121212',
-  error: '#CF6679',
-  onPrimary: '#FFFFFF',
-  onSecondary: '#000000',
-  onSurface: '#FFFFFF',
-  onBackground: '#FFFFFF',
-  text: '#E0E0E0',
-  textSecondary: '#B0B0B0',
-  divider: '#424242',
-  outline: '#616161',
-  buttonGreen: '#4CAF50'
-}
+// Material UI Dark Theme with Green Accents
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#4CAF50',
+      dark: '#388E3C',
+      light: '#66BB6A',
+    },
+    secondary: {
+      main: '#FFC107',
+    },
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    error: {
+      main: '#CF6679',
+    },
+    text: {
+      primary: '#E0E0E0',
+      secondary: '#B0B0B0',
+    },
+    divider: '#424242',
+  },
+  typography: {
+    fontFamily: 'Inter, system-ui, sans-serif',
+  },
+  shape: {
+    borderRadius: 12,
+  },
+})
+
+// Styled Components
+const StyledCarouselCard = styled(Card)(({ theme }) => ({
+  background: 'rgba(0, 0, 0, 0.4)',
+  backdropFilter: 'blur(16px)',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: theme.spacing(3),
+  padding: theme.spacing(4),
+  maxWidth: 600,
+  margin: '0 auto',
+  boxShadow: theme.shadows[24],
+}))
+
+const StyledCarouselImage = styled(CardMedia)(({ theme }) => ({
+  height: 240,
+  width: 320,
+  borderRadius: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+  boxShadow: theme.shadows[8],
+}))
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  backdropFilter: 'blur(8px)',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+}))
+
+const StyledSocialButton = styled(Button)(({ theme }) => ({
+  width: 48,
+  height: 48,
+  minWidth: 48,
+  borderRadius: '50%',
+  border: `2px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+    borderColor: theme.palette.text.secondary,
+  },
+}))
+
+const StyledDotButton = styled(Button)<{ theme?: any; active?: boolean }>(({ theme, active }) => ({
+  width: active ? theme.spacing(2.5) : theme.spacing(0.75),
+  height: theme.spacing(0.75),
+  minWidth: 'auto',
+  borderRadius: theme.spacing(0.375),
+  backgroundColor: active ? theme.palette.common.white : 'rgba(255, 255, 255, 0.6)',
+  padding: 0,
+  margin: theme.spacing(0, 0.5),
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    backgroundColor: theme.palette.common.white,
+  },
+}))
 
 interface CarouselSlide {
   id: number
@@ -230,240 +320,284 @@ export default function Login() {
   }
 
   return (
-    <PageLayout>
-      <ContentWrapper maxWidth="desktop">
-        <div className="min-h-screen bg-background text-text relative flex flex-col">
-          {/* Main Content */}
-          <div className="flex-1 flex">
-            {/* Left Side - Carousel */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-gray-900 to-black">
-              <div className="relative z-10 flex flex-col justify-center items-center p-12 text-center">
-                <div className="bg-black/40 backdrop-blur-sm rounded-3xl p-10 shadow-2xl max-w-2xl mx-auto border border-gray-800">
-                  <img
-                    src={carouselSlides[currentSlide].image}
-                    alt={carouselSlides[currentSlide].title}
-                    className="w-80 h-60 object-cover rounded-2xl mb-8 shadow-xl"
-                  />
-                  <h2 className="text-4xl font-bold mb-6 text-white drop-shadow-lg leading-tight">
-                    {carouselSlides[currentSlide].title}
-                  </h2>
-                  <p className="text-xl text-gray-300 mb-8 max-w-lg mx-auto leading-relaxed">
-                    {carouselSlides[currentSlide].description}
-                  </p>
-                </div>
-                
-                <div className="flex space-x-3 mt-8">
-                  {carouselSlides.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`w-3 h-3 rounded-full transition-all ${
-                        index === currentSlide ? 'bg-white w-10' : 'bg-white/60'
-                      }`}
-                    />
-                  ))}
-                </div>
-                
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-gray-800/50 backdrop-blur-sm rounded-full hover:bg-gray-700/50 transition-all shadow-xl"
-                >
-                  <ChevronLeft className="w-7 h-7 text-white" />
-                </button>
-                
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-gray-800/50 backdrop-blur-sm rounded-full hover:bg-gray-700/50 transition-all shadow-xl"
-                >
-                  <ChevronRight className="w-7 h-7 text-white" />
-                </button>
-              </div>
-            </div>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <PageLayout>
+        <ContentWrapper maxWidth="desktop">
+          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+            {/* Main Content */}
+            <Box sx={{ flex: 1, display: 'flex' }}>
+              {/* Left Side - Carousel */}
+              <Box
+                sx={{
+                  display: { xs: 'none', lg: 'flex' },
+                  width: { lg: '50%' },
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)'
+                }}
+              >
+                <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 6, textAlign: 'center' }}>
+                  <Fade in={true} timeout={800}>
+                    <StyledCarouselCard>
+                      <StyledCarouselImage
+                        image={carouselSlides[currentSlide].image}
+                        title={carouselSlides[currentSlide].title}
+                      />
+                      <CardContent sx={{ p: 0 }}>
+                        <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', mb: 3, color: 'white', lineHeight: 1.2 }}>
+                          {carouselSlides[currentSlide].title}
+                        </Typography>
+                        <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3, maxWidth: 400, mx: 'auto', lineHeight: 1.6 }}>
+                          {carouselSlides[currentSlide].description}
+                        </Typography>
+                      </CardContent>
+                    </StyledCarouselCard>
+                  </Fade>
+                  
+                  {/* Carousel Dots */}
+                  <Box sx={{ display: 'flex', mt: 3 }}>
+                    {carouselSlides.map((_, index) => (
+                      <StyledDotButton
+                        key={index}
+                        active={index === currentSlide}
+                        onClick={() => setCurrentSlide(index)}
+                      />
+                    ))}
+                  </Box>
+                  
+                  {/* Navigation Buttons */}
+                  <StyledIconButton
+                    sx={{ left: 3 }}
+                    onClick={prevSlide}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box component="span" sx={{ color: 'white', fontSize: 28, display: 'flex' }}>
+                        <ChevronLeft size={28} color="white" />
+                      </Box>
+                    </Box>
+                  </StyledIconButton>
+                  
+                  <StyledIconButton
+                    sx={{ right: 3 }}
+                    onClick={nextSlide}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box component="span" sx={{ color: 'white', fontSize: 28, display: 'flex' }}>
+                        <ChevronRight size={28} color="white" />
+                      </Box>
+                    </Box>
+                  </StyledIconButton>
+                </Box>
+              </Box>
 
-            {/* Right Side - Signup Form */}
-            <div className="w-full lg:w-1/2 flex flex-col justify-center p-8 lg:p-16 bg-surface">
-              <div className="max-w-md mx-auto w-full">
-                <div className="mb-8">
-                  <h1 className="text-3xl lg:text-4xl font-bold mb-2" style={{color: mdColors.buttonGreen}}>
-                    Create Account
-                  </h1>
-                  <p className="text-gray-400 text-lg">
-                    Join us and start your journey
-                  </p>
-                </div>
+              {/* Right Side - Signup Form */}
+              <Box sx={{ width: { xs: '100%', lg: '50%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', p: { xs: 4, lg: 8 } }}>
+                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000' }}>
+                  <Box sx={{ mb: 6 }}>
+                    {/* Placeholder for Icon */}
+                    <Box sx={{ width: 40, height: 40, bgcolor: 'primary.main', borderRadius: '8px', mb: 2 }} />
+                    <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+                      Let's get started
+                    </Typography>
+                  </Box>
 
-                {/* Signup Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="relative">
-                    <input
-                      type="text"
+                  {/* Signup Form */}
+                  <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 , bgcolor: '#000000', border: '2px solid', borderColor: '#000000' }}>
+                    <TextField
+                      fullWidth
                       id="organizationName"
+                      label="Organization name"
                       value={formData.organizationName}
                       onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
-                      className="peer w-full px-4 py-3 bg-transparent border-2 border-gray-600 rounded-lg focus:outline-none focus:border-green-500 transition-colors text-white placeholder-transparent"
-                      placeholder="Organization name"
                       required
+                      InputProps={{
+                        startAdornment: <Building style={{ color: 'text.secondary', marginRight: '4px' }} />
+                      }}
+                      variant="outlined"
                     />
-                    <label
-                      htmlFor="organizationName"
-                      className="absolute left-4 -top-2.5 bg-surface px-1 text-sm text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-green-500 peer-focus:bg-surface"
-                    >
-                      Organization name
-                    </label>
-                    <Building className="absolute right-3 top-3.5 w-5 h-5 text-gray-500" />
-                  </div>
 
-                  <div className="relative">
-                    <input
-                      type="email"
+                    <TextField
+                      fullWidth
                       id="email"
+                      label="Email"
+                      type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="peer w-full px-4 py-3 bg-transparent border-2 border-gray-600 rounded-lg focus:outline-none focus:border-green-500 transition-colors text-white placeholder-transparent"
-                      placeholder="Email"
                       required
+                      InputProps={{
+                        startAdornment: <Mail style={{ color: 'text.secondary', marginRight: '4px' }} />
+                      }}
+                      variant="outlined"
                     />
-                    <label
-                      htmlFor="email"
-                      className="absolute left-4 -top-2.5 bg-surface px-1 text-sm text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-green-500 peer-focus:bg-surface"
-                    >
-                      Email
-                    </label>
-                    <Mail className="absolute right-3 top-3.5 w-5 h-5 text-gray-500" />
-                  </div>
-                  
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
+                    
+                    <TextField
+                      fullWidth
                       id="password"
+                      label="Password"
+                      type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="peer w-full px-4 py-3 pr-12 bg-transparent border-2 border-gray-600 rounded-lg focus:outline-none focus:border-green-500 transition-colors text-white placeholder-transparent"
-                      placeholder="Password"
                       required
+                      InputProps={{
+                        startAdornment: <Lock style={{ color: 'text.secondary', marginRight: '4px' }} />,
+                        endAdornment: (
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
+                          </IconButton>
+                        )
+                      }}
+                      variant="outlined"
                     />
-                    <label
-                      htmlFor="password"
-                      className="absolute left-4 -top-2.5 bg-surface px-1 text-sm text-gray-400 transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-placeholder-shown:top-3 peer-focus:-top-2.5 peer-focus:text-sm peer-focus:text-green-500 peer-focus:bg-surface"
-                    >
-                      Password
-                    </label>
-                    <Lock className="absolute right-10 top-3.5 w-5 h-5 text-gray-500" />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3.5 text-gray-500 hover:text-gray-300 transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                    </button>
-                  </div>
 
-                  {/* Terms Checkbox */}
-                  <div className="flex items-start space-x-2">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      checked={formData.agreeToTerms}
-                      onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                      className="mt-1 rounded border-gray-600 bg-surface text-green-500 focus:ring-green-500 focus:ring-2"
-                    />
-                    <label htmlFor="terms" className="text-sm text-gray-400 leading-tight">
-                      I agree to the <a href="/terms" className="text-green-500 hover:text-green-400 font-medium">Terms of Service</a> and <a href="/privacy" className="text-green-500 hover:text-green-400 font-medium">Privacy Policy</a>
-                    </label>
-                  </div>
-                  
-                  <button
-                    type="submit"
-                    disabled={signupLoading}
-                    className="w-full bg-green-600 hover:bg-green-500 text-white py-3 px-6 rounded-lg transition-all font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
-                    style={{backgroundColor: signupLoading ? undefined : mdColors.buttonGreen}}
-                  >
-                    {signupLoading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    {/* Terms Checkbox */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Checkbox
+                        id="terms"
+                        checked={formData.agreeToTerms}
+                        onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
+                        color="primary"
+                        sx={{ mt: 0.5 }}
+                      />
+                      <Box component="label" htmlFor="terms" sx={{ fontSize: '0.875rem', color: 'text.secondary', lineHeight: 1.4, cursor: 'pointer' }}>
+                        I agree to the{' '}
+                        <Link href="/terms" sx={{ color: 'primary.main', '&:hover': { color: 'primary.light' } }}>
+                          Terms of Service
+                        </Link>
+                        {' '}and{' '}
+                        <Link href="/privacy" sx={{ color: 'primary.main', '&:hover': { color: 'primary.light' } }}>
+                          Privacy Policy
+                        </Link>
+                      </Box>
+                    </Box>
+                    
+                    <Button
+                      type="submit"
+                      fullWidth
+                      variant="contained"
+                      disabled={signupLoading}
+                      size="large"
+                      sx={{ py: 1.5, fontSize: '1rem', fontWeight: 600, color: 'white' }}
+                    >
+                      {signupLoading ? (
+                        <>
+                          <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
+                          Creating Account...
+                        </>
+                      ) : (
+                        'SIGN UP'
+                      )}
+                    </Button>
+                  </Box>
+                    </Box>
+                    <Box>
+                  <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
+                    or sign up using
+                  </Typography>
+
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2, flexWrap: 'wrap' }}>
+                    <Chip
+                      icon={
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
-                        Creating Account...
-                      </>
-                    ) : (
-                      'SIGN UP'
-                    )}
-                  </button>
-                </form>
+                      }
+                      label="Google"
+                      onClick={() => handleSocialLogin('Google')}
+                      sx={{ 
+                        bgcolor: 'background.paper', 
+                        border: '1px solid',
+                        borderColor: 'divider',
+                         borderRadius: '8px',
+                        '&:hover': { 
+                          bgcolor: 'action.hover',
+                          borderColor: 'text.secondary'
+                        },
+                        cursor: 'pointer'
+                      }}
+                    />
+                    
+                    <Chip
+                      icon={
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                          <path fill="#F25022" d="M11.4 11.4H2.6V2.6h8.8v8.8z"/>
+                          <path fill="#7FBA00" d="M21.4 11.4h-8.8V2.6h8.8v8.8z"/>
+                          <path fill="#00A4EF" d="M11.4 21.4H2.6v-8.8h8.8v8.8z"/>
+                          <path fill="#FFB900" d="M21.4 21.4h-8.8v-8.8h8.8v8.8z"/>
+                        </svg>
+                      }
+                      label="Microsoft"
+                      onClick={() => handleSocialLogin('Microsoft')}
+                      sx={{ 
+                        bgcolor: 'background.paper', 
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: '8px',
+                        '&:hover': { 
+                          bgcolor: 'action.hover',
+                          borderColor: 'text.secondary'
+                        },
+                        cursor: 'pointer'
+                      }}
+                    />
+                    
+                    <Chip
+                      icon={<Linkedin style={{ color: '#0077B5', fontSize: '20px' }} />}
+                      label="LinkedIn"
+                      onClick={() => handleSocialLogin('LinkedIn')}
+                      disabled={authLoading}
+                      sx={{ 
+                        bgcolor: 'background.paper', 
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        borderRadius: '8px',
+                        '&:hover': { 
+                          bgcolor: 'action.hover',
+                          borderColor: 'text.secondary'
+                        },
+                        cursor: authLoading ? 'not-allowed' : 'pointer'
+                      }}
+                    />
+                  </Box>
 
-                <div className="mt-8 text-center text-gray-500 text-sm">
-                  or sign up using
-                </div>
+                  <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
+                    Already have an account?{' '}
+                    <Link href="/login" sx={{ color: 'primary.main', fontWeight: 'medium', '&:hover': { color: 'primary.light' } }}>
+                      Sign in
+                    </Link>
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
 
-                <div className="flex justify-center space-x-3 mt-6">
-                  <button
-                    onClick={() => handleSocialLogin('Google')}
-                    className="flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-300 rounded-full hover:border-gray-400 hover:shadow-md transition-all shadow-sm"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={() => handleSocialLogin('Microsoft')}
-                    className="flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-300 rounded-full hover:border-gray-400 hover:shadow-md transition-all shadow-sm"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="#F25022" d="M11.4 11.4H2.6V2.6h8.8v8.8z"/>
-                      <path fill="#7FBA00" d="M21.4 11.4h-8.8V2.6h8.8v8.8z"/>
-                      <path fill="#00A4EF" d="M11.4 21.4H2.6v-8.8h8.8v8.8z"/>
-                      <path fill="#FFB900" d="M21.4 21.4h-8.8v-8.8h8.8v8.8z"/>
-                    </svg>
-                  </button>
-                  
-                  <button
-                    onClick={() => handleSocialLogin('LinkedIn')}
-                    disabled={authLoading}
-                    className="flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-300 rounded-full hover:border-gray-400 hover:shadow-md transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Linkedin className="w-5 h-5 text-blue-600" />
-                  </button>
-                </div>
+            {/* Footer */}
+            <Box component="footer" sx={{ bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
+              <Box sx={{ maxWidth: 'lg', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ mb: { xs: 2, sm: 0 } }}>
+                  <Link href="/terms" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, mr: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Terms of Service</Link>
+                  <Typography component="span" sx={{ color: '#A3A3A3', mx: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>|</Typography>
+                  <Link href="/privacy" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Privacy Policy</Link>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#A3A3A3', fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>
+                  All rights reserved © 2025 Puviyan Digital Solutions Private Limited.
+                </Typography>
+              </Box>
+            </Box>
 
-                <div className="mt-8 text-center text-gray-600">
-                  Already have an account?{' '}
-                  <a href="/login" className="text-green-500 hover:text-green-400 font-medium">
-                    Sign in
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <footer className="bg-surface border-t border-gray-800 py-6 px-8">
-            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-              <div className="mb-3 sm:mb-0">
-                <a href="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</a>
-                <span className="mx-2">•</span>
-                <a href="/privacy" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
-              </div>
-              <div>
-                All rights reserved © 2025 Puviyan Digital Solutions Private Limited.
-              </div>
-            </div>
-          </footer>
-
-          {/* Custom Popup */}
-          <CustomPopup
-            isOpen={showPopup}
-            onClose={() => setShowPopup(false)}
-            title={popupConfig.title}
-            message={popupConfig.message}
-            type={popupConfig.type}
-          />
-        </div>
-      </ContentWrapper>
-    </PageLayout>
+            {/* Custom Popup */}
+            <CustomPopup
+              isOpen={showPopup}
+              onClose={() => setShowPopup(false)}
+              title={popupConfig.title}
+              message={popupConfig.message}
+              type={popupConfig.type}
+            />
+          </Box>
+        </ContentWrapper>
+      </PageLayout>
+    </ThemeProvider>
   )
 }
