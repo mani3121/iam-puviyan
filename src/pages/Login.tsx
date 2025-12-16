@@ -78,7 +78,7 @@ const StyledCarouselImage = styled(CardMedia)(({ theme }) => ({
   boxShadow: theme.shadows[8],
 }))
 
-const StyledIconButton = styled(IconButton)(({ theme }) => ({
+const StyledIconButton = styled(IconButton)(({ }) => ({
   position: 'absolute',
   top: '50%',
   transform: 'translateY(-50%)',
@@ -86,19 +86,6 @@ const StyledIconButton = styled(IconButton)(({ theme }) => ({
   backdropFilter: 'blur(8px)',
   '&:hover': {
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-}))
-
-const StyledSocialButton = styled(Button)(({ theme }) => ({
-  width: 48,
-  height: 48,
-  minWidth: 48,
-  borderRadius: '50%',
-  border: `2px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    borderColor: theme.palette.text.secondary,
   },
 }))
 
