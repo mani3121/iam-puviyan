@@ -71,6 +71,11 @@ export default function Login() {
   })
   const [signupLoading, setSignupLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
+  const [isSignInMode, setIsSignInMode] = useState(false)
+
+  const toggleAuthMode = () => {
+    setIsSignInMode(!isSignInMode)
+  }
 
   useEffect(() => {
     // Check if this is a LinkedIn OAuth callback
@@ -237,7 +242,7 @@ export default function Login() {
 
               {/* Right Side - Signup Form */}
               <Box sx={{ width: { xs: '100%', lg: '50%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
-                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000', textAlign: 'center' ,p: 4}}>
+                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000', textAlign: 'center' ,p: 3}}>
                   <Box sx={{ mb: 2, textAlign: 'center' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                       <Box  
@@ -273,6 +278,13 @@ export default function Login() {
                       InputProps={{
                         startAdornment: <Building style={{ color: 'text.secondary', marginRight: '4px' }} />
                       }}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
+                        }
+                      }}
                       variant="outlined"
                     />
 
@@ -286,6 +298,13 @@ export default function Login() {
                       required
                       InputProps={{
                         startAdornment: <Mail style={{ color: 'text.secondary', marginRight: '4px' }} />
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
+                        }
                       }}
                       variant="outlined"
                     />
@@ -305,6 +324,13 @@ export default function Login() {
                             {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
                           </IconButton>
                         )
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
+                        }
                       }}
                       variant="outlined"
                     />
@@ -351,9 +377,13 @@ export default function Login() {
                     </Box>
                     
                     <Box>
-                  <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
-                    or sign up using
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 1, maxWidth: 400, mx: 'auto', px: 0 }}>
+                    <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
+                    <Typography variant="body2" sx={{ px: 2, color: 'text.secondary', fontSize: '0.875rem', flexShrink: 0 }}>
+                      or sign up using
+                    </Typography>
+                    <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
+                  </Box>
 
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2, flexWrap: 'wrap' }}>
                     <Chip
@@ -424,9 +454,16 @@ export default function Login() {
                   </Box>
 
                   <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
-                    Already have an account?{' '}
-                    <Link href="/login" sx={{ color: 'primary.main', fontWeight: 'medium', '&:hover': { color: 'primary.light' } }}>
-                      Sign in
+                    {isSignInMode ? "Don't have an account?" : 'Already have an account?'}{' '}
+                    <Link 
+                      href="#" 
+                      onClick={(e) => {
+                        e.preventDefault()
+                        toggleAuthMode()
+                      }}
+                      sx={{ color: 'primary.main', fontWeight: 'medium', '&:hover': { color: 'primary.light' } }}
+                    >
+                      {isSignInMode ? 'Sign up' : 'Sign in'}
                     </Link>
                   </Typography>
                 </Box>
