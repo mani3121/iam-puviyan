@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Mail, Linkedin, Lock, Eye, EyeOff, Building } from 'lucide-react'
+import { Mail, Linkedin, Lock, Eye, EyeOff, Building } from 'lucide-react'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
 import PageLayout from '../components/PageLayout'
@@ -17,13 +17,8 @@ import {
   Checkbox,
   Link,
   CircularProgress,
-  Card,
-  CardMedia,
-  CardContent,
-  Fade,
   Chip
 } from '@mui/material'
-import { styled } from '@mui/material/styles'
 
 // Material UI Dark Theme with Green Accents
 const darkTheme = createTheme({
@@ -58,81 +53,9 @@ const darkTheme = createTheme({
   },
 })
 
-// Styled Components
-const StyledCarouselCard = styled(Card)(({ theme }) => ({
-  background: 'rgba(0, 0, 0, 0.4)',
-  backdropFilter: 'blur(16px)',
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.spacing(3),
-  padding: theme.spacing(4),
-  maxWidth: 600,
-  margin: '0 auto',
-  boxShadow: theme.shadows[24],
-}))
 
-const StyledCarouselImage = styled(CardMedia)(({ theme }) => ({
-  height: 240,
-  width: 320,
-  borderRadius: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  boxShadow: theme.shadows[8],
-}))
-
-const StyledIconButton = styled(IconButton)(({ }) => ({
-  position: 'absolute',
-  top: '50%',
-  transform: 'translateY(-50%)',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  backdropFilter: 'blur(8px)',
-  '&:hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-}))
-
-const StyledDotButton = styled(Button)<{ theme?: any; active?: boolean }>(({ theme, active }) => ({
-  width: active ? theme.spacing(2.5) : theme.spacing(0.75),
-  height: theme.spacing(0.75),
-  minWidth: 'auto',
-  borderRadius: theme.spacing(0.375),
-  backgroundColor: active ? theme.palette.common.white : 'rgba(255, 255, 255, 0.6)',
-  padding: 0,
-  margin: theme.spacing(0, 0.5),
-  transition: 'all 0.3s ease',
-  '&:hover': {
-    backgroundColor: theme.palette.common.white,
-  },
-}))
-
-interface CarouselSlide {
-  id: number
-  title: string
-  description: string
-  image: string
-}
-
-const carouselSlides: CarouselSlide[] = [
-  {
-    id: 1,
-    title: "GROW YOUR IMPACT. ENERGIZE YOUR BRAND.",
-    description: "Join the movement towards a greener, more sustainable future for everyone.",
-    image: "/src/assets/Co-2.avif"
-  },
-  {
-    id: 2,
-    title: "SUSTAINABLE LIVING",
-    description: "Connect with changemakers building sustainable communities worldwide.",
-    image: "/src/assets/Co-2.avif"
-  },
-  {
-    id: 3,
-    title: "ECO-INNOVATION",
-    description: "Transform your environmental impact with powerful sustainable tools.",
-    image: "/src/assets/Co-2.avif"
-  }
-]
 
 export default function Login() {
-  const [currentSlide, setCurrentSlide] = useState(0)
   const [showPassword, setShowPassword] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [popupConfig, setPopupConfig] = useState({
@@ -189,21 +112,6 @@ export default function Login() {
       setAuthLoading(false)
       window.history.replaceState({}, document.title, window.location.pathname)
     }
-  }
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % carouselSlides.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + carouselSlides.length) % carouselSlides.length)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -311,86 +219,50 @@ export default function Login() {
       <CssBaseline />
       <PageLayout>
         <ContentWrapper maxWidth="desktop">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
+          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
             {/* Main Content */}
             <Box sx={{ flex: 1, display: 'flex' }}>
-              {/* Left Side - Carousel */}
+              {/* Left Side - Static Content */}
               <Box
                 sx={{
                   display: { xs: 'none', lg: 'flex' },
                   width: { lg: '50%' },
-                  position: 'relative',
-                  overflow: 'hidden',
-                  background: 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)'
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  p: 6,
+                  background: ' #1a1a1a 0%'
                 }}
               >
-                <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 6, textAlign: 'center' }}>
-                  <Fade in={true} timeout={800}>
-                    <StyledCarouselCard>
-                      <StyledCarouselImage
-                        image={carouselSlides[currentSlide].image}
-                        title={carouselSlides[currentSlide].title}
-                      />
-                      <CardContent sx={{ p: 0 }}>
-                        <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', mb: 3, color: 'white', lineHeight: 1.2 }}>
-                          {carouselSlides[currentSlide].title}
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 3, maxWidth: 400, mx: 'auto', lineHeight: 1.6 }}>
-                          {carouselSlides[currentSlide].description}
-                        </Typography>
-                      </CardContent>
-                    </StyledCarouselCard>
-                  </Fade>
-                  
-                  {/* Carousel Dots */}
-                  <Box sx={{ display: 'flex', mt: 3 }}>
-                    {carouselSlides.map((_, index) => (
-                      <StyledDotButton
-                        key={index}
-                        active={index === currentSlide}
-                        onClick={() => setCurrentSlide(index)}
-                      />
-                    ))}
-                  </Box>
-                  
-                  {/* Navigation Buttons */}
-                  <StyledIconButton
-                    sx={{ left: 3 }}
-                    onClick={prevSlide}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Box component="span" sx={{ color: 'white', fontSize: 28, display: 'flex' }}>
-                        <ChevronLeft size={28} color="white" />
-                      </Box>
-                    </Box>
-                  </StyledIconButton>
-                  
-                  <StyledIconButton
-                    sx={{ right: 3 }}
-                    onClick={nextSlide}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Box component="span" sx={{ color: 'white', fontSize: 28, display: 'flex' }}>
-                        <ChevronRight size={28} color="white" />
-                      </Box>
-                    </Box>
-                  </StyledIconButton>
-                </Box>
               </Box>
 
               {/* Right Side - Signup Form */}
-              <Box sx={{ width: { xs: '100%', lg: '50%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', p: { xs: 4, lg: 8 } }}>
-                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000' }}>
-                  <Box sx={{ mb: 6 }}>
-                    {/* Placeholder for Icon */}
-                    <Box sx={{ width: 40, height: 40, bgcolor: 'primary.main', borderRadius: '8px', mb: 2 }} />
-                    <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+              <Box sx={{ width: { xs: '100%', lg: '50%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
+                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000', textAlign: 'center' ,p: 4}}>
+                  <Box sx={{ mb: 2, textAlign: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                      <Box  
+                        component="img"
+                        src="/src/assets/IamPuviyanLogo.png"
+                        alt="IamPuviyan Logo"
+                        sx={{ width: 40, height: 40, mr: 1 }}
+                      />
+                      <Typography sx={{ color: '#D4D4D4', fontFamily: '"Segoe UI Variable"', fontSize: '12px', lineHeight: 1.2, textAlign: 'left' }}>
+                        IAMPUVIYAN
+                        <br />
+                        <Typography component="span" sx={{ fontSize: '14px' }}>
+                          ORGANISATION
+                        </Typography>
+                      </Typography>
+                    </Box>
+                    <Box>
+                       <Typography sx={{ color: '#D4D4D4', textAlign: 'center', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
                       Let's get started
-                    </Typography>
+                     </Typography>
+                    </Box>
                   </Box>
 
                   {/* Signup Form */}
-                  <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 , bgcolor: '#000000', border: '2px solid', borderColor: '#000000' }}>
+                  <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 , bgcolor: '#000000', border: '22px solid', borderColor: '#000000', alignItems: 'center' }}>
                     <TextField
                       fullWidth
                       id="organizationName"
@@ -438,15 +310,14 @@ export default function Login() {
                     />
 
                     {/* Terms Checkbox */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center'}}>
                       <Checkbox
                         id="terms"
                         checked={formData.agreeToTerms}
                         onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
                         color="primary"
-                        sx={{ mt: 0.5 }}
                       />
-                      <Box component="label" htmlFor="terms" sx={{ fontSize: '0.875rem', color: 'text.secondary', lineHeight: 1.4, cursor: 'pointer' }}>
+                      <Box component="label" htmlFor="terms" sx={{ fontSize: '0.720rem', color: 'text.secondary', lineHeight: 1.4, cursor: 'pointer' }}>
                         I agree to the{' '}
                         <Link href="/terms" sx={{ color: 'primary.main', '&:hover': { color: 'primary.light' } }}>
                           Terms of Service
@@ -476,7 +347,9 @@ export default function Login() {
                       )}
                     </Button>
                   </Box>
+                  <br/>
                     </Box>
+                    
                     <Box>
                   <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
                     or sign up using
@@ -561,7 +434,7 @@ export default function Login() {
             </Box>
 
             {/* Footer */}
-            <Box component="footer" sx={{ bgcolor: 'background.paper', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
+            <Box component="footer" sx={{  bgcolor: '#000000', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
               <Box sx={{ maxWidth: 'lg', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ mb: { xs: 2, sm: 0 } }}>
                   <Link href="/terms" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, mr: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Terms of Service</Link>
