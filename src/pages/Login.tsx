@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Mail, Linkedin, Lock, Eye, EyeOff, Building } from 'lucide-react'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
+import logoImage from '../assets/IamPuviyanLogo.png'
 import {
   ThemeProvider,
   createTheme,
@@ -56,6 +58,7 @@ const darkTheme = createTheme({
 
 
 export default function Login() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [popupConfig, setPopupConfig] = useState({
@@ -164,6 +167,13 @@ export default function Login() {
     
     // Validate form
     if (!validateForm()) {
+      return
+    }
+    
+    // Handle sign in navigation
+    if (isSignInMode) {
+      // For sign in, navigate to dashboard after validation
+      navigate('/dashboard')
       return
     }
     
@@ -293,7 +303,7 @@ export default function Login() {
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
                       <Box  
                         component="img"
-                        src="/src/assets/IamPuviyanLogo.png"
+                        src={logoImage}
                         alt="IamPuviyan Logo"
                         sx={{ width: 40, height: 40, mr: 1 }}
                       />

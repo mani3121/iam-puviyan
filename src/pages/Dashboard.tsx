@@ -99,8 +99,9 @@ function Dashboard() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <PageLayout>
-        <ContentWrapper>
-          <Box sx={{ display: 'flex', height: 'calc(100vh - 200px)' }}>
+        <ContentWrapper maxWidth="desktop">
+          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ flex: 1, display: 'flex', height: 'calc(100vh - 200px)' }}>
             {/* Left Sidebar */}
             <StyledDrawer
               variant="permanent"
@@ -153,6 +154,7 @@ function Dashboard() {
               {selectedComponent}
             </Box>
           </Box>
+        </Box>
         </ContentWrapper>
       </PageLayout>
     </ThemeProvider>
