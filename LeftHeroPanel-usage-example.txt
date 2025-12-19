@@ -1,0 +1,50 @@
+// Usage Example for LeftHeroPanel Component
+
+import LeftHeroPanel from './components/LeftHeroPanel'
+
+const exampleSlides = [
+  {
+    imageUrl: "/path/to/image1.jpg",
+    title: "GROW YOUR",
+    highlight: "IMPACT.",
+    subtitle: "ENERGIZE YOUR BRAND.",
+    description: "Transform your business with our innovative solutions that drive measurable results and sustainable growth."
+  },
+  {
+    imageUrl: "/path/to/image2.jpg", 
+    title: "BUILD YOUR",
+    highlight: "FUTURE.",
+    subtitle: "INNOVATE WITH CONFIDENCE.",
+    description: "Leverage cutting-edge technology and expert guidance to stay ahead in today's competitive landscape."
+  },
+  {
+    imageUrl: "/path/to/image3.jpg",
+    title: "ACCELERATE YOUR",
+    subtitle: "SUCCESS JOURNEY.",
+    description: "Join thousands of businesses that have transformed their operations and achieved remarkable growth."
+  }
+]
+
+// Example usage in a two-column auth layout:
+<div className="flex min-h-screen">
+  {/* Left column - Hero Panel */}
+  <div className="w-1/2 hidden lg:block">
+    <LeftHeroPanel 
+      slides={exampleSlides}
+      autoRotate={true}
+      intervalMs={6000}
+      className="h-[520px]"
+    />
+  </div>
+  
+  {/* Right column - Auth Form */}
+  <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+    {/* Your signup/login form goes here */}
+  </div>
+</div>
+
+// Single slide usage (no dots, no auto-rotation):
+<LeftHeroPanel 
+  slides={[exampleSlides[0]]}
+  className="h-[360px]"
+/>

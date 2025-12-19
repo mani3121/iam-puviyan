@@ -91,7 +91,6 @@ const RewardsContent = () => {
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
-    const [lastVisible, setLastVisible] = useState<any>(null)
   const [totalRewardsCount, setTotalRewardsCount] = useState(0)
   const pageSize = 10
 
@@ -107,7 +106,6 @@ const RewardsContent = () => {
         ])
         console.log('Data fetched:', { rewardsResult, statsData })
         setRewards(rewardsResult.rewards)
-                setLastVisible(rewardsResult.lastVisible)
         setStatsData(statsData)
         setTotalRewardsCount(statsData.totalRewards)
         setError('')
@@ -131,7 +129,6 @@ const RewardsContent = () => {
       if (page === 1) {
         // First page - no lastVisible
         rewardsResult = await fetchRewardsPaginated(pageSize)
-        setLastVisible(rewardsResult.lastVisible)
       } else {
         // For simplicity, we'll fetch from the beginning for now
         // In a real app, you might want to cache previous pages
@@ -171,7 +168,6 @@ const RewardsContent = () => {
   // Function to refresh data (useful after creating new rewards)
   const refreshData = async () => {
     setCurrentPage(1)
-    setLastVisible(null)
     const fetchData = async () => {
       try {
         setLoading(true)
@@ -180,7 +176,6 @@ const RewardsContent = () => {
           fetchRewardsStats()
         ])
         setRewards(rewardsResult.rewards)
-                setLastVisible(rewardsResult.lastVisible)
         setStatsData(statsData)
         setTotalRewardsCount(statsData.totalRewards)
         setError('')

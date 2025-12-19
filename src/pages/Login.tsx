@@ -6,7 +6,11 @@ import { storeUserSignup, sendVerificationEmail } from '../services/firebaseServ
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
+import LeftHeroPanel from '../components/LeftHeroPanel'
 import logoImage from '../assets/IamPuviyanLogo.png'
+import slide1Image from '../assets/1.jpg'
+import slide2Image from '../assets/2.jpg'
+import slide3Image from '../assets/3.jpg'
 import {
   ThemeProvider,
   createTheme,
@@ -21,6 +25,30 @@ import {
   CircularProgress,
   Chip
 } from '@mui/material'
+
+// Slides data for LeftHeroPanel
+const heroSlides = [
+  {
+    imageUrl: slide1Image,
+    title: 'GROW YOUR',
+    highlight: 'IMPACT.',
+    subtitle: 'ENERGIZE YOUR BRAND.',
+    description: 'Transform your business with our innovative rewards platform that drives measurable results and sustainable growth.'
+  },
+  {
+    imageUrl: slide2Image, 
+    title: 'BUILD YOUR',
+    highlight: 'FUTURE.',
+    subtitle: 'INNOVATE WITH CONFIDENCE.',
+    description: 'Leverage cutting-edge technology and expert guidance to stay ahead in today\'s competitive landscape.'
+  },
+  {
+    imageUrl: slide3Image,
+    title: 'ACCELERATE YOUR',
+    subtitle: 'SUCCESS JOURNEY.',
+    description: 'Join thousands of organizations that have transformed their operations and achieved remarkable growth.'
+  }
+]
 
 // Material UI Dark Theme with Green Accents
 const darkTheme = createTheme({
@@ -283,21 +311,28 @@ export default function Login() {
           <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
             {/* Main Content */}
             <Box sx={{ flex: 1, display: 'flex' }}>
-              {/* Left Side - Static Content */}
+              {/* Left Side - Hero Panel */}
               <Box
                 sx={{
                   display: { xs: 'none', lg: 'flex' },
-                  width: { lg: '50%' },
+                  width: { lg: '55%' },
                   flexDirection: 'column',
-                  justifyContent: 'space-between',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
                   p: 6,
-                  background: ' #1a1a1a 0%'
+                  background: '#1a1a1a'
                 }}
               >
+                <LeftHeroPanel 
+                  slides={heroSlides}
+                  autoRotate={true}
+                  intervalMs={6000}
+                  className="w-full h-full max-h-[800px]"
+                />
               </Box>
 
               {/* Right Side - Signup Form */}
-              <Box sx={{ width: { xs: '100%', lg: '50%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
+              <Box sx={{ width: { xs: '100%', lg: '45%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
                 <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000', textAlign: 'center' ,p: 3}}>
                   <Box sx={{ mb: 2, textAlign: 'center' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
