@@ -131,16 +131,16 @@ function Dashboard() {
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: isMobile ? 3 : 'auto',
+                  mr: isMobile ? 3 : 2,
                   justifyContent: 'center',
                   color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3',
                 }}
               >
                 {item.icon}
-              </ListItemIcon>
+              </ListItemIcon> 
               <ListItemText 
                 primary={item.label}
-                sx={{ opacity: isMobile ? 1 : 0 }}
+                sx={{ opacity: 1 }}
                 primaryTypographyProps={{
                   sx: { 
                     color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3',
