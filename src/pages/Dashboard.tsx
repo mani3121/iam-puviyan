@@ -160,7 +160,7 @@ function Dashboard() {
       <CssBaseline />
       <PageLayout>
         <ContentWrapper maxWidth="desktop">
-          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+          <Box sx={{ display: 'flex', minHeight: '100vh', height: { xs: '100vh', lg: 'auto' }, overflow: { xs: 'hidden', lg: 'visible' } }}>
             <AppBar
               position="fixed"
               sx={{
@@ -238,6 +238,8 @@ function Dashboard() {
                 p: 3,
                 backgroundColor: '#1a1a1a',
                 mt: { xs: 8, lg: 0 },
+                height: { xs: 'calc(100vh - 64px)', lg: 'auto' },
+                overflow: { xs: 'auto', lg: 'visible' },
                 transition: theme.transitions.create(['margin', 'width'], {
                   easing: theme.transitions.easing.sharp,
                   duration: theme.transitions.duration.leavingScreen,
