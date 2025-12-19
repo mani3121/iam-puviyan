@@ -11,17 +11,23 @@ import {
   ListItemIcon,
   ListItemText,
   Drawer,
-  Divider
+  Divider,
+  IconButton,
+  AppBar,
+  Toolbar,
+  useTheme,
+  useMediaQuery
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import {
+  Menu as MenuIcon,
+  School,
+  Trophy
+} from 'lucide-react'
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
-import Onboarding from '../components/Onboarding'
-import Rewards from '../components/Rewards'
-import {
-  Trophy,
-  School
-} from 'lucide-react'
+import OnboardingContent from '../components/OnboardingContent'
+import RewardsContent from '../components/RewardsContent'
 
 // Material UI Dark Theme with Green Accents
 const darkTheme = createTheme({
@@ -44,16 +50,9 @@ const darkTheme = createTheme({
   },
 })
 
-const drawerWidth = 280
+const drawerWidth = 240
 
-const StyledDrawer = styled(Drawer)(() => ({
-  '& .MuiDrawer-paper': {
-    width: drawerWidth,
-    boxSizing: 'border-box',
-    backgroundColor: '#2a2a2a',
-    borderRight: '1px solid #333',
-  },
-}))
+
 
 const StyledListItemButton = styled(ListItemButton)(() => ({
   '&.Mui-selected': {
@@ -69,6 +68,9 @@ const StyledListItemButton = styled(ListItemButton)(() => ({
   '&:hover': {
     backgroundColor: '#333',
   },
+  minHeight: 48,
+  justifyContent: 'center',
+  px: 2.5,
 }))
 
 const menuItems = [
@@ -76,85 +78,175 @@ const menuItems = [
     id: 'onboarding',
     label: 'Onboarding',
     icon: <School />,
-    component: <Onboarding />
+    component: () => <OnboardingContent />
   },
   {
     id: 'rewards',
     label: 'Rewards',
     icon: <Trophy />,
-    component: <Rewards />
+    component: () => <RewardsContent />
   }
 ]
 
+
 function Dashboard() {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [selectedMenu, setSelectedMenu] = useState('onboarding')
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen)
+  }
 
   const handleMenuClick = (menuId: string) => {
     setSelectedMenu(menuId)
+    if (isMobile) {
+      setMobileOpen(false)
+    }
   }
 
-  const selectedComponent = menuItems.find(item => item.id === selectedMenu)?.component || <Onboarding />
+  const selectedComponent = menuItems.find(item => item.id === selectedMenu)?.component || (() => <OnboardingContent />)
+
+  const drawer = (
+    <Box>
+      <Toolbar>
+        <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+          Dashboard
+        </Typography>
+      </Toolbar>
+      <Divider sx={{ borderColor: '#333' }} />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem key={item.id} disablePadding sx={{ display: 'block' }}>
+            <StyledListItemButton
+              selected={selectedMenu === item.id}
+              onClick={() => handleMenuClick(item.id)}
+              sx={{
+                minHeight: 48,
+                justifyContent: isMobile ? 'initial' : 'center',
+                px: 2.5,
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: isMobile ? 3 : 'auto',
+                  justifyContent: 'center',
+                  color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3',
+                }}
+              >
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.label}
+                sx={{ opacity: isMobile ? 1 : 0 }}
+                primaryTypographyProps={{
+                  sx: { 
+                    color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3',
+                    fontWeight: selectedMenu === item.id ? 'bold' : 'normal'
+                  }
+                }}
+              />
+            </StyledListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Box>
+  )
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <PageLayout>
         <ContentWrapper maxWidth="desktop">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ flex: 1, display: 'flex', height: 'calc(100vh - 200px)' }}>
-            {/* Left Sidebar */}
-            <StyledDrawer
-              variant="permanent"
-              anchor="left"
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+            <AppBar
+              position="fixed"
+              sx={{
+                display: { lg: 'none' },
+                backgroundColor: '#2a2a2a',
+                borderBottom: '1px solid #333',
+                zIndex: theme.zIndex.drawer + 1,
+              }}
             >
-              <Box sx={{ p: 3 }}>
-                <Typography variant="h6" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2 }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
                   Dashboard
                 </Typography>
-              </Box>
-              <Divider sx={{ borderColor: '#333' }} />
-              <List sx={{ px: 2, py: 2 }}>
-                {menuItems.map((item) => (
-                  <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-                    <StyledListItemButton
-                      selected={selectedMenu === item.id}
-                      onClick={() => handleMenuClick(item.id)}
-                      sx={{ borderRadius: 2 }}
-                    >
-                      <ListItemIcon sx={{ color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3' }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={item.label}
-                        primaryTypographyProps={{
-                          sx: { 
-                            color: selectedMenu === item.id ? '#ffffff' : '#A3A3A3',
-                            fontWeight: selectedMenu === item.id ? 'bold' : 'normal'
-                          }
-                        }}
-                      />
-                    </StyledListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            </StyledDrawer>
+              </Toolbar>
+            </AppBar>
 
-            {/* Right Content Area */}
+            <Box
+              component="nav"
+              sx={{ width: { lg: drawerWidth }, flexShrink: { lg: 0 } }}
+            >
+              <Drawer
+                variant={isMobile ? 'temporary' : 'permanent'}
+                open={isMobile ? mobileOpen : true}
+                onClose={handleDrawerToggle}
+                ModalProps={{
+                  keepMounted: true,
+                }}
+                sx={{
+                  display: { xs: 'block', lg: 'none' },
+                  '& .MuiDrawer-paper': { 
+                    boxSizing: 'border-box', 
+                    width: drawerWidth,
+                    backgroundColor: '#2a2a2a',
+                    borderRight: '1px solid #333',
+                    transition: theme.transitions.create('width', {
+                      easing: theme.transitions.easing.sharp,
+                      duration: theme.transitions.duration.enteringScreen,
+                    }),
+                  },
+                }}
+              >
+                {drawer}
+              </Drawer>
+              <Drawer
+                variant="permanent"
+                sx={{
+                  display: { xs: 'none', lg: 'block' },
+                  '& .MuiDrawer-paper': { 
+                    boxSizing: 'border-box', 
+                    width: drawerWidth,
+                    backgroundColor: '#2a2a2a',
+                    borderRight: '1px solid #333',
+                  },
+                }}
+                open
+              >
+                {drawer}
+              </Drawer>
+            </Box>
+
             <Box
               component="main"
               sx={{
                 flexGrow: 1,
+                width: { lg: `calc(100% - ${drawerWidth}px)` },
                 p: 3,
                 backgroundColor: '#1a1a1a',
-                borderRadius: 2,
-                ml: 2,
-                overflow: 'auto'
+                mt: { xs: 8, lg: 0 },
+                transition: theme.transitions.create(['margin', 'width'], {
+                  easing: theme.transitions.easing.sharp,
+                  duration: theme.transitions.duration.leavingScreen,
+                }),
               }}
             >
-              {selectedComponent}
+              {selectedComponent()}
             </Box>
           </Box>
-        </Box>
         </ContentWrapper>
       </PageLayout>
     </ThemeProvider>

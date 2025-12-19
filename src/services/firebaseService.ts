@@ -1,6 +1,7 @@
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, orderBy, limit, startAfter, DocumentSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { v4 as uuidv4 } from 'uuid';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface EmailSubmissionResult {
   success: boolean;
@@ -14,6 +15,37 @@ interface SignupResult {
   alreadyExists: boolean;
   verificationLink?: string;
   userId?: string;
+}
+
+export interface Reward {
+  id: string;
+  availableCoupons:string;
+  brandName: string;
+  deductPoints: number;
+  dislikeCount: number;
+  fullImage: string;
+  fullImageGreyed: string;
+  howToClaim: string[];
+  likeCount: number;
+  maxPerUser: number;
+  previewImage: string;
+  previewImageGreyed: string;
+  rewardDetails: string[];
+  rewardSubtitle: string;
+  rewardTitle: string;
+  rewardType: string;
+  status: string;
+  usefulnessScore: number;
+  validFrom: string;
+  validTo: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PaginatedRewardsResult {
+  rewards: Reward[];
+  hasMore: boolean;
+  lastVisible?: DocumentSnapshot;
 }
 
 /**
@@ -163,6 +195,204 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
     return {
       success: false,
       message: 'Failed to send verification email. Please request a new verification email.'
+    };
+  }
+};
+
+/**
+ * Fetches all rewards from the Rewards collection
+ * @returns Array of rewards or empty array if error
+ */
+export const fetchRewards = async (): Promise<Reward[]> => {
+  try {
+    const rewardsQuery = query(
+      collection(db, 'rewards'),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(rewardsQuery);
+    const rewards: Reward[] = [];
+    
+    querySnapshot.forEach((doc) => {
+      const rewardData = doc.data() as Omit<Reward, 'id'>;
+      rewards.push({
+        id: doc.id,
+        ...rewardData
+      });
+    });
+    
+    return rewards;
+  } catch (error) {
+    console.error('Error fetching rewards:', error);
+    return [];
+  }
+};
+
+/**
+ * Fetches rewards from the Rewards collection with pagination
+ * @param pageSize - Number of rewards per page (default: 10)
+ * @param lastVisible - Last document from previous page (for pagination)
+ * @returns Paginated rewards result with rewards array and pagination info
+ */
+export const fetchRewardsPaginated = async (
+  pageSize: number = 10,
+  lastVisible?: DocumentSnapshot
+): Promise<PaginatedRewardsResult> => {
+  try {
+    console.log('fetchRewardsPaginated called with:', { pageSize, lastVisible: !!lastVisible });
+    
+    let rewardsQuery = query(
+      collection(db, 'rewards'),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+
+    // If we have a lastVisible document, start after it for pagination
+    if (lastVisible) {
+      rewardsQuery = query(
+        collection(db, 'rewards'),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastVisible),
+        limit(pageSize)
+      );
+    }
+    
+    console.log('Executing query...');
+    const querySnapshot = await getDocs(rewardsQuery);
+    console.log('Query executed, docs found:', querySnapshot.docs.length);
+    
+    const rewards: Reward[] = [];
+    
+    querySnapshot.forEach((doc) => {
+      const rewardData = doc.data() as Omit<Reward, 'id'>;
+      rewards.push({
+        id: doc.id,
+        ...rewardData
+      });
+    });
+    
+    console.log('Processed rewards:', rewards.length);
+    
+    // Check if there are more documents
+    const hasMore = querySnapshot.docs.length === pageSize;
+    const newLastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    
+    const result = {
+      rewards,
+      hasMore,
+      lastVisible: hasMore ? newLastVisible : undefined
+    };
+    
+    console.log('Returning result:', { rewardsCount: result.rewards.length, hasMore: result.hasMore });
+    return result;
+  } catch (error) {
+    console.error('Error fetching paginated rewards:', error);
+    return {
+      rewards: [],
+      hasMore: false
+    };
+  }
+};
+
+/**
+ * Creates a new reward in the Rewards collection
+ * @param rewardData - Reward data object
+ * @returns Result object with success status and message
+ */
+export const createReward = async (rewardData: Omit<Reward, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; message: string; rewardId?: string }> => {
+  try {
+    const currentDateTime = new Date().toISOString();
+    
+    const rewardWithTimestamps = {
+      ...rewardData,
+      createdAt: currentDateTime,
+      updatedAt: currentDateTime,
+      likeCount: 0,
+      dislikeCount: 0,
+      availableCoupons: rewardData.availableCoupons || "0"
+    };
+
+    const docRef = await addDoc(collection(db, 'rewards'), rewardWithTimestamps);
+    
+    return {
+      success: true,
+      message: 'Reward created successfully!',
+      rewardId: docRef.id
+    };
+  } catch (error) {
+    console.error('Error creating reward:', error);
+    return {
+      success: false,
+      message: 'Failed to create reward. Please try again.'
+    };
+  }
+};
+
+/**
+ * Fetches statistics about rewards
+ * @returns Object containing reward statistics
+ */
+export const fetchRewardsStats = async (): Promise<{
+  totalRewards: number;
+  totalClaimed: number;
+  totalUnclaimed: number;
+  totalExpiring: number;
+}> => {
+  try {
+    const rewardsQuery = query(collection(db, 'rewards'));
+    const querySnapshot = await getDocs(rewardsQuery);
+    
+    const rewards = querySnapshot.docs.map(doc => doc.data() as Reward);
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    
+    const stats = {
+      totalRewards: rewards.length,
+      totalClaimed: rewards.filter(r => r.status === 'claimed').length,
+      totalUnclaimed: rewards.filter(r => r.status === 'active').length,
+      totalExpiring: rewards.filter(r => {
+        const validToDate = new Date(r.validTo);
+        return validToDate <= thirtyDaysFromNow && validToDate >= now;
+      }).length
+    };
+    
+    return stats;
+  } catch (error) {
+    console.error('Error fetching rewards stats:', error);
+    return {
+      totalRewards: 0,
+      totalClaimed: 0,
+      totalUnclaimed: 0,
+      totalExpiring: 0
+    };
+  }
+};
+
+/**
+ * Uploads an image to Firebase Storage
+ * @param file - Image file to upload
+ * @param folder - Storage folder path
+ * @returns Download URL of the uploaded image
+ */
+export const uploadImage = async (file: File, folder: string = 'reward-images'): Promise<{ success: boolean; url?: string; message: string }> => {
+  try {
+    const storage = getStorage();
+    const fileName = `${folder}/${uuidv4()}-${file.name}`;
+    const storageRef = ref(storage, fileName);
+    
+    await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(storageRef);
+    
+    return {
+      success: true,
+      url: downloadURL,
+      message: 'Image uploaded successfully!'
+    };
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    return {
+      success: false,
+      message: 'Failed to upload image. Please try again.'
     };
   }
 };
