@@ -1,33 +1,38 @@
-import { useState, useEffect } from 'react'
 import {
+  Alert,
   Box,
-  Typography,
+  Button,
   Card,
   CardContent,
+  Chip,
+  CircularProgress,
+  createTheme,
+  CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  IconButton,
+  Pagination,
+  Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
   TextField,
-  Button,
-  CircularProgress,
-  Alert,
-  Stack,
-  Chip,
-  Grid,
-  Pagination,
   ThemeProvider,
-  createTheme,
-  CssBaseline,
-  IconButton
+  Typography
 } from '@mui/material'
+import { useEffect, useState } from 'react'
 
-import { Search, Plus, Gift, CheckCircle, Clock, AlertCircle, Edit } from 'lucide-react'
+import { AlertCircle, CheckCircle, Clock, Edit, Gift, Plus, Search, Trash2 } from 'lucide-react'
+import { deleteReward, fetchRewardsPaginated, fetchRewardsStats, type PaginatedRewardsResult, type Reward } from '../services/firebaseService'
 import RewardModal from './RewardModal'
-import { fetchRewardsPaginated, fetchRewardsStats, type Reward, type PaginatedRewardsResult } from '../services/firebaseService'
 
 // Create a custom theme with enhanced scrollbar
 const theme = createTheme({
@@ -79,6 +84,8 @@ const RewardsContent = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingReward, setEditingReward] = useState<Reward | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [rewardToDelete, setRewardToDelete] = useState<Reward | null>(null)
   const [rewards, setRewards] = useState<Reward[]>([])
   const [statsData, setStatsData] = useState({
     totalRewards: 0,
@@ -206,6 +213,30 @@ const RewardsContent = () => {
     console.log('Reward updated:', rewardData)
     refreshData()
     setEditingReward(null)
+  }
+
+  // Handle delete reward
+  const handleDeleteReward = async () => {
+    if (!rewardToDelete) return;
+    
+    try {
+      const result = await deleteReward(rewardToDelete.id);
+      
+      if (result.success) {
+        // Refresh data after successful deletion
+        refreshData();
+      } else {
+        setError(result.message || 'Failed to delete reward. Please try again.');
+      }
+      
+      setDeleteDialogOpen(false);
+      setRewardToDelete(null);
+    } catch (error) {
+      console.error('Error deleting reward:', error);
+      setError('An unexpected error occurred while deleting the reward.');
+      setDeleteDialogOpen(false);
+      setRewardToDelete(null);
+    }
   }
 
   // Filter rewards based on search term (applied to current page data)
@@ -374,13 +405,25 @@ const RewardsContent = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEdit(reward)}
-                        color="primary"
-                      >
-                        <Edit size={16} />
-                      </IconButton>
+                      <Stack direction="row" spacing={1}>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEdit(reward)}
+                          color="primary"
+                        >
+                          <Edit size={16} />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            setRewardToDelete(reward)
+                            setDeleteDialogOpen(true)
+                          }}
+                          color="error"
+                        >
+                          <Trash2 size={16} />
+                        </IconButton>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -421,10 +464,41 @@ const RewardsContent = () => {
             onSave={editingReward ? handleUpdateReward : handleCreateReward}
             editingReward={editingReward}
           />
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog
+            open={deleteDialogOpen}
+            onClose={() => setDeleteDialogOpen(false)}
+            aria-labelledby="delete-dialog-title"
+            aria-describedby="delete-dialog-description"
+          >
+            <DialogTitle id="delete-dialog-title">
+              Delete Reward
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="delete-dialog-description">
+                Are you sure you want to delete the reward "{rewardToDelete?.rewardTitle}"?
+                This action cannot be undone.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDeleteDialogOpen(false)} color="primary">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleDeleteReward} 
+                color="error"
+                variant="contained"
+                autoFocus
+              >
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Box>
-    </ThemeProvider>
+  </ThemeProvider>
   )
 }
 

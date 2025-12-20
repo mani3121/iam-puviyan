@@ -1,7 +1,7 @@
-import { collection, addDoc, query, where, getDocs, orderBy, limit, startAfter, DocumentSnapshot } from 'firebase/firestore';
-import { db } from '../firebase';
+import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, where } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db } from '../firebase';
 
 interface EmailSubmissionResult {
   success: boolean;
@@ -364,6 +364,33 @@ export const fetchRewardsStats = async (): Promise<{
       totalClaimed: 0,
       totalUnclaimed: 0,
       totalExpiring: 0
+    };
+  }
+};
+
+/**
+ * Uploads an image to Firebase Storage
+ * @param file - Image file to upload
+ * @param folder - Storage folder path
+ * @returns Download URL of the uploaded image
+ */
+/**
+ * Deletes a reward from the Rewards collection
+ * @param rewardId - ID of the reward to delete
+ * @returns Result object with success status and message
+ */
+export const deleteReward = async (rewardId: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    await deleteDoc(doc(db, 'rewards', rewardId));
+    return {
+      success: true,
+      message: 'Reward deleted successfully!'
+    };
+  } catch (error) {
+    console.error('Error deleting reward:', error);
+    return {
+      success: false,
+      message: 'Failed to delete reward. Please try again.'
     };
   }
 };
