@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react'
+import {
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  CircularProgress,
+  createTheme,
+  CssBaseline,
+  IconButton,
+  Link,
+  TextField,
+  ThemeProvider,
+  Typography
+} from '@mui/material'
+import { Eye, EyeOff, Linkedin } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Linkedin, Lock, Eye, EyeOff, Building } from 'lucide-react'
-import { LinkedInAuthService } from '../services/linkedInAuthService'
-import { storeUserSignup, sendVerificationEmail } from '../services/firebaseService'
-import PageLayout from '../components/PageLayout'
-import ContentWrapper from '../components/ContentWrapper'
-import CustomPopup from '../components/CustomPopup'
-import LeftHeroPanel from '../components/LeftHeroPanel'
-import logoImage from '../assets/IamPuviyanLogo.png'
 import slide1Image from '../assets/1.jpg'
 import slide2Image from '../assets/2.jpg'
 import slide3Image from '../assets/3.jpg'
-import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  Box,
-  Typography,
-  TextField,
-  IconButton,
-  Button,
-  Checkbox,
-  Link,
-  CircularProgress,
-  Chip
-} from '@mui/material'
+import logoImage from '../assets/IamPuviyanLogo.png'
+import ContentWrapper from '../components/ContentWrapper'
+import CustomPopup from '../components/CustomPopup'
+import LeftHeroPanel from '../components/LeftHeroPanel'
+import PageLayout from '../components/PageLayout'
+import { sendVerificationEmail, storeUserSignup } from '../services/firebaseService'
+import { LinkedInAuthService } from '../services/linkedInAuthService'
 
 // Slides data for LeftHeroPanel
 const heroSlides = [
@@ -95,12 +95,14 @@ export default function Login() {
     type: 'success' as 'success' | 'error' | 'info'
   })
   const [formData, setFormData] = useState({
+    fullName: '',
     organizationName: '',
     email: '',
     password: '',
     agreeToTerms: false
   })
   const [formErrors, setFormErrors] = useState({
+    fullName: false,
     organizationName: false,
     email: false,
     password: false
@@ -111,6 +113,7 @@ export default function Login() {
 
   const validateForm = () => {
     const errors = {
+      fullName: false,
       organizationName: false,
       email: false,
       password: false
@@ -131,8 +134,15 @@ export default function Login() {
       errors.password = true
     }
     
-    // Organization name validation (only for sign-up)
+    // Full name validation (only for sign-up)
     if (!isSignInMode) {
+      if (!formData.fullName) {
+        errors.fullName = true
+      } else if (formData.fullName.length < 2) {
+        errors.fullName = true
+      }
+      
+      // Organization name validation (only for sign-up)
       if (!formData.organizationName) {
         errors.organizationName = true
       } else if (formData.organizationName.length < 2) {
@@ -141,7 +151,7 @@ export default function Login() {
     }
     
     setFormErrors(errors)
-    return !errors.organizationName && !errors.email && !errors.password
+    return !errors.fullName && !errors.organizationName && !errors.email && !errors.password
   }
 
   const toggleAuthMode = () => {
@@ -260,6 +270,7 @@ export default function Login() {
       
       // Clear form
       setFormData({
+        fullName: '',
         organizationName: '',
         email: '',
         password: '',
@@ -351,32 +362,30 @@ export default function Login() {
                       </Typography>
                     </Box>
                     <Box>
-                       <Typography sx={{ color: '#D4D4D4', textAlign: 'center', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
-                      {isSignInMode ? 'Welcome back!' : 'Let\'s get started'}
-                     </Typography>
+                      <Typography sx={{ color: '#D4D4D4', textAlign: 'center', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
+                        {isSignInMode ? 'Welcome back!' : 'Let\'s get started'}
+                      </Typography>
                     </Box>
-                  </Box>
+                </Box>
 
-                  {/* Signup Form */}
-                  <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3 , bgcolor: '#000000', border: '22px solid', borderColor: '#000000', alignItems: 'center' }}>
-                    {!isSignInMode && (
+                {/* Signup Form */}
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#000000', border: '22px solid', borderColor: '#000000', alignItems: 'center' }}>
+                  {!isSignInMode ? (
+                    <Box sx={{ width: '100%' }}>
                       <TextField
                         fullWidth
-                        id="organizationName"
-                        label="Organization name"
-                        value={formData.organizationName}
+                        id="fullName"
+                        label="Full Name"
+                        value={formData.fullName}
                         onChange={(e) => {
-                          setFormData({ ...formData, organizationName: e.target.value })
+                          setFormData({ ...formData, fullName: e.target.value })
                           // Clear error when user starts typing
-                          if (formErrors.organizationName) {
-                            setFormErrors({ ...formErrors, organizationName: false })
+                          if (formErrors.fullName) {
+                            setFormErrors({ ...formErrors, fullName: false })
                           }
                         }}
                         required
-                        error={formErrors.organizationName}
-                        InputProps={{
-                          startAdornment: <Building style={{ color: 'text.secondary', marginRight: '4px' }} />
-                        }}
+                        error={formErrors.fullName}
                         InputLabelProps={{
                           sx: {
                             '& .MuiInputLabel-asterisk': {
@@ -393,8 +402,71 @@ export default function Login() {
                         }}
                         variant="outlined"
                       />
-                    )}
-
+                      <TextField
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => {
+                          setFormData({ ...formData, email: e.target.value })
+                          // Clear error when user starts typing
+                          if (formErrors.email) {
+                            setFormErrors({ ...formErrors, email: false })
+                          }
+                        }}
+                        required
+                        error={formErrors.email}
+                        InputLabelProps={{
+                          sx: {
+                            '& .MuiInputLabel-asterisk': {
+                              color: 'red'
+                            }
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '&.Mui-error fieldset': {
+                              borderColor: 'red'
+                            }
+                          },
+                          mt: 2
+                        }}
+                        variant="outlined"
+                      />
+                      <TextField
+                        fullWidth
+                        id="organizationName"
+                        label="Organization name"
+                        value={formData.organizationName}
+                        onChange={(e) => {
+                          setFormData({ ...formData, organizationName: e.target.value })
+                          // Clear error when user starts typing
+                          if (formErrors.organizationName) {
+                            setFormErrors({ ...formErrors, organizationName: false })
+                          }
+                        }}
+                        required
+                        error={formErrors.organizationName}
+                        InputLabelProps={{
+                          sx: {
+                            '& .MuiInputLabel-asterisk': {
+                              color: 'red'
+                            }
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            '&.Mui-error fieldset': {
+                              borderColor: 'red'
+                            }
+                          },
+                          mt: 2
+                        }}
+                        variant="outlined"
+                      />
+                    </Box>
+                  ) : (
                     <TextField
                       fullWidth
                       id="email"
@@ -403,16 +475,12 @@ export default function Login() {
                       value={formData.email}
                       onChange={(e) => {
                         setFormData({ ...formData, email: e.target.value })
-                        // Clear error when user starts typing
                         if (formErrors.email) {
                           setFormErrors({ ...formErrors, email: false })
                         }
                       }}
                       required
                       error={formErrors.email}
-                      InputProps={{
-                        startAdornment: <Mail style={{ color: 'text.secondary', marginRight: '4px' }} />
-                      }}
                       InputLabelProps={{
                         sx: {
                           '& .MuiInputLabel-asterisk': {
@@ -429,37 +497,38 @@ export default function Login() {
                       }}
                       variant="outlined"
                     />
-                    
-                    <TextField
-                      fullWidth
-                      id="password"
-                      label="Password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={formData.password}
-                      onChange={(e) => {
-                        setFormData({ ...formData, password: e.target.value })
-                        // Clear error when user starts typing
-                        if (formErrors.password) {
-                          setFormErrors({ ...formErrors, password: false })
+                  )}
+                  
+                  <TextField
+                    fullWidth
+                    id="password"
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={(e) => {
+                      setFormData({ ...formData, password: e.target.value })
+                      // Clear error when user starts typing
+                      if (formErrors.password) {
+                        setFormErrors({ ...formErrors, password: false })
+                      }
+                    }}
+                    required
+                    error={formErrors.password}
+                    InputProps={{
+                      // Lock icon removed as requested
+                      endAdornment: (
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
+                        </IconButton>
+                      )
+                    }}
+                    InputLabelProps={{
+                      sx: {
+                        '& .MuiInputLabel-asterisk': {
+                          color: 'red'
                         }
-                      }}
-                      required
-                      error={formErrors.password}
-                      InputProps={{
-                        startAdornment: <Lock style={{ color: 'text.secondary', marginRight: '4px' }} />,
-                        endAdornment: (
-                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                            {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
-                          </IconButton>
-                        )
-                      }}
-                      InputLabelProps={{
-                        sx: {
-                          '& .MuiInputLabel-asterisk': {
-                            color: 'red'
-                          }
-                        }
-                      }}
+                      }
+                    }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           '&.Mui-error fieldset': {
