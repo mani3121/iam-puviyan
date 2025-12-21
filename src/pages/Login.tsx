@@ -30,23 +30,19 @@ import { LinkedInAuthService } from '../services/linkedInAuthService'
 const heroSlides = [
   {
     imageUrl: slide1Image,
-    title: 'GROW YOUR',
-    highlight: 'IMPACT.',
-    subtitle: 'ENERGIZE YOUR BRAND.',
-    description: 'Transform your business with our innovative rewards platform that drives measurable results and sustainable growth.'
+    title: 'EMPOWER SUSTAINABLE LIVING',
+    subtitle: 'Better employee retention. Attract top talent. Embrace higher productivity.',
   },
   {
     imageUrl: slide2Image, 
     title: 'BUILD YOUR',
     highlight: 'FUTURE.',
     subtitle: 'INNOVATE WITH CONFIDENCE.',
-    description: 'Leverage cutting-edge technology and expert guidance to stay ahead in today\'s competitive landscape.'
   },
   {
     imageUrl: slide3Image,
     title: 'ACCELERATE YOUR',
     subtitle: 'SUCCESS JOURNEY.',
-    description: 'Join thousands of organizations that have transformed their operations and achieved remarkable growth.'
   }
 ]
 
@@ -63,7 +59,7 @@ const darkTheme = createTheme({
       main: '#FFC107',
     },
     background: {
-      default: '#121212',
+      default: '#1a1a1a',
       paper: '#1e1e1e',
     },
     error: {
@@ -336,22 +332,22 @@ export default function Login() {
               >
                 <LeftHeroPanel 
                   slides={heroSlides}
-                  autoRotate={true}
-                  intervalMs={6000}
+                  // autoRotate={true}
+                  // intervalMs={6000}
                   className="w-full h-full max-h-[800px]"
                 />
               </Box>
 
               {/* Right Side - Signup Form */}
               <Box sx={{ width: { xs: '100%', lg: '45%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
-                <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%', bgcolor: '#000000', textAlign: 'center' ,p: 3}}>
-                  <Box sx={{ mb: 2, textAlign: 'center' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', }}>
+                <Box sx={{ bgcolor: '#1a1a1a', textAlign: 'left', pl: 2, pr: 2, pt: 2, pb: 0 }}>
+                  <Box sx={{ mb: 1, textAlign: 'left', ml: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', mb: 3 }}>
                       <Box  
                         component="img"
                         src={logoImage}
                         alt="IamPuviyan Logo"
-                        sx={{ width: 40, height: 40, mr: 1 }}
+                        sx={{ width: 40, height: 40, mr: 2 }}
                       />
                       <Typography sx={{ color: '#D4D4D4', fontFamily: '"Segoe UI Variable"', fontSize: '12px', lineHeight: 1.2, textAlign: 'left' }}>
                         IAMPUVIYAN
@@ -361,15 +357,15 @@ export default function Login() {
                         </Typography>
                       </Typography>
                     </Box>
-                    <Box>
-                      <Typography sx={{ color: '#D4D4D4', textAlign: 'center', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
+                    <Box >
+                      <Typography sx={{ color: '#D4D4D4', textAlign: 'left', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
                         {isSignInMode ? 'Welcome back!' : 'Let\'s get started'}
-                      </Typography>
+                      </Typography> 
                     </Box>
                 </Box>
 
                 {/* Signup Form */}
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#000000', border: '22px solid', borderColor: '#000000', alignItems: 'center' }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#1a1a1a', border: '22px solid', borderColor: '#1a1a1a', alignItems: 'center' }}>
                   {!isSignInMode ? (
                     <Box sx={{ width: '100%' }}>
                       <TextField
@@ -405,7 +401,7 @@ export default function Login() {
                       <TextField
                         fullWidth
                         id="email"
-                        label="Email"
+                        label="Work Email"
                         type="email"
                         value={formData.email}
                         onChange={(e) => {
@@ -703,7 +699,7 @@ export default function Login() {
             </Box>
 
             {/* Footer */}
-            <Box component="footer" sx={{  bgcolor: '#000000', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
+            <Box component="footer" sx={{  bgcolor: '#1a1a1a', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
               <Box sx={{ maxWidth: 'lg', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ mb: { xs: 2, sm: 0 } }}>
                   <Link href="/terms" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, mr: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Terms of Service</Link>
