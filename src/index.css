@@ -55,3 +55,18 @@ body {
   animation-delay: 0.6s;
   will-change: transform;
 }
+
+@keyframes tickFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tick-fade-in {
+  animation: tickFadeIn 0.3s ease-in-out forwards;
+}

@@ -12,7 +12,7 @@ import {
   ThemeProvider,
   Typography
 } from '@mui/material'
-import { Eye, EyeOff, Linkedin } from 'lucide-react'
+import { Eye, EyeOff, Linkedin, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import slide1Image from '../assets/1.jpg'
@@ -101,26 +101,33 @@ export default function Login() {
     fullName: false,
     organizationName: false,
     email: false,
-    password: false
+    password: false,
+    agreeToTerms: false
   })
   const [signupLoading, setSignupLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [isSignInMode, setIsSignInMode] = useState(false)
+  const [emailValid, setEmailValid] = useState(false)
 
   const validateForm = () => {
     const errors = {
       fullName: false,
       organizationName: false,
       email: false,
-      password: false
+      password: false,
+      agreeToTerms: false
     }
     
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!formData.email) {
       errors.email = true
+      setEmailValid(false)
     } else if (!emailRegex.test(formData.email)) {
       errors.email = true
+      setEmailValid(false)
+    } else {
+      setEmailValid(true)
     }
     
     // Password validation
@@ -144,10 +151,15 @@ export default function Login() {
       } else if (formData.organizationName.length < 2) {
         errors.organizationName = true
       }
+      
+      // Terms agreement validation (only for sign-up)
+      if (!formData.agreeToTerms) {
+        errors.agreeToTerms = true
+      }
     }
     
     setFormErrors(errors)
-    return !errors.fullName && !errors.organizationName && !errors.email && !errors.password
+    return !errors.fullName && !errors.organizationName && !errors.email && !errors.password && !errors.agreeToTerms
   }
 
   const toggleAuthMode = () => {
@@ -213,6 +225,7 @@ export default function Login() {
     
     // Check terms agreement only for sign-up
     if (!isSignInMode && !formData.agreeToTerms) {
+      setFormErrors({ ...formErrors, agreeToTerms: true })
       setPopupConfig({
         title: 'Terms Agreement Required',
         message: 'Please agree to the Terms of Service and Privacy Policy to continue.',
@@ -417,9 +430,28 @@ export default function Login() {
                           if (formErrors.email) {
                             setFormErrors({ ...formErrors, email: false })
                           }
+                          // Validate email on change
+                          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                          if (e.target.value && emailRegex.test(e.target.value)) {
+                            setEmailValid(true)
+                          } else {
+                            setEmailValid(false)
+                          }
                         }}
                         required
                         error={formErrors.email}
+                        InputProps={{
+                          endAdornment: emailValid && (
+                            <Box 
+                              component={CheckCircle}
+                              className="tick-fade-in"
+                              sx={{ 
+                                color: '#4CAF50', 
+                                fontSize: '20px'
+                              }} 
+                            />
+                          )
+                        }}
                         InputLabelProps={{
                           sx: {
                             '& .MuiInputLabel-asterisk': {
@@ -482,9 +514,28 @@ export default function Login() {
                         if (formErrors.email) {
                           setFormErrors({ ...formErrors, email: false })
                         }
+                        // Validate email on change
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                        if (e.target.value && emailRegex.test(e.target.value)) {
+                          setEmailValid(true)
+                        } else {
+                          setEmailValid(false)
+                        }
                       }}
                       required
                       error={formErrors.email}
+                      InputProps={{
+                        endAdornment: emailValid && (
+                          <Box 
+                            component={CheckCircle}
+                            className="tick-fade-in"
+                            sx={{ 
+                              color: '#4CAF50', 
+                              fontSize: '20px'
+                            }} 
+                          />
+                        )
+                      }}
                       InputLabelProps={{
                         sx: {
                           '& .MuiInputLabel-asterisk': {
@@ -576,8 +627,17 @@ export default function Login() {
                         <Checkbox
                           id="terms"
                           checked={formData.agreeToTerms}
-                          onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                          color="primary"
+                          onChange={(e) => {
+                            setFormData({ ...formData, agreeToTerms: e.target.checked })
+                            // Clear error when user clicks checkbox
+                            if (formErrors.agreeToTerms) {
+                              setFormErrors({ ...formErrors, agreeToTerms: false })
+                            }
+                          }}
+                          color={formErrors.agreeToTerms ? 'error' : 'primary'}
+                          sx={{
+                            color: formErrors.agreeToTerms ? 'red' : 'inherit'
+                          }}
                         />
                         <Box component="label" htmlFor="terms" sx={{ fontSize: '0.720rem', color: 'text.secondary', lineHeight: 1.4, cursor: 'pointer' }}>
                           I agree to the{' '}
