@@ -371,7 +371,8 @@ export default function Login() {
                       <TextField
                         fullWidth
                         id="fullName"
-                        label="Full Name"
+                        label="Full name*"
+                        placeholder="Enter your full name"
                         value={formData.fullName}
                         onChange={(e) => {
                           setFormData({ ...formData, fullName: e.target.value })
@@ -389,20 +390,26 @@ export default function Login() {
                             }
                           }
                         }}
+                        variant="standard"
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '&.Mui-error fieldset': {
                               borderColor: 'red'
                             }
+                          },
+                          '& .MuiInputLabel-root': {
+                            position: 'relative',
+                            transform: 'none',
+                            marginBottom: '8px'
                           }
                         }}
-                        variant="outlined"
                       />
                       <TextField
                         fullWidth
                         id="email"
                         label="Work Email"
                         type="email"
+                        placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => {
                           setFormData({ ...formData, email: e.target.value })
@@ -433,7 +440,8 @@ export default function Login() {
                       <TextField
                         fullWidth
                         id="organizationName"
-                        label="Organization name"
+                        label="Organisation Name*"
+                        placeholder="Enter your organisation or community name"
                         value={formData.organizationName}
                         onChange={(e) => {
                           setFormData({ ...formData, organizationName: e.target.value })
@@ -498,8 +506,9 @@ export default function Login() {
                   <TextField
                     fullWidth
                     id="password"
-                    label="Password"
+                    label="Password*"
                     type={showPassword ? 'text' : 'password'}
+                    placeholder="Create a password"
                     value={formData.password}
                     onChange={(e) => {
                       setFormData({ ...formData, password: e.target.value })
@@ -563,7 +572,7 @@ export default function Login() {
                         </Box>
                       </Box>
                     ) : (
-                      <Box sx={{ display: 'flex', alignItems: 'center'}}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                         <Checkbox
                           id="terms"
                           checked={formData.agreeToTerms}
