@@ -16,14 +16,17 @@ import {
   AppBar,
   Toolbar,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Button
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import {
   Menu as MenuIcon,
   School,
-  Trophy
+  Trophy,
+  LogOut
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
 import OnboardingContent from '../components/OnboardingContent'
@@ -94,6 +97,7 @@ function Dashboard() {
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [selectedMenu, setSelectedMenu] = useState('onboarding')
+  const navigate = useNavigate()
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -104,6 +108,15 @@ function Dashboard() {
     if (isMobile) {
       setMobileOpen(false)
     }
+  }
+
+  const handleLogout = () => {
+    // Clear localStorage session
+    localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('userEmail')
+    
+    // Navigate to login page
+    navigate('/login')
   }
 
   const selectedComponent = menuItems.find(item => item.id === selectedMenu)?.component || (() => <OnboardingContent />)
@@ -152,6 +165,40 @@ function Dashboard() {
           </ListItem>
         ))}
       </List>
+      <Box sx={{ flexGrow: 1 }} />
+      <List>
+        <ListItem disablePadding sx={{ display: 'block' }}>
+          <StyledListItemButton
+            onClick={handleLogout}
+            sx={{
+              minHeight: 48,
+              justifyContent: isMobile ? 'initial' : 'center',
+              px: 2.5,
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: isMobile ? 3 : 2,
+                justifyContent: 'center',
+                color: '#A3A3A3',
+              }}
+            >
+              <LogOut />
+            </ListItemIcon> 
+            <ListItemText 
+              primary="Logout"
+              sx={{ opacity: 1 }}
+              primaryTypographyProps={{
+                sx: { 
+                  color: '#A3A3A3',
+                  fontWeight: 'normal'
+                }
+              }}
+            />
+          </StyledListItemButton>
+        </ListItem>
+      </List>
     </Box>
   )
 
@@ -180,9 +227,23 @@ function Dashboard() {
                 >
                   <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold', flexGrow: 1 }}>
                   Dashboard
                 </Typography>
+                <Button
+                  color="inherit"
+                  startIcon={<LogOut />}
+                  onClick={handleLogout}
+                  sx={{ 
+                    color: 'text.secondary',
+                    '&:hover': {
+                      color: 'primary.main',
+                      backgroundColor: 'rgba(76, 175, 80, 0.08)'
+                    }
+                  }}
+                >
+                  Logout
+                </Button>
               </Toolbar>
             </AppBar>
 

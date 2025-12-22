@@ -218,6 +218,10 @@ export default function Login() {
     
     // Handle sign in navigation
     if (isSignInMode) {
+      // Store credentials in localStorage
+      localStorage.setItem('userEmail', formData.email)
+      localStorage.setItem('isLoggedIn', 'true')
+      
       // For sign in, navigate to dashboard after validation
       navigate('/dashboard')
       return
@@ -591,19 +595,8 @@ export default function Login() {
                     />
 
                     {isSignInMode ? (
-                      <Box sx={{ textAlign: 'right', mt: -1, mb: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                          <Link 
-                            href="#" 
-                            sx={{ 
-                              color: 'primary.main', 
-                              fontSize: '0.750rem',
-                              '&:hover': { color: 'primary.light' },
-                              textDecoration: 'none'
-                            }}
-                          >
-                            Sign in using OTP
-                          </Link>
+                      <Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                           <Link 
                             href="#" 
                             sx={{ 
@@ -615,6 +608,17 @@ export default function Login() {
                           >
                             Forgot Password?
                           </Link>
+                          {/* <Link 
+                            href="#" 
+                            sx={{ 
+                              color: 'primary.main', 
+                              fontSize: '0.750rem',
+                              '&:hover': { color: 'primary.light' },
+                              textDecoration: 'none'
+                            }}
+                          >
+                            Forgot Password?
+                          </Link> */}
                         </Box>
                       </Box>
                     ) : (
