@@ -80,14 +80,27 @@ const darkTheme = createTheme({
 
 
 
+interface PopupConfig {
+  title: string
+  message: string
+  type: 'success' | 'error' | 'info'
+  customActions?: Array<{
+    label: string
+    onClick: () => void
+    variant?: 'text' | 'outlined' | 'contained'
+    color?: 'primary' | 'secondary' | 'error'
+  }>
+}
+
 export default function Login() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
-  const [popupConfig, setPopupConfig] = useState({
+  const [popupConfig, setPopupConfig] = useState<PopupConfig>({
     title: '',
     message: '',
-    type: 'success' as 'success' | 'error' | 'info'
+    type: 'success',
+    customActions: undefined
   })
   const [formData, setFormData] = useState({
     email: '',
@@ -138,15 +151,24 @@ export default function Login() {
       return
     }
     
-    // Check email verification status
+    // Check if user exists (for error handling only)
     try {
       const verificationResult = await getUserEmailVerificationStatus(formData.email)
       
       if (!verificationResult.success) {
+        const isEmailNotFound = verificationResult.message === 'Email not found in our system.'
         setPopupConfig({
           title: 'Login Error',
           message: verificationResult.message,
-          type: 'error'
+          type: 'error',
+          customActions: isEmailNotFound ? [
+            {
+              label: 'Sign Up',
+              onClick: () => navigate('/signup'),
+              variant: 'contained',
+              color: 'primary'
+            }
+          ] : undefined
         })
         setShowPopup(true)
         return
@@ -156,20 +178,13 @@ export default function Login() {
       localStorage.setItem('userEmail', formData.email)
       localStorage.setItem('isLoggedIn', 'true')
       
-      // Check if email is verified
-      if (!verificationResult.emailVerified) {
-        // Navigate to verify email page with userId and email
-        navigate(`/verify-email?userId=${verificationResult.userId}&email=${encodeURIComponent(formData.email)}`)
-        return
-      }
-      
-      // Navigate to dashboard if email is verified
+      // Navigate to dashboard (email verification handled separately via verification link)
       navigate('/dashboard')
       return
     } catch (error) {
       setPopupConfig({
         title: 'Login Error',
-        message: 'Failed to verify email status. Please try again.',
+        message: 'Failed to verify user credentials. Please try again.',
         type: 'error'
       })
       setShowPopup(true)
