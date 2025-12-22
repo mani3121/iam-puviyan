@@ -384,7 +384,7 @@ export default function Login() {
                       <TextField
                         fullWidth
                         id="fullName"
-                        label="Full name*"
+                        label="Full name"
                         placeholder="Enter your full name"
                         value={formData.fullName}
                         onChange={(e) => {
@@ -403,19 +403,14 @@ export default function Login() {
                             }
                           }
                         }}
-                        variant="standard"
                         sx={{
                           '& .MuiOutlinedInput-root': {
                             '&.Mui-error fieldset': {
                               borderColor: 'red'
                             }
-                          },
-                          '& .MuiInputLabel-root': {
-                            position: 'relative',
-                            transform: 'none',
-                            marginBottom: '8px'
                           }
                         }}
+                        variant="outlined"
                       />
                       <TextField
                         fullWidth
@@ -472,7 +467,7 @@ export default function Login() {
                       <TextField
                         fullWidth
                         id="organizationName"
-                        label="Organisation Name*"
+                        label="Organisation Name"
                         placeholder="Enter your organisation or community name"
                         value={formData.organizationName}
                         onChange={(e) => {
@@ -506,7 +501,7 @@ export default function Login() {
                     <TextField
                       fullWidth
                       id="email"
-                      label="Email"
+                      label="Work Email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => {
