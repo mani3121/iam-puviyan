@@ -151,7 +151,7 @@ export default function Login() {
       return
     }
     
-    // Check if user exists (for error handling only)
+    // Check if user exists and verify email status
     try {
       const verificationResult = await getUserEmailVerificationStatus(formData.email)
       
@@ -174,11 +174,22 @@ export default function Login() {
         return
       }
 
+      // Check if email is verified
+      if (!verificationResult.emailVerified) {
+        setPopupConfig({
+          title: 'Email Verification Required',
+          message: 'Verify your email',
+          type: 'info'
+        })
+        setShowPopup(true)
+        return
+      }
+
       // Store credentials in localStorage
       localStorage.setItem('userEmail', formData.email)
       localStorage.setItem('isLoggedIn', 'true')
       
-      // Navigate to dashboard (email verification handled separately via verification link)
+      // Navigate to dashboard
       navigate('/dashboard')
       return
     } catch (error) {
