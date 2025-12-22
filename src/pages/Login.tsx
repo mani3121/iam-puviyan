@@ -50,16 +50,16 @@ const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#4CAF50',
-      dark: '#388E3C',
-      light: '#66BB6A',
+      main: '#48C84F',
+      dark: '#3FA640',
+      light: '#5FD55F',
     },
     secondary: {
       main: '#FFC107',
     },
     background: {
-      default: '#1a1a1a',
-      paper: '#1e1e1e',
+      default: '#1A1A1A',
+      paper: '#242424',
     },
     error: {
       main: '#CF6679',
@@ -158,12 +158,12 @@ export default function Login() {
       if (!verificationResult.success) {
         const isEmailNotFound = verificationResult.message === 'Email not found in our system.'
         setPopupConfig({
-          title: 'Login Error',
+          title: 'Access Denied',
           message: verificationResult.message,
           type: 'error',
           customActions: isEmailNotFound ? [
             {
-              label: 'Sign Up',
+              label: 'Create Account',
               onClick: () => navigate('/signup'),
               variant: 'contained',
               color: 'primary'
@@ -194,8 +194,8 @@ export default function Login() {
       return
     } catch (error) {
       setPopupConfig({
-        title: 'Login Error',
-        message: 'Failed to verify user credentials. Please try again.',
+        title: 'Access Denied',
+        message: 'Invalid credentials. Try again.',
         type: 'error'
       })
       setShowPopup(true)
@@ -432,7 +432,7 @@ export default function Login() {
                             textDecoration: 'none'
                           }}
                         >
-                          Forgot Password?
+                          Reset Password?
                         </Link>
                       </Box>
                     </Box>
@@ -448,7 +448,7 @@ export default function Login() {
                       {loginLoading ? (
                         <>
                           <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-                          Signing In...
+                          Signing in...
                         </>
                       ) : (
                         'SIGN IN'
@@ -462,7 +462,7 @@ export default function Login() {
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 1, maxWidth: 400, mx: 'auto', px: 0 }}>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
                     <Typography variant="body2" sx={{ px: 2, color: 'text.secondary', fontSize: '0.875rem', flexShrink: 0 }}>
-                      or sign in using
+                      or connect with
                     </Typography>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
                   </Box>
