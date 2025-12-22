@@ -9,6 +9,7 @@ import AuthPage from './pages/AuthPage'
 import SignupPage from './pages/SignupPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
 import Login from './pages/Login'
+import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -38,7 +39,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/Authpage" element={<AuthPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup" element={<Signup />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsConditions />} />

@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Checkbox,
+  Chip,
   CircularProgress,
   createTheme,
   CssBaseline,
@@ -8,10 +10,9 @@ import {
   Link,
   TextField,
   ThemeProvider,
-  Typography,
-  Chip
+  Typography
 } from '@mui/material'
-import { Eye, EyeOff, CheckCircle, Linkedin } from 'lucide-react'
+import { Eye, EyeOff, Linkedin, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import slide1Image from '../assets/1.jpg'
@@ -22,6 +23,7 @@ import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import LeftHeroPanel from '../components/LeftHeroPanel'
 import PageLayout from '../components/PageLayout'
+import { sendVerificationEmail, storeUserSignup } from '../services/firebaseService'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 
 // Slides data for LeftHeroPanel
@@ -77,9 +79,7 @@ const darkTheme = createTheme({
   },
 })
 
-
-
-export default function Login() {
+export default function Signup() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
@@ -89,21 +89,30 @@ export default function Login() {
     type: 'success' as 'success' | 'error' | 'info'
   })
   const [formData, setFormData] = useState({
+    fullName: '',
+    organizationName: '',
     email: '',
-    password: ''
+    password: '',
+    agreeToTerms: false
   })
   const [formErrors, setFormErrors] = useState({
+    fullName: false,
+    organizationName: false,
     email: false,
-    password: false
+    password: false,
+    agreeToTerms: false
   })
-  const [loginLoading, setLoginLoading] = useState(false)
+  const [signupLoading, setSignupLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [emailValid, setEmailValid] = useState(false)
 
   const validateForm = () => {
     const errors = {
+      fullName: false,
+      organizationName: false,
       email: false,
-      password: false
+      password: false,
+      agreeToTerms: false
     }
     
     // Email validation
@@ -125,25 +134,27 @@ export default function Login() {
       errors.password = true
     }
     
-    setFormErrors(errors)
-    return !errors.email && !errors.password
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // Validate form
-    if (!validateForm()) {
-      return
+    // Full name validation
+    if (!formData.fullName) {
+      errors.fullName = true
+    } else if (formData.fullName.length < 2) {
+      errors.fullName = true
     }
     
-    // Store credentials in localStorage
-    localStorage.setItem('userEmail', formData.email)
-    localStorage.setItem('isLoggedIn', 'true')
+    // Organization name validation
+    if (!formData.organizationName) {
+      errors.organizationName = true
+    } else if (formData.organizationName.length < 2) {
+      errors.organizationName = true
+    }
     
-    // Navigate to dashboard after validation
-    navigate('/dashboard')
-    return
+    // Terms agreement validation Shuttle
+    if (!formData.agreeToTerms) {
+      errors.agreeToTerms = true
+    }
+    
+    setFormErrors(errors)
+    return !errors.fullName && !errors.organizationName && !errors.email && !errors.password && !errors.agreeToTerms
   }
 
   useEffect(() => {
@@ -185,6 +196,89 @@ export default function Login() {
     } finally {
       setAuthLoading(false)
       window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    // Validate form
+    if (!validateForm()) {
+      return
+    }
+    
+    // Check terms agreement
+    if (!formData.agreeToTerms) {
+      setFormErrors({ ...formErrors, agreeToTerms: true })
+      setPopupConfig({
+        title: 'Terms Agreement Required',
+        message: 'Please agree to the Terms of Service and Privacy Policy to continue.',
+        type: 'error'
+      })
+      setShowPopup(true)
+      return
+    }
+    
+    setSignupLoading(true)
+    try {
+      const result = await storeUserSignup(formData.email, formData.password)
+      
+      if (!result.success) {
+        setPopupConfig({
+          title: 'Signup Failed',
+          message: result.message,
+          type: 'error'
+        })
+        setShowPopup(true)
+        return
+      }
+      
+      // Send verification email
+      if (result.verificationLink) {
+        const emailResult = await sendVerificationEmail(formData.email, result.verificationLink)
+        
+        if (emailResult.success) {
+          setPopupConfig({
+            title: 'Signup Successful',
+            message: `${result.message} ${emailResult.message}`,
+            type: 'success'
+          })
+          setShowPopup(true)
+        } else {
+          setPopupConfig({
+            title: 'Email Verification Issue',
+            message: `${result.message} However, there was an issue sending the verification email: ${emailResult.message}`,
+            type: 'error'
+          })
+          setShowPopup(true)
+        }
+      } else {
+        setPopupConfig({
+          title: 'Signup Successful',
+          message: result.message,
+          type: 'success'
+        })
+        setShowPopup(true)
+      }
+      
+      // Clear form
+      setFormData({
+        fullName: '',
+        organizationName: '',
+        email: '',
+        password: '',
+        agreeToTerms: false
+      })
+    } catch (error) {
+      console.error('Signup error:', error)
+      setPopupConfig({
+        title: 'Signup Error',
+        message: 'An error occurred during signup. Please try again.',
+        type: 'error'
+      })
+      setShowPopup(true)
+    } finally {
+      setSignupLoading(false)
     }
   }
 
@@ -262,69 +356,137 @@ export default function Login() {
                     </Box>
                     <Box >
                       <Typography sx={{ color: '#D4D4D4', textAlign: 'left', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
-                        Welcome back!
+                        Let's get started
                       </Typography> 
                     </Box>
                 </Box>
 
-                {/* Login Form */}
+                {/* Signup Form */}
                 <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#1a1a1a', border: '22px solid', borderColor: '#1a1a1a', alignItems: 'center' }}>
-                  <TextField
-                    fullWidth
-                    id="email"
-                    label="Work Email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => {
-                      setFormData({ ...formData, email: e.target.value })
-                      if (formErrors.email) {
-                        setFormErrors({ ...formErrors, email: false })
-                      }
-                      // Validate email on change
-                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                      if (e.target.value && emailRegex.test(e.target.value)) {
-                        setEmailValid(true)
-                      } else {
-                        setEmailValid(false)
-                      }
-                    }}
-                    required
-                    error={formErrors.email}
-                    InputProps={{
-                      endAdornment: emailValid && (
-                        <Box 
-                          component={CheckCircle}
-                          className="tick-fade-in"
-                          sx={{ 
-                            color: '#4CAF50', 
-                            fontSize: '20px'
-                          }} 
-                        />
-                      )
-                    }}
-                    InputLabelProps={{
-                      sx: {
-                        '& .MuiInputLabel-asterisk': {
-                          color: 'red'
+                  <Box sx={{ width: '100%' }}>
+                    <TextField
+                      fullWidth
+                      id="fullName"
+                      label="Full name"
+                      placeholder="Enter your full name"
+                      value={formData.fullName}
+                      onChange={(e) => {
+                        setFormData({ ...formData, fullName: e.target.value })
+                        // Clear error when user starts typing
+                        if (formErrors.fullName) {
+                          setFormErrors({ ...formErrors, fullName: false })
                         }
-                      }
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&.Mui-error fieldset': {
-                          borderColor: 'red'
+                      }}
+                      required
+                      error={formErrors.fullName}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
                         }
-                      }
-                    }}
-                    variant="outlined"
-                  />
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '&.Mui-error fieldset': {
+                            borderColor: 'red'
+                          }
+                        }
+                      }}
+                      variant="outlined"
+                    />
+                    <TextField
+                      fullWidth
+                      id="email"
+                      label="Work Email"
+                      type="email"
+                      placeholder="Enter your email"
+                      value={formData.email}
+                      onChange={(e) => {
+                        setFormData({ ...formData, email: e.target.value })
+                        // Clear error when user starts typing
+                        if (formErrors.email) {
+                          setFormErrors({ ...formErrors, email: false })
+                        }
+                        // Validate email on change
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                        if (e.target.value && emailRegex.test(e.target.value)) {
+                          setEmailValid(true)
+                        } else {
+                          setEmailValid(false)
+                        }
+                      }}
+                      required
+                      error={formErrors.email}
+                      InputProps={{
+                        endAdornment: emailValid && (
+                          <Box 
+                            component={CheckCircle}
+                            className="tick-fade-in"
+                            sx={{ 
+                              color: '#4CAF50', 
+                              fontSize: '20px'
+                            }} 
+                          />
+                        )
+                      }}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '&.Mui-error fieldset': {
+                            borderColor: 'red'
+                          }
+                        },
+                        mt: 2
+                      }}
+                      variant="outlined"
+                    />
+                    <TextField
+                      fullWidth
+                      id="organizationName"
+                      label="Organisation Name"
+                      placeholder="Enter your organisation or community name"
+                      value={formData.organizationName}
+                      onChange={(e) => {
+                        setFormData({ ...formData, organizationName: e.target.value })
+                        // Clear error when user starts typing
+                        if (formErrors.organizationName) {
+                          setFormErrors({ ...formErrors, organizationName: false })
+                        }
+                      }}
+                      required
+                      error={formErrors.organizationName}
+                      InputLabelProps={{
+                        sx: {
+                          '& .MuiInputLabel-asterisk': {
+                            color: 'red'
+                          }
+                        }
+                      }}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '&.Mui-error fieldset': {
+                            borderColor: 'red'
+                          }
+                        },
+                        mt: 2
+                      }}
+                      variant="outlined"
+                    />
+                  </Box>
                   
                   <TextField
                     fullWidth
                     id="password"
                     label="Password*"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder="Create a password"
                     value={formData.password}
                     onChange={(e) => {
                       setFormData({ ...formData, password: e.target.value })
@@ -360,18 +522,30 @@ export default function Login() {
                       variant="outlined"
                     />
 
-                    <Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                        <Link 
-                          href="#" 
-                          sx={{ 
-                            color: 'primary.main', 
-                            fontSize: '0.750rem',
-                            '&:hover': { color: 'primary.light' },
-                            textDecoration: 'none'
-                          }}
-                        >
-                          Forgot Password?
+                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <Checkbox
+                        id="terms"
+                        checked={formData.agreeToTerms}
+                        onChange={(e) => {
+                          setFormData({ ...formData, agreeToTerms: e.target.checked })
+                          // Clear error when user clicks checkbox
+                          if (formErrors.agreeToTerms) {
+                            setFormErrors({ ...formErrors, agreeToTerms: false })
+                          }
+                        }}
+                        color={formErrors.agreeToTerms ? 'error' : 'primary'}
+                        sx={{
+                          color: formErrors.agreeToTerms ? 'red' : 'inherit'
+                        }}
+                      />
+                      <Box component="label" htmlFor="terms" sx={{ fontSize: '0.720rem', color: 'text.secondary', lineHeight: 1.4, cursor: 'pointer' }}>
+                        I agree to the{' '}
+                        <Link href="/terms" sx={{ color: 'primary.main', '&:hover': { color: 'primary.light' } }}>
+                          Terms of Service
+                        </Link>
+                        {' '}and{' '}
+                        <Link href="/privacy" sx={{ color: 'primary.main', '&:hover': { color: 'primary.light' } }}>
+                          Privacy Policy
                         </Link>
                       </Box>
                     </Box>
@@ -380,28 +554,28 @@ export default function Login() {
                       type="submit"
                       fullWidth
                       variant="contained"
-                      disabled={loginLoading}
+                      disabled={signupLoading}
                       size="large"
                       sx={{ py: 1.5, fontSize: '1rem', fontWeight: 600, color: 'white' }}
                     >
-                      {loginLoading ? (
+                      {signupLoading ? (
                         <>
                           <CircularProgress size={20} sx={{ mr: 1 }} color="inherit" />
-                          Signing In...
+                          Creating Account...
                         </>
                       ) : (
-                        'SIGN IN'
+                        'SIGN UP'
                       )}
                     </Button>
                   </Box>
                   <br/>
                     </Box>
                     
-                <Box>
+                    <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 1, maxWidth: 400, mx: 'auto', px: 0 }}>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
                     <Typography variant="body2" sx={{ px: 2, color: 'text.secondary', fontSize: '0.875rem', flexShrink: 0 }}>
-                      or sign in using
+                      or sign up using
                     </Typography>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
                   </Box>
@@ -473,20 +647,18 @@ export default function Login() {
                       }}
                     />
                   </Box>
-                </Box>
 
-                <Box>
                   <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
-                    Don't have an account?{' '}
+                    Already have an account?{' '}
                     <Link 
                       href="#" 
                       onClick={(e) => {
                         e.preventDefault()
-                        navigate('/signup')
+                        navigate('/login')
                       }}
                       sx={{ color: 'primary.main', fontWeight: 'medium', '&:hover': { color: 'primary.light' } }}
                     >
-                      Sign up
+                      Sign in
                     </Link>
                   </Typography>
                 </Box>
