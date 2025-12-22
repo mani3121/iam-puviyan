@@ -96,7 +96,7 @@ export default function Login() {
     email: false,
     password: false
   })
-  const [loginLoading, setLoginLoading] = useState(false)
+  const [loginLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [emailValid, setEmailValid] = useState(false)
 
