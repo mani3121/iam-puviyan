@@ -203,7 +203,7 @@ export default function VerifyEmailPage() {
                     <Button
                       variant="contained"
                       size="large"
-                      onClick={() => navigate('/signup')}
+                      onClick={() => navigate('/login')}
                       sx={{
                         py: { xs: 1.5, md: 2 },
                         px: { xs: 4, md: 6 },
@@ -215,7 +215,7 @@ export default function VerifyEmailPage() {
                         }
                       }}
                     >
-                      Go to Signup
+                      Go to Login
                     </Button>
                   </Box>
                 </Slide>

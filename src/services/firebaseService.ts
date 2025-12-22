@@ -1,4 +1,4 @@
-import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, where } from 'firebase/firestore';
+import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebase';
@@ -391,6 +391,230 @@ export const deleteReward = async (rewardId: string): Promise<{ success: boolean
     return {
       success: false,
       message: 'Failed to delete reward. Please try again.'
+    };
+  }
+};
+
+/**
+ * Checks if an email exists in the org_login_details collection
+ * @param email - Email address to check
+ * @returns Result object with existence status and message
+ */
+export const checkEmailExists = async (email: string): Promise<{ exists: boolean; message: string }> => {
+  try {
+    const trimmedEmail = email.trim();
+
+    // Check if email exists in org_login_details
+    const emailQuery = query(
+      collection(db, 'org_login_details'),
+      where('email', '==', trimmedEmail)
+    );
+    const querySnapshot = await getDocs(emailQuery);
+
+    if (!querySnapshot.empty) {
+      return {
+        exists: true,
+        message: 'Email found in our system.'
+      };
+    } else {
+      return {
+        exists: false,
+        message: 'Email not found in our system.'
+      };
+    }
+  } catch (error) {
+    console.error('Error checking email existence:', error);
+    return {
+      exists: false,
+      message: 'Failed to check email. Please try again.'
+    };
+  }
+};
+
+/**
+ * Gets user details including emailVerified status
+ * @param email - User email address
+ * @returns Result object with user data and emailVerified status
+ */
+export const getUserEmailVerificationStatus = async (email: string): Promise<{ 
+  success: boolean; 
+  message: string; 
+  emailVerified?: boolean; 
+  userId?: string 
+}> => {
+  try {
+    const trimmedEmail = email.trim();
+
+    // Check if email exists in org_login_details
+    const emailQuery = query(
+      collection(db, 'org_login_details'),
+      where('email', '==', trimmedEmail)
+    );
+    const querySnapshot = await getDocs(emailQuery);
+
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Email not found in our system.'
+      };
+    }
+
+    // Get user data
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
+
+    return {
+      success: true,
+      message: 'User found.',
+      emailVerified: userData.emailVerified || false,
+      userId: userData.userId
+    };
+  } catch (error) {
+    console.error('Error getting user verification status:', error);
+    return {
+      success: false,
+      message: 'Failed to check user status. Please try again.'
+    };
+  }
+};
+
+/**
+ * Updates user password and sets emailVerified to false
+ * @param email - User email address
+ * @param newPassword - New password to set
+ * @returns Result object with success status and message
+ */
+export const updateUserPassword = async (email: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    const trimmedEmail = email.trim();
+
+    // Check if email exists in org_login_details
+    const emailQuery = query(
+      collection(db, 'org_login_details'),
+      where('email', '==', trimmedEmail)
+    );
+    const querySnapshot = await getDocs(emailQuery);
+
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Email not found in our system.'
+      };
+    }
+
+    // Update password and emailVerified flag
+    const userDoc = querySnapshot.docs[0];
+    const userRef = doc(db, 'org_login_details', userDoc.id);
+    
+    await updateDoc(userRef, {
+      password: newPassword,
+      emailVerified: false,
+      passwordUpdatedAt: new Date().toISOString()
+    });
+
+    return {
+      success: true,
+      message: 'Password updated successfully. Please verify your email.'
+    };
+  } catch (error) {
+    console.error('Error updating password:', error);
+    return {
+      success: false,
+      message: 'Failed to update password. Please try again.'
+    };
+  }
+};
+
+/**
+ * Generates password reset link and stores it in the user document
+ * @param email - User email address
+ * @returns Result object with success status and reset link
+ */
+export const generatePasswordResetLink = async (email: string): Promise<{ success: boolean; message: string; resetLink?: string }> => {
+  try {
+    const trimmedEmail = email.trim();
+
+    // Check if email exists in org_login_details
+    const emailQuery = query(
+      collection(db, 'org_login_details'),
+      where('email', '==', trimmedEmail)
+    );
+    const querySnapshot = await getDocs(emailQuery);
+
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Email not found in our system.'
+      };
+    }
+
+    // Generate reset link
+    const userDoc = querySnapshot.docs[0];
+    const userId = userDoc.data().userId;
+    const resetLink = `https://iam-puviyan-web.vercel.app/reset-password?userId=${userId}&email=${encodeURIComponent(trimmedEmail)}`;
+
+    // Update the user document with reset link and timestamp
+    const userRef = doc(db, 'org_login_details', userDoc.id);
+    await updateDoc(userRef, {
+      passwordResetLink: resetLink,
+      resetRequestedAt: new Date().toISOString()
+    });
+
+    return {
+      success: true,
+      message: 'Password reset link generated successfully.',
+      resetLink: resetLink
+    };
+  } catch (error) {
+    console.error('Error generating password reset link:', error);
+    return {
+      success: false,
+      message: 'Failed to generate password reset link. Please try again.'
+    };
+  }
+};
+
+/**
+ * Verifies email by updating the emailVerified flag in org_login_details collection
+ * @param userId - User ID to verify
+ * @param email - User email for verification
+ * @returns Result object with success status and message
+ */
+export const verifyEmail = async (userId: string, email: string): Promise<{ success: boolean; message: string }> => {
+  try {
+    // Query for the user document
+    const userQuery = query(
+      collection(db, 'org_login_details'),
+      where('userId', '==', userId),
+      where('email', '==', email)
+    );
+    const querySnapshot = await getDocs(userQuery);
+
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Invalid verification link. User not found.'
+      };
+    }
+
+    // Update the emailVerified flag
+    const userDoc = querySnapshot.docs[0];
+    const userRef = doc(db, 'org_login_details', userDoc.id);
+    
+    await updateDoc(userRef, {
+      emailVerified: true,
+      verifiedAt: new Date().toISOString()
+    });
+
+    return {
+      success: true,
+      message: 'Email verified successfully! You can now log in to your account.'
+    };
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    return {
+      success: false,
+      message: 'Failed to verify email. Please try again or contact support.'
     };
   }
 };

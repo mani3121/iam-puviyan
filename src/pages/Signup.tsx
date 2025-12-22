@@ -23,7 +23,8 @@ import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import LeftHeroPanel from '../components/LeftHeroPanel'
 import PageLayout from '../components/PageLayout'
-import { sendVerificationEmail, storeUserSignup } from '../services/firebaseService'
+import { sendVerificationEmailViaEmailJS, initializeEmailJS } from '../services/emailjsConfig'
+import { storeUserSignup } from '../services/firebaseService'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 
 // Slides data for LeftHeroPanel
@@ -79,14 +80,26 @@ const darkTheme = createTheme({
   },
 })
 
+interface PopupConfig {
+  title: string
+  message: string
+  type: 'success' | 'error' | 'info'
+  customActions?: Array<{
+    label: string
+    onClick: () => void
+    variant?: 'text' | 'outlined' | 'contained'
+    color?: 'primary' | 'secondary' | 'error'
+  }>
+}
+
 export default function Signup() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
-  const [popupConfig, setPopupConfig] = useState({
+  const [popupConfig, setPopupConfig] = useState<PopupConfig>({
     title: '',
     message: '',
-    type: 'success' as 'success' | 'error' | 'info'
+    type: 'success'
   })
   const [formData, setFormData] = useState({
     fullName: '',
@@ -105,6 +118,11 @@ export default function Signup() {
   const [signupLoading, setSignupLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [emailValid, setEmailValid] = useState(false)
+
+  // Initialize EmailJS on component mount
+  useEffect(() => {
+    initializeEmailJS()
+  }, [])
 
   const validateForm = () => {
     const errors = {
@@ -224,26 +242,44 @@ export default function Signup() {
       const result = await storeUserSignup(formData.email, formData.password)
       
       if (!result.success) {
-        setPopupConfig({
-          title: 'Signup Failed',
-          message: result.message,
-          type: 'error'
-        })
-        setShowPopup(true)
+        if (result.alreadyExists) {
+          // Show custom popup with login button for already registered email
+          setPopupConfig({
+            title: 'Account Already Registered',
+            message: 'Your account is already registered with this email address.',
+            type: 'info',
+            customActions: [
+              {
+                label: 'Login',
+                onClick: () => navigate('/login'),
+                variant: 'contained',
+                color: 'primary'
+              }
+            ]
+          })
+          setShowPopup(true)
+        } else {
+          setPopupConfig({
+            title: 'Signup Failed',
+            message: result.message,
+            type: 'error'
+          })
+          setShowPopup(true)
+        }
         return
       }
       
-      // Send verification email
+      // Send verification email using EmailJS
       if (result.verificationLink) {
-        const emailResult = await sendVerificationEmail(formData.email, result.verificationLink)
+        const emailResult = await sendVerificationEmailViaEmailJS(
+          formData.email, 
+          result.verificationLink, 
+          formData.fullName
+        )
         
         if (emailResult.success) {
-          setPopupConfig({
-            title: 'Signup Successful',
-            message: `${result.message} ${emailResult.message}`,
-            type: 'success'
-          })
-          setShowPopup(true)
+          // Navigate to verify email page instead of showing popup
+          navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`)
         } else {
           setPopupConfig({
             title: 'Email Verification Issue',
@@ -686,6 +722,7 @@ export default function Signup() {
               title={popupConfig.title}
               message={popupConfig.message}
               type={popupConfig.type}
+              customActions={popupConfig.customActions}
             />
           </Box>
         </ContentWrapper>

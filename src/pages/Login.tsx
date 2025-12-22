@@ -23,6 +23,7 @@ import CustomPopup from '../components/CustomPopup'
 import LeftHeroPanel from '../components/LeftHeroPanel'
 import PageLayout from '../components/PageLayout'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
+import { getUserEmailVerificationStatus } from '../services/firebaseService'
 
 // Slides data for LeftHeroPanel
 const heroSlides = [
@@ -137,13 +138,42 @@ export default function Login() {
       return
     }
     
-    // Store credentials in localStorage
-    localStorage.setItem('userEmail', formData.email)
-    localStorage.setItem('isLoggedIn', 'true')
-    
-    // Navigate to dashboard after validation
-    navigate('/dashboard')
-    return
+    // Check email verification status
+    try {
+      const verificationResult = await getUserEmailVerificationStatus(formData.email)
+      
+      if (!verificationResult.success) {
+        setPopupConfig({
+          title: 'Login Error',
+          message: verificationResult.message,
+          type: 'error'
+        })
+        setShowPopup(true)
+        return
+      }
+
+      // Store credentials in localStorage
+      localStorage.setItem('userEmail', formData.email)
+      localStorage.setItem('isLoggedIn', 'true')
+      
+      // Check if email is verified
+      if (!verificationResult.emailVerified) {
+        // Navigate to verify email page with userId and email
+        navigate(`/verify-email?userId=${verificationResult.userId}&email=${encodeURIComponent(formData.email)}`)
+        return
+      }
+      
+      // Navigate to dashboard if email is verified
+      navigate('/dashboard')
+      return
+    } catch (error) {
+      setPopupConfig({
+        title: 'Login Error',
+        message: 'Failed to verify email status. Please try again.',
+        type: 'error'
+      })
+      setShowPopup(true)
+    }
   }
 
   useEffect(() => {
@@ -363,7 +393,12 @@ export default function Login() {
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                         <Link 
-                          href="#" 
+                          component="button"
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            navigate('/forgot-password')
+                          }}
                           sx={{ 
                             color: 'primary.main', 
                             fontSize: '0.750rem',

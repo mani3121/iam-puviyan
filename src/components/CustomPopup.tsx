@@ -60,6 +60,12 @@ interface CustomPopupProps {
   message: string
   type?: 'success' | 'error' | 'info'
   duration?: number
+  customActions?: Array<{
+    label: string
+    onClick: () => void
+    variant?: 'text' | 'outlined' | 'contained'
+    color?: 'primary' | 'secondary' | 'error'
+  }>
 }
 
 export default function CustomPopup({ 
@@ -68,7 +74,8 @@ export default function CustomPopup({
   title, 
   message, 
   type = 'success',
-  duration = 5000 
+  duration = 5000,
+  customActions
 }: CustomPopupProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
@@ -78,14 +85,16 @@ export default function CustomPopup({
       setIsVisible(true)
       setIsExiting(false)
       
-      // Auto close after duration
-      const timer = setTimeout(() => {
-        handleClose()
-      }, duration)
-      
-      return () => clearTimeout(timer)
+      // Auto close after duration only if no custom actions
+      if (!customActions || customActions.length === 0) {
+        const timer = setTimeout(() => {
+          handleClose()
+        }, duration)
+        
+        return () => clearTimeout(timer)
+      }
     }
-  }, [isOpen, duration])
+  }, [isOpen, duration, customActions])
 
   const handleClose = () => {
     setIsExiting(true)
@@ -184,21 +193,52 @@ export default function CustomPopup({
         </DialogContent>
         
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button
-            onClick={handleClose}
-            variant="contained"
-            fullWidth
-            sx={{
-              py: 1.5,
-              fontWeight: 600,
-              textTransform: 'none',
-              '&:hover': {
-                bgcolor: 'primary.dark',
-              }
-            }}
-          >
-            Got it
-          </Button>
+          {customActions && customActions.length > 0 ? (
+            <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+              {customActions.map((action, index) => (
+                <Button
+                  key={index}
+                  onClick={() => {
+                    action.onClick()
+                    if (!action.onClick.toString().includes('navigate')) {
+                      handleClose()
+                    }
+                  }}
+                  variant={action.variant || 'contained'}
+                  color={action.color || 'primary'}
+                  fullWidth={customActions.length === 1}
+                  sx={{
+                    py: 1.5,
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    '&:hover': {
+                      bgcolor: action.color === 'primary' ? 'primary.dark' : 
+                               action.color === 'error' ? 'error.dark' : 
+                               'action.hover',
+                    }
+                  }}
+                >
+                  {action.label}
+                </Button>
+              ))}
+            </Box>
+          ) : (
+            <Button
+              onClick={handleClose}
+              variant="contained"
+              fullWidth
+              sx={{
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  bgcolor: 'primary.dark',
+                }
+              }}
+            >
+              Got it
+            </Button>
+          )}
         </DialogActions>
       </StyledDialog>
     </ThemeProvider>
