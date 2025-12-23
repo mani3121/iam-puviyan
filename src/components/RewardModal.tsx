@@ -1,101 +1,76 @@
-import { useState, useEffect } from 'react'
 import {
   Box,
-  Typography,
-  Modal,
-  TextField,
   Button,
-  IconButton,
+  Divider,
   Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  IconButton,
+  Modal,
+  Snackbar,
   Stack,
-  Divider
+  TextField,
+  Typography
 } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { X, Plus, Trash2, Upload } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { createReward, uploadImage } from '../services/firebaseService'
-import { formatDateForStorage } from '../utils/dateUtils'
-import dayjs from 'dayjs'
 
 interface RewardModalProps {
   open: boolean
   onClose: () => void
   onSave: (rewardData: any) => void
+  onPublishSuccess?: () => void
   editingReward?: any
 }
 
-const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps) => {
+const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }: RewardModalProps) => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     brandName: '',
-    deductPoints: '',
-    maxPerUser: '',
     availableCoupons: '',
-    fullImage: '',
-    fullImageGreyed: '',
-    previewImage: '',
-    previewImageGreyed: '',
+    posterImage: '',
     rewardSubtitle: '',
     rewardTitle: '',
-    rewardType: 'discount',
-    status: 'available',
     usefulnessScore: '',
-    validFrom: dayjs(),
-    validTo: dayjs().add(30, 'day'),
-    rewardDetails: [''],
-    howToClaim: ['']
+    rewardDetails: '',
+    howToClaim: '',
+    termsAndConditions: '',
+    approverEmails: [] as string[]
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [previewImageFile, setPreviewImageFile] = useState<File | null>(null)
-  const [fullImageFile, setFullImageFile] = useState<File | null>(null)
+  const [posterImageFile, setPosterImageFile] = useState<File | null>(null)
+  const [emailInput, setEmailInput] = useState('')
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
 
   // Populate form when editingReward is provided
   useEffect(() => {
     if (editingReward) {
       setFormData({
         brandName: editingReward.brandName || '',
-        deductPoints: editingReward.deductPoints?.toString() || '',
-        maxPerUser: editingReward.maxPerUser?.toString() || '',
         availableCoupons: editingReward.availableCoupons || '',
-        fullImage: editingReward.fullImage || '',
-        fullImageGreyed: editingReward.fullImageGreyed || '',
-        previewImage: editingReward.previewImage || '',
-        previewImageGreyed: editingReward.previewImageGreyed || '',
+        posterImage: editingReward.fullImage || editingReward.previewImage || '',
         rewardSubtitle: editingReward.rewardSubtitle || '',
         rewardTitle: editingReward.rewardTitle || '',
-        rewardType: editingReward.rewardType || 'discount',
-        status: editingReward.status || 'available',
         usefulnessScore: editingReward.usefulnessScore?.toString() || '',
-        validFrom: editingReward.validFrom ? dayjs(editingReward.validFrom) : dayjs(),
-        validTo: editingReward.validTo ? dayjs(editingReward.validTo) : dayjs().add(30, 'day'),
-        rewardDetails: editingReward.rewardDetails || [''],
-        howToClaim: editingReward.howToClaim || ['']
+        rewardDetails: editingReward.rewardDetails?.[0] || '',
+        howToClaim: editingReward.howToClaim?.[0] || '',
+        termsAndConditions: editingReward.termsAndConditions?.[0] || '',
+        approverEmails: editingReward.approverEmails || []
       })
     } else {
       // Reset form for new reward
       setFormData({
         brandName: '',
-        deductPoints: '',
-        maxPerUser: '',
         availableCoupons: '',
-        fullImage: '',
-        fullImageGreyed: '',
-        previewImage: '',
-        previewImageGreyed: '',
+        posterImage: '',
         rewardSubtitle: '',
         rewardTitle: '',
-        rewardType: 'discount',
-        status: 'available',
         usefulnessScore: '',
-        validFrom: dayjs(),
-        validTo: dayjs().add(30, 'day'),
-        rewardDetails: [''],
-        howToClaim: ['']
+        rewardDetails: '',
+        howToClaim: '',
+        termsAndConditions: '',
+        approverEmails: []
       })
     }
   }, [editingReward])
@@ -107,49 +82,67 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
     }))
   }
 
-  const handleArrayChange = (field: 'rewardDetails' | 'howToClaim', index: number, value: string) => {
+  const addApproverEmail = () => {
+    if (emailInput && emailInput.includes('@') && formData.approverEmails.length < 10) {
+      setFormData(prev => ({
+        ...prev,
+        approverEmails: [...prev.approverEmails, emailInput.trim()]
+      }))
+      setEmailInput('')
+      setError('')
+    } else if (!emailInput.includes('@')) {
+      setError('Please enter a valid email address')
+    } else if (formData.approverEmails.length >= 10) {
+      setError('Maximum 10 approver emails allowed')
+    }
+  }
+
+  const removeApproverEmail = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field].map((item, i) => i === index ? value : item)
+      approverEmails: prev.approverEmails.filter((_, i) => i !== index)
     }))
   }
 
-  const addArrayItem = (field: 'rewardDetails' | 'howToClaim') => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: [...prev[field], '']
-    }))
+  const handlePublishReward = async () => {
+    await handleSubmitWithStatus('active')
   }
 
-  const removeArrayItem = (field: 'rewardDetails' | 'howToClaim', index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field].filter((_, i) => i !== index)
-    }))
+  const handleSaveDraft = async () => {
+    await handleSubmitWithStatus('draft')
   }
 
-  const handleSubmit = async () => {
+  const handleSubmitWithStatus = async (status: string) => {
     setLoading(true)
     setError('')
     
     try {
-      // Upload images if files are selected
-      let previewImageUrl = formData.previewImage
-      let fullImageUrl = formData.fullImage
+      // Upload poster image if file is selected
+      let posterImageUrl = formData.posterImage
       
-      if (previewImageFile) {
-        const uploadResult = await uploadImage(previewImageFile, 'preview-images')
-        if (uploadResult.success && uploadResult.url) {
-          previewImageUrl = uploadResult.url
-        } else {
-          throw new Error(uploadResult.message)
+      if (posterImageFile) {
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+        if (!allowedTypes.includes(posterImageFile.type)) {
+          throw new Error('Only JPG and PNG files are allowed')
         }
-      }
-      
-      if (fullImageFile) {
-        const uploadResult = await uploadImage(fullImageFile, 'full-images')
+        
+        // Validate aspect ratio (16:9)
+        const aspectRatio = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+          const img = new Image()
+          img.onload = () => resolve({ width: img.width, height: img.height })
+          img.onerror = reject
+          img.src = URL.createObjectURL(posterImageFile)
+        })
+        
+        const ratio = aspectRatio.width / aspectRatio.height
+        if (Math.abs(ratio - 16/9) > 0.01) { // Allow small tolerance
+          throw new Error('Image must have 16:9 aspect ratio')
+        }
+        
+        const uploadResult = await uploadImage(posterImageFile, 'poster-images')
         if (uploadResult.success && uploadResult.url) {
-          fullImageUrl = uploadResult.url
+          posterImageUrl = uploadResult.url
         } else {
           throw new Error(uploadResult.message)
         }
@@ -158,24 +151,26 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
       // Prepare reward data
       const rewardData = {
         brandName: formData.brandName,
-        deductPoints: parseInt(formData.deductPoints) || 0,
-        maxPerUser: parseInt(formData.maxPerUser) || 1,
-        availableCoupons: formData.availableCoupons || "0",
-        fullImage: fullImageUrl,
-        fullImageGreyed: fullImageUrl, // For now, use same image
-        previewImage: previewImageUrl,
-        previewImageGreyed: previewImageUrl, // For now, use same image
+        availableCoupons: formData.availableCoupons,
+        fullImage: posterImageUrl,
+        fullImageGreyed: posterImageUrl,
+        previewImage: posterImageUrl,
+        previewImageGreyed: posterImageUrl,
         rewardSubtitle: formData.rewardSubtitle,
         rewardTitle: formData.rewardTitle,
-        rewardType: formData.rewardType,
-        status: formData.status,
         usefulnessScore: parseFloat(formData.usefulnessScore) || 0,
-        validFrom: formatDateForStorage(formData.validFrom),
-        validTo: formatDateForStorage(formData.validTo),
-        rewardDetails: formData.rewardDetails.filter(item => item.trim() !== ''),
-        howToClaim: formData.howToClaim.filter(item => item.trim() !== ''),
+        rewardDetails: formData.rewardDetails ? [formData.rewardDetails] : [],
+        howToClaim: formData.howToClaim ? [formData.howToClaim] : [],
+        termsAndConditions: formData.termsAndConditions ? [formData.termsAndConditions] : [],
+        approverEmails: formData.approverEmails,
         likeCount: 0,
-        dislikeCount: 0
+        dislikeCount: 0,
+        deductPoints: 0,
+        maxPerUser: 1,
+        rewardType: 'general',
+        status: status, // Set status based on button clicked
+        validFrom: new Date().toISOString(),
+        validTo: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
       }
       
       // Save to Firebase
@@ -183,29 +178,43 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
       
       if (result.success) {
         onSave(rewardData)
-        onClose()
+        
+        // If publishing successfully, show toast and redirect
+        if (status === 'active') {
+          // Show success toast
+          setShowSuccessToast(true)
+          
+          // Call success callback if provided
+          if (onPublishSuccess) {
+            onPublishSuccess()
+          }
+          
+          // Close modal immediately
+          onClose()
+          
+          // Redirect to dashboard after a short delay
+          setTimeout(() => {
+            navigate('/dashboard')
+          }, 1500)
+        } else {
+          // For draft, just close modal normally
+          onClose()
+        }
+        
         // Reset form
         setFormData({
           brandName: '',
-          deductPoints: '',
-          maxPerUser: '',
           availableCoupons: '',
-          fullImage: '',
-          fullImageGreyed: '',
-          previewImage: '',
-          previewImageGreyed: '',
+          posterImage: '',
           rewardSubtitle: '',
           rewardTitle: '',
-          rewardType: 'discount',
-          status: 'available',
           usefulnessScore: '',
-          validFrom: dayjs(),
-          validTo: dayjs().add(30, 'day'),
-          rewardDetails: [''],
-          howToClaim: ['']
+          rewardDetails: '',
+          howToClaim: '',
+          termsAndConditions: '',
+          approverEmails: []
         })
-        setPreviewImageFile(null)
-        setFullImageFile(null)
+        setPosterImageFile(null)
       } else {
         throw new Error(result.message)
       }
@@ -216,23 +225,17 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
     }
   }
 
-  const handleImageUpload = (type: 'preview' | 'full', file: File) => {
-    if (type === 'preview') {
-      setPreviewImageFile(file)
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file)
-      setFormData(prev => ({ ...prev, previewImage: previewUrl }))
-    } else {
-      setFullImageFile(file)
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file)
-      setFormData(prev => ({ ...prev, fullImage: previewUrl }))
-    }
+  const handlePosterUpload = (file: File) => {
+    setPosterImageFile(file)
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file)
+    setFormData(prev => ({ ...prev, posterImage: previewUrl }))
   }
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={{
+      <>
+        <Box sx={{
         position: 'absolute',
         top: '50%',
         left: '50%',
@@ -292,224 +295,68 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
             </Grid>
           </Grid>
 
-          {/* Points and Limits */}
+          {/* Upload Poster */}
           <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Points & Limits
-          </Typography>
-
-          <Grid container spacing={3} mb={3}>
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Points to Deduct"
-                value={formData.deductPoints}
-                onChange={(e) => handleInputChange('deductPoints', e.target.value)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Max Per User"
-                value={formData.maxPerUser}
-                onChange={(e) => handleInputChange('maxPerUser', e.target.value)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
-                type="number"
-                label="Usefulness Score"
-                value={formData.usefulnessScore}
-                onChange={(e) => handleInputChange('usefulnessScore', e.target.value)}
-              />
-            </Grid>
-          </Grid>
-
-          {/* Type and Status */}
-          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Type & Status
-          </Typography>
-
-          <Grid container spacing={3} mb={3}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <FormControl fullWidth>
-                <InputLabel>Reward Type</InputLabel>
-                <Select
-                  value={formData.rewardType}
-                  onChange={(e) => handleInputChange('rewardType', e.target.value as string)}
-                  label="Reward Type"
-                >
-                  <MenuItem value="coupon">Coupon</MenuItem>
-                  <MenuItem value="voucher">Voucher</MenuItem>
-                  <MenuItem value="cashback">Cashback</MenuItem>
-                  <MenuItem value="discount">Discount</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value as string)}
-                  label="Status"
-                >
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
-                  <MenuItem value="expired">Expired</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-
-          {/* Validity Period */}
-          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Validity Period
-          </Typography>
-
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Grid container spacing={3} mb={3}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DatePicker
-                  label="Valid From"
-                  value={formData.validFrom}
-                  onChange={(newValue) => handleInputChange('validFrom', newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <DatePicker
-                  label="Valid To"
-                  value={formData.validTo}
-                  onChange={(newValue) => handleInputChange('validTo', newValue)}
-                  slotProps={{ textField: { fullWidth: true } }}
-                />
-              </Grid>
-            </Grid>
-          </LocalizationProvider>
-
-          {/* Image Upload */}
-          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Images
-          </Typography>
-
-          <Grid container spacing={3} mb={3}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box
-                sx={{
-                  border: '2px dashed #ccc',
-                  borderRadius: 2,
-                  p: 3,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  '&:hover': { borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.04)' },
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => document.getElementById('preview-image-input')?.click()}
-              >
-                <input
-                  id="preview-image-input"
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload('preview', file);
-                  }}
-                />
-                <Upload size={40} color="#666" />
-                <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
-                  {previewImageFile ? previewImageFile.name : 'Click to upload preview image'}
-                </Typography>
-                {formData.previewImage && (
-                  <Box sx={{ mt: 2 }}>
-                    <img
-                      src={formData.previewImage}
-                      alt="Preview"
-                      style={{ maxWidth: '100%', maxHeight: '100px', borderRadius: '8px' }}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box
-                sx={{
-                  border: '2px dashed #ccc',
-                  borderRadius: 2,
-                  p: 3,
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  '&:hover': { borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.04)' },
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => document.getElementById('full-image-input')?.click()}
-              >
-                <input
-                  id="full-image-input"
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleImageUpload('full', file);
-                  }}
-                />
-                <Upload size={40} color="#666" />
-                <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
-                  {fullImageFile ? fullImageFile.name : 'Click to upload full image'}
-                </Typography>
-                {formData.fullImage && (
-                  <Box sx={{ mt: 2 }}>
-                    <img
-                      src={formData.fullImage}
-                      alt="Full"
-                      style={{ maxWidth: '100%', maxHeight: '100px', borderRadius: '8px' }}
-                    />
-                  </Box>
-                )}
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* Dynamic Arrays - UNCHANGED */}
-          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Reward Details
+            Upload Poster
           </Typography>
 
           <Box mb={3}>
-            {formData.rewardDetails.map((detail, index) => (
-              <Stack direction="row" spacing={2} mb={2} key={index}>
-                <TextField
-                  fullWidth
-                  label={`Detail ${index + 1}`}
-                  value={detail}
-                  onChange={(e) => handleArrayChange('rewardDetails', index, e.target.value)}
-                />
-                {formData.rewardDetails.length > 1 && (
-                  <IconButton
-                    onClick={() => removeArrayItem('rewardDetails', index)}
-                    color="error"
-                  >
-                    <Trash2 size={20} />
-                  </IconButton>
-                )}
-              </Stack>
-            ))}
-            <Button
-              startIcon={<Plus size={20} />}
-              onClick={() => addArrayItem('rewardDetails')}
-              variant="outlined"
+            <Box
+              sx={{
+                border: '2px dashed #ccc',
+                borderRadius: 2,
+                p: 3,
+                textAlign: 'center',
+                cursor: 'pointer',
+                '&:hover': { borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.04)' },
+                transition: 'all 0.2s ease'
+              }}
+              onClick={() => document.getElementById('poster-image-input')?.click()}
             >
-              Add Detail
-            </Button>
+              <input
+                id="poster-image-input"
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handlePosterUpload(file);
+                }}
+              />
+              <Upload size={40} color="#666" />
+              <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+                {posterImageFile ? posterImageFile.name : 'Click to upload poster (JPG/PNG, 16:9 aspect ratio)'}
+              </Typography>
+              {formData.posterImage && (
+                <Box sx={{ mt: 2 }}>
+                  <img
+                    src={formData.posterImage}
+                    alt="Poster"
+                    style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }}
+                  />
+                </Box>
+              )}
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              Only JPG and PNG files allowed. Image must have 16:9 aspect ratio.
+            </Typography>
+          </Box>
+
+          {/* Reward Details */}
+          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
+            Details
+          </Typography>
+
+          <Box mb={3}>
+            <TextField
+              fullWidth
+              label="Details"
+              value={formData.rewardDetails}
+              onChange={(e) => handleInputChange('rewardDetails', e.target.value)}
+              multiline
+              rows={4}
+              placeholder="Enter detailed information about the reward..."
+            />
           </Box>
 
           <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
@@ -517,31 +364,100 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
           </Typography>
 
           <Box mb={3}>
-            {formData.howToClaim.map((step, index) => (
-              <Stack direction="row" spacing={2} mb={2} key={index}>
-                <TextField
-                  fullWidth
-                  label={`Step ${index + 1}`}
-                  value={step}
-                  onChange={(e) => handleArrayChange('howToClaim', index, e.target.value)}
-                />
-                {formData.howToClaim.length > 1 && (
+            <TextField
+              fullWidth
+              label="How to Claim"
+              value={formData.howToClaim}
+              onChange={(e) => handleInputChange('howToClaim', e.target.value)}
+              multiline
+              rows={4}
+              placeholder="Enter step-by-step instructions on how to claim this reward..."
+            />
+          </Box>
+
+          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
+            Terms and Conditions
+          </Typography>
+
+          <Box mb={3}>
+            <TextField
+              fullWidth
+              label="Terms and Conditions"
+              value={formData.termsAndConditions}
+              onChange={(e) => handleInputChange('termsAndConditions', e.target.value)}
+              multiline
+              rows={4}
+              placeholder="Enter terms and conditions for this reward..."
+            />
+          </Box>
+
+          {/* Approver Emails */}
+          <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
+            Approver Emails
+          </Typography>
+
+          <Box mb={3}>
+            <Stack direction="row" spacing={2} mb={2}>
+              <TextField
+                fullWidth
+                label="Enter email address"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addApproverEmail()
+                  }
+                }}
+                placeholder="Type email and press Enter"
+              />
+              <Button 
+                onClick={addApproverEmail}
+                variant="outlined"
+                disabled={!emailInput || !emailInput.includes('@')}
+              >
+                Add
+              </Button>
+            </Stack>
+            
+            {/* Email Chips */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
+              {formData.approverEmails.map((email, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    px: 2,
+                    py: 1,
+                    borderRadius: 2,
+                    fontSize: '0.875rem',
+                    gap: 1
+                  }}
+                >
+                  {email}
                   <IconButton
-                    onClick={() => removeArrayItem('howToClaim', index)}
-                    color="error"
+                    size="small"
+                    onClick={() => removeApproverEmail(index)}
+                    sx={{ color: 'inherit', padding: 0.5 }}
                   >
-                    <Trash2 size={20} />
+                    <X size={16} />
                   </IconButton>
-                )}
-              </Stack>
-            ))}
-            <Button
-              startIcon={<Plus size={20} />}
-              onClick={() => addArrayItem('howToClaim')}
-              variant="outlined"
-            >
-              Add Step
-            </Button>
+                </Box>
+              ))}
+            </Box>
+            
+            {formData.approverEmails.length === 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                No approver emails added. Add 1-10 email addresses.
+              </Typography>
+            )}
+            
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              {formData.approverEmails.length}/10 emails added
+            </Typography>
           </Box>
         </Box>
 
@@ -557,14 +473,42 @@ const RewardModal = ({ open, onClose, onSave, editingReward }: RewardModalProps)
         {/* Footer Actions */}
         <Divider />
         <Stack direction="row" spacing={2} justifyContent="flex-end" p={3}>
-          <Button onClick={onClose} variant="outlined" disabled={loading}>
+          <Button onClick={onClose} variant="text" disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {loading ? (editingReward ? 'Updating...' : 'Creating...') : (editingReward ? 'Update Reward' : 'Create Reward')}
+          <Button 
+            onClick={handleSaveDraft} 
+            variant="outlined" 
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : 'Save as Draft'}
+          </Button>
+          <Button 
+            onClick={handlePublishReward} 
+            variant="contained" 
+            color="primary"
+            disabled={loading}
+          >
+            {loading ? 'Publishing...' : 'Publish Reward'}
           </Button>
         </Stack>
       </Box>
+      
+      {/* Success Toast */}
+      <Snackbar
+        open={showSuccessToast}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccessToast(false)}
+        message="Reward published successfully!"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{
+          '& .MuiSnackbar-content': {
+            backgroundColor: 'success.main',
+            color: 'success.contrastText'
+          }
+        }}
+      />
+    </>
     </Modal>
   )
 }

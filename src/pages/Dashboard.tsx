@@ -1,35 +1,35 @@
-import { useState } from 'react'
 import {
-  ThemeProvider,
+  AppBar,
+  Box,
+  Button,
   createTheme,
   CssBaseline,
-  Box,
-  Typography,
+  Divider,
+  Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Drawer,
-  Divider,
-  IconButton,
-  AppBar,
+  ThemeProvider,
   Toolbar,
-  useTheme,
+  Typography,
   useMediaQuery,
-  Button
+  useTheme
 } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import {
+  LogOut,
   Menu as MenuIcon,
-  School,
-  Trophy,
-  LogOut
+  // School,
+  Trophy
 } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import PageLayout from '../components/PageLayout'
 import ContentWrapper from '../components/ContentWrapper'
 import OnboardingContent from '../components/OnboardingContent'
+import PageLayout from '../components/PageLayout'
 import RewardsContent from '../components/RewardsContent'
 
 // Material UI Dark Theme with Green Accents
@@ -77,12 +77,12 @@ const StyledListItemButton = styled(ListItemButton)(() => ({
 }))
 
 const menuItems = [
-  {
-    id: 'onboarding',
-    label: 'Onboarding',
-    icon: <School />,
-    component: () => <OnboardingContent />
-  },
+  // {
+  //   id: 'onboarding',
+  //   label: 'Onboarding',
+  //   icon: <School />,
+  //   component: () => <OnboardingContent />
+  // },
   {
     id: 'rewards',
     label: 'Rewards',

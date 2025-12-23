@@ -35,6 +35,7 @@ export interface Reward {
   rewardTitle: string;
   rewardType: string;
   status: string;
+  termsAndConditions: string[];
   usefulnessScore: number;
   validFrom: string;
   validTo: string;
