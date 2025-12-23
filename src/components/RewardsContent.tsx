@@ -30,8 +30,9 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
-import { AlertCircle, CheckCircle, Clock, Edit, Gift, Plus, Search, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle, Clock, Edit, Eye, Gift, Plus, Search, Trash2 } from 'lucide-react'
 import { deleteReward, fetchRewardsPaginated, fetchRewardsStats, type PaginatedRewardsResult, type Reward } from '../services/firebaseService'
+import { formatDateForDisplay } from '../utils/dateUtils'
 import RewardModal from './RewardModal'
 
 // Create a custom theme with enhanced scrollbar
@@ -380,10 +381,13 @@ const RewardsContent = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Reward Name</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Brand</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Points</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Title</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Views</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Redemptions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Rate</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Carbon Impact</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Created Date</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -391,8 +395,6 @@ const RewardsContent = () => {
                 {filteredRewards.map((reward) => (
                   <TableRow key={reward.id} hover>
                     <TableCell>{reward.rewardTitle}</TableCell>
-                    <TableCell>{reward.brandName}</TableCell>
-                    <TableCell>{reward.deductPoints}</TableCell>
                     <TableCell>
                       <Chip
                         label={reward.status}
@@ -404,6 +406,11 @@ const RewardsContent = () => {
                         }}
                       />
                     </TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{reward.createdAt ? formatDateForDisplay(reward.createdAt) : '-'}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
                         <IconButton
@@ -423,13 +430,19 @@ const RewardsContent = () => {
                         >
                           <Trash2 size={16} />
                         </IconButton>
+                        <IconButton
+                          size="small"
+                          color="info"
+                        >
+                          <Eye size={16} />
+                        </IconButton>
                       </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
                 {filteredRewards.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} align="center" sx={{ py: 4, color: 'text.secondary' }}>
+                    <TableCell colSpan={8} align="center" sx={{ py: 4, color: 'text.secondary' }}>
                       No rewards found matching your search criteria.
                     </TableCell>
                   </TableRow>
