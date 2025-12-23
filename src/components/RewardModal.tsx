@@ -1,6 +1,8 @@
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Divider,
   Grid,
   IconButton,
@@ -28,7 +30,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
   const [formData, setFormData] = useState({
     brandName: '',
     availableCoupons: '',
-    posterImage: '',
+    fullImage: '',
+    previewImage: '',
     rewardSubtitle: '',
     rewardTitle: '',
     usefulnessScore: '',
@@ -38,8 +41,11 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
     approverEmails: [] as string[]
   })
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [posterImageFile, setPosterImageFile] = useState<File | null>(null)
+  const [previewImageFile, setPreviewImageFile] = useState<File | null>(null)
+  const [fullImageUploading, setFullImageUploading] = useState(false)
+  const [previewImageUploading, setPreviewImageUploading] = useState(false)
   const [emailInput, setEmailInput] = useState('')
   const [showSuccessToast, setShowSuccessToast] = useState(false)
 
@@ -49,7 +55,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
       setFormData({
         brandName: editingReward.brandName || '',
         availableCoupons: editingReward.availableCoupons || '',
-        posterImage: editingReward.fullImage || editingReward.previewImage || '',
+        fullImage: editingReward.fullImage || '',
+        previewImage: editingReward.previewImage || '',
         rewardSubtitle: editingReward.rewardSubtitle || '',
         rewardTitle: editingReward.rewardTitle || '',
         usefulnessScore: editingReward.usefulnessScore?.toString() || '',
@@ -63,7 +70,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
       setFormData({
         brandName: '',
         availableCoupons: '',
-        posterImage: '',
+        fullImage: '',
+        previewImage: '',
         rewardSubtitle: '',
         rewardTitle: '',
         usefulnessScore: '',
@@ -80,6 +88,13 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
       ...prev,
       [field]: value
     }))
+    // Clear field error when user starts typing
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }))
+    }
   }
 
   const addApproverEmail = () => {
@@ -89,11 +104,11 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         approverEmails: [...prev.approverEmails, emailInput.trim()]
       }))
       setEmailInput('')
-      setError('')
+      setFieldErrors(prev => ({ ...prev, general: '' }))
     } else if (!emailInput.includes('@')) {
-      setError('Please enter a valid email address')
+      setFieldErrors(prev => ({ ...prev, general: 'Please enter a valid email address' }))
     } else if (formData.approverEmails.length >= 10) {
-      setError('Maximum 10 approver emails allowed')
+      setFieldErrors(prev => ({ ...prev, general: 'Maximum 10 approver emails allowed' }))
     }
   }
 
@@ -114,48 +129,47 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
 
   const handleSubmitWithStatus = async (status: string) => {
     setLoading(true)
-    setError('')
+    setFieldErrors({})
     
     try {
-      // Upload poster image if file is selected
-      let posterImageUrl = formData.posterImage
+      // Validate required fields
+      const errors: Record<string, string> = {}
       
-      if (posterImageFile) {
-        // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
-        if (!allowedTypes.includes(posterImageFile.type)) {
-          throw new Error('Only JPG and PNG files are allowed')
-        }
-        
-        // Validate aspect ratio (16:9)
-        const aspectRatio = await new Promise<{ width: number; height: number }>((resolve, reject) => {
-          const img = new Image()
-          img.onload = () => resolve({ width: img.width, height: img.height })
-          img.onerror = reject
-          img.src = URL.createObjectURL(posterImageFile)
-        })
-        
-        const ratio = aspectRatio.width / aspectRatio.height
-        if (Math.abs(ratio - 16/9) > 0.01) { // Allow small tolerance
-          throw new Error('Image must have 16:9 aspect ratio')
-        }
-        
-        const uploadResult = await uploadImage(posterImageFile, 'poster-images')
-        if (uploadResult.success && uploadResult.url) {
-          posterImageUrl = uploadResult.url
-        } else {
-          throw new Error(uploadResult.message)
-        }
+      if (!formData.brandName.trim()) {
+        errors.brandName = 'Brand name is required'
+      }
+      
+      if (!formData.rewardTitle.trim()) {
+        errors.rewardTitle = 'Reward title is required'
+      }
+      
+      if (!formData.availableCoupons.trim()) {
+        errors.availableCoupons = 'Available coupons is required'
+      }
+      
+      // Images are already uploaded, just use the URLs from formData
+      const fullImageUrl = formData.fullImage
+      const previewImageUrl = formData.previewImage
+      
+      // Validate that at least one image is uploaded
+      if (!fullImageUrl && !previewImageUrl) {
+        throw new Error('Please upload at least one image')
+      }
+      
+      // If there are field errors, set them and stop
+      if (Object.keys(errors).length > 0) {
+        setFieldErrors(errors)
+        return
       }
       
       // Prepare reward data
       const rewardData = {
         brandName: formData.brandName,
         availableCoupons: formData.availableCoupons,
-        fullImage: posterImageUrl,
-        fullImageGreyed: posterImageUrl,
-        previewImage: posterImageUrl,
-        previewImageGreyed: posterImageUrl,
+        fullImage: fullImageUrl,
+        fullImageGreyed: fullImageUrl,
+        previewImage: previewImageUrl || fullImageUrl, // Fallback to fullImage if no preview
+        previewImageGreyed: previewImageUrl || fullImageUrl, // Fallback to fullImage if no preview
         rewardSubtitle: formData.rewardSubtitle,
         rewardTitle: formData.rewardTitle,
         usefulnessScore: parseFloat(formData.usefulnessScore) || 0,
@@ -205,7 +219,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         setFormData({
           brandName: '',
           availableCoupons: '',
-          posterImage: '',
+          fullImage: '',
+          previewImage: '',
           rewardSubtitle: '',
           rewardTitle: '',
           usefulnessScore: '',
@@ -215,21 +230,84 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
           approverEmails: []
         })
         setPosterImageFile(null)
+        setPreviewImageFile(null)
       } else {
         throw new Error(result.message)
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to create reward')
+      setFieldErrors(prev => ({ ...prev, general: err.message || 'Failed to create reward' }))
     } finally {
       setLoading(false)
     }
   }
 
-  const handlePosterUpload = (file: File) => {
+  const handlePosterUpload = async (file: File) => {
     setPosterImageFile(file)
-    // Create preview URL
-    const previewUrl = URL.createObjectURL(file)
-    setFormData(prev => ({ ...prev, posterImage: previewUrl }))
+    setFullImageUploading(true)
+    
+    try {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Only JPG and PNG files are allowed for full image')
+      }
+      
+      // Validate aspect ratio (16:9)
+      const aspectRatio = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve({ width: img.width, height: img.height })
+        img.onerror = reject
+        img.src = URL.createObjectURL(file)
+      })
+      
+      const ratio = aspectRatio.width / aspectRatio.height
+      if (Math.abs(ratio - 16/9) > 0.01) { // Allow small tolerance
+        throw new Error('Full image must have 16:9 aspect ratio')
+      }
+      
+      // Upload to storage immediately
+      const uploadResult = await uploadImage(file, 'rewards')
+      if (uploadResult.success && uploadResult.url) {
+        setFormData(prev => ({ ...prev, fullImage: uploadResult.url! }))
+      } else {
+        throw new Error(uploadResult.message)
+      }
+    } catch (err: any) {
+      setFieldErrors(prev => ({ ...prev, fullImage: err.message || 'Failed to upload full image' }))
+      // Reset file on error
+      setPosterImageFile(null)
+      setFormData(prev => ({ ...prev, fullImage: '' }))
+    } finally {
+      setFullImageUploading(false)
+    }
+  }
+
+  const handlePreviewImageUpload = async (file: File) => {
+    setPreviewImageFile(file)
+    setPreviewImageUploading(true)
+    
+    try {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png']
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Only JPG and PNG files are allowed for preview image')
+      }
+      
+      // Upload to storage immediately
+      const uploadResult = await uploadImage(file, 'rewards')
+      if (uploadResult.success && uploadResult.url) {
+        setFormData(prev => ({ ...prev, previewImage: uploadResult.url! }))
+      } else {
+        throw new Error(uploadResult.message)
+      }
+    } catch (err: any) {
+      setFieldErrors(prev => ({ ...prev, previewImage: err.message || 'Failed to upload preview image' }))
+      // Reset file on error
+      setPreviewImageFile(null)
+      setFormData(prev => ({ ...prev, previewImage: '' }))
+    } finally {
+      setPreviewImageUploading(false)
+    }
   }
 
   return (
@@ -260,6 +338,13 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
 
         {/* Form Content */}
         <Box sx={{ p: 3 }}>
+          {/* General Error Display */}
+          {fieldErrors.general && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {fieldErrors.general}
+            </Alert>
+          )}
+          
           {/* Basic Information */}
           <Typography variant="h6" fontWeight="bold" mb={2}>
             Basic Information
@@ -273,6 +358,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Brand Name"
                 value={formData.brandName}
                 onChange={(e) => handleInputChange('brandName', e.target.value)}
+                error={!!fieldErrors.brandName}
+                helperText={fieldErrors.brandName}
               />
             </Grid>
 
@@ -282,65 +369,154 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Reward Title"
                 value={formData.rewardTitle}
                 onChange={(e) => handleInputChange('rewardTitle', e.target.value)}
+                error={!!fieldErrors.rewardTitle}
+                helperText={fieldErrors.rewardTitle}
               />
             </Grid>
 
-            <Grid size={12}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 fullWidth
                 label="Reward Subtitle"
                 value={formData.rewardSubtitle}
                 onChange={(e) => handleInputChange('rewardSubtitle', e.target.value)}
+                error={!!fieldErrors.rewardSubtitle}
+                helperText={fieldErrors.rewardSubtitle}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <TextField
+                fullWidth
+                label="Available coupons to redeem"
+                value={formData.availableCoupons}
+                onChange={(e) => handleInputChange('availableCoupons', e.target.value)}
+                error={!!fieldErrors.availableCoupons}
+                helperText={fieldErrors.availableCoupons}
               />
             </Grid>
           </Grid>
 
-          {/* Upload Poster */}
+          {/* Upload Images */}
           <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
-            Upload Poster
+            Upload Images
           </Typography>
 
-          <Box mb={3}>
-            <Box
-              sx={{
-                border: '2px dashed #ccc',
-                borderRadius: 2,
-                p: 3,
-                textAlign: 'center',
-                cursor: 'pointer',
-                '&:hover': { borderColor: '#4CAF50', backgroundColor: 'rgba(76, 175, 80, 0.04)' },
-                transition: 'all 0.2s ease'
-              }}
-              onClick={() => document.getElementById('poster-image-input')?.click()}
-            >
-              <input
-                id="poster-image-input"
-                type="file"
-                accept=".jpg,.jpeg,.png"
-                hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handlePosterUpload(file);
-                }}
-              />
-              <Upload size={40} color="#666" />
-              <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
-                {posterImageFile ? posterImageFile.name : 'Click to upload poster (JPG/PNG, 16:9 aspect ratio)'}
+          <Grid container spacing={3} mb={3}>
+            {/* Full Image Upload */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle1" fontWeight="medium" mb={1}>
+                Full Image
               </Typography>
-              {formData.posterImage && (
-                <Box sx={{ mt: 2 }}>
-                  <img
-                    src={formData.posterImage}
-                    alt="Poster"
-                    style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '8px' }}
-                  />
-                </Box>
+              <Box
+                sx={{
+                  border: '2px dashed #ccc',
+                  borderRadius: 2,
+                  p: 2,
+                  textAlign: 'center',
+                  cursor: fullImageUploading ? 'not-allowed' : 'pointer',
+                  '&:hover': { borderColor: fullImageUploading ? '#ccc' : '#4CAF50', backgroundColor: fullImageUploading ? 'transparent' : 'rgba(76, 175, 80, 0.04)' },
+                  transition: 'all 0.2s ease',
+                  opacity: fullImageUploading ? 0.7 : 1
+                }}
+                onClick={() => !fullImageUploading && document.getElementById('full-image-input')?.click()}
+              >
+                <input
+                  id="full-image-input"
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePosterUpload(file);
+                  }}
+                />
+                <Upload size={40} color="#666" />
+                <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+                  {fullImageUploading ? 'Uploading...' : (posterImageFile ? posterImageFile.name : 'Click to upload full image')}
+                </Typography>
+                {fullImageUploading && (
+                  <Box sx={{ mt: 2 }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                )}
+                {formData.fullImage && (
+                  <Box sx={{ mt: 2 }}>
+                    <img
+                      src={formData.fullImage}
+                      alt="Full Image"
+                      style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px' }}
+                    />
+                  </Box>
+                )}
+              </Box>
+              {fieldErrors.fullImage && (
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {fieldErrors.fullImage}
+                </Alert>
               )}
-            </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-              Only JPG and PNG files allowed. Image must have 16:9 aspect ratio.
-            </Typography>
-          </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                JPG/PNG, 16:9 aspect ratio recommended
+              </Typography>
+            </Grid>
+
+            {/* Preview Image Upload */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle1" fontWeight="medium" mb={1}>
+                Preview Image
+              </Typography>
+              <Box
+                sx={{
+                  border: '2px dashed #ccc',
+                  borderRadius: 2,
+                  p: 2,
+                  textAlign: 'center',
+                  cursor: previewImageUploading ? 'not-allowed' : 'pointer',
+                  '&:hover': { borderColor: previewImageUploading ? '#ccc' : '#4CAF50', backgroundColor: previewImageUploading ? 'transparent' : 'rgba(76, 175, 80, 0.04)' },
+                  transition: 'all 0.2s ease',
+                  opacity: previewImageUploading ? 0.7 : 1
+                }}
+                onClick={() => !previewImageUploading && document.getElementById('preview-image-input')?.click()}
+              >
+                <input
+                  id="preview-image-input"
+                  type="file"
+                  accept=".jpg,.jpeg,.png"
+                  hidden
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handlePreviewImageUpload(file);
+                  }}
+                />
+                <Upload size={40} color="#666" />
+                <Typography variant="body2" sx={{ mt: 1, color: '#666' }}>
+                  {previewImageUploading ? 'Uploading...' : (previewImageFile ? previewImageFile.name : 'Click to upload preview image')}
+                </Typography>
+                {previewImageUploading && (
+                  <Box sx={{ mt: 2 }}>
+                    <CircularProgress size={24} />
+                  </Box>
+                )}
+                {formData.previewImage && (
+                  <Box sx={{ mt: 2 }}>
+                    <img
+                      src={formData.previewImage}
+                      alt="Preview Image"
+                      style={{ maxWidth: '100%', maxHeight: '150px', borderRadius: '8px' }}
+                    />
+                  </Box>
+                )}
+              </Box>
+              {fieldErrors.previewImage && (
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {fieldErrors.previewImage}
+                </Alert>
+              )}
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                JPG/PNG, smaller version for preview
+              </Typography>
+            </Grid>
+          </Grid>
 
           {/* Reward Details */}
           <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
@@ -461,15 +637,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
           </Box>
         </Box>
 
-        {/* Error Display */}
-        {error && (
-          <Box mb={2}>
-            <Typography color="error" variant="body2">
-              {error}
-            </Typography>
-          </Box>
-        )}
-
+        
         {/* Footer Actions */}
         <Divider />
         <Stack direction="row" spacing={2} justifyContent="flex-end" p={3}>

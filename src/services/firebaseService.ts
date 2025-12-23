@@ -626,7 +626,7 @@ export const verifyEmail = async (userId: string, email: string): Promise<{ succ
  * @param folder - Storage folder path
  * @returns Download URL of the uploaded image
  */
-export const uploadImage = async (file: File, folder: string = 'reward-images'): Promise<{ success: boolean; url?: string; message: string }> => {
+export const uploadImage = async (file: File, folder: string = 'rewards'): Promise<{ success: boolean; url?: string; message: string }> => {
   try {
     const storage = getStorage();
     const fileName = `${folder}/${uuidv4()}-${file.name}`;
