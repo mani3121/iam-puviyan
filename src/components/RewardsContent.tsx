@@ -87,6 +87,8 @@ const RewardsContent = () => {
   const [editingReward, setEditingReward] = useState<Reward | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [rewardToDelete, setRewardToDelete] = useState<Reward | null>(null)
+  const [viewRewardOpen, setViewRewardOpen] = useState(false)
+  const [rewardToView, setRewardToView] = useState<Reward | null>(null)
   const [rewards, setRewards] = useState<Reward[]>([])
   const [statsData, setStatsData] = useState({
     totalRewards: 0,
@@ -201,6 +203,12 @@ const RewardsContent = () => {
   const handleCreateReward = (rewardData: any) => {
     console.log('New reward created:', rewardData)
     refreshData()
+  }
+
+  // Handle view reward
+  const handleView = (reward: Reward) => {
+    setRewardToView(reward)
+    setViewRewardOpen(true)
   }
 
   // Handle edit reward
@@ -392,7 +400,7 @@ const RewardsContent = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredRewards.map((reward) => (
+                {filteredRewards.map((reward: Reward) => (
                   <TableRow key={reward.id} hover>
                     <TableCell>{reward.rewardTitle}</TableCell>
                     <TableCell>
@@ -433,6 +441,7 @@ const RewardsContent = () => {
                         <IconButton
                           size="small"
                           color="info"
+                          onClick={() => handleView(reward)}
                         >
                           <Eye size={16} />
                         </IconButton>
@@ -505,6 +514,131 @@ const RewardsContent = () => {
                 autoFocus
               >
                 Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* View Reward Dialog */}
+          <Dialog
+            open={viewRewardOpen}
+            onClose={() => setViewRewardOpen(false)}
+            maxWidth="md"
+            fullWidth
+            aria-labelledby="view-dialog-title"
+          >
+            <DialogTitle id="view-dialog-title">
+              Reward Details
+            </DialogTitle>
+            <DialogContent>
+              {rewardToView && (
+                <Box sx={{ py: 2 }}>
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Title
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.rewardTitle}
+                      </Typography>
+                      
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Brand
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.brandName}
+                      </Typography>
+                      
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Status
+                      </Typography>
+                      <Chip
+                        label={rewardToView.status}
+                        size="small"
+                        sx={{
+                          backgroundColor: getStatusColor(rewardToView.status) + '20',
+                          color: getStatusColor(rewardToView.status),
+                          fontWeight: 'medium',
+                          mb: 2
+                        }}
+                      />
+                    </Grid>
+                    
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Points Required
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.deductPoints}
+                      </Typography>
+                      
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Reward Type
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.rewardType}
+                      </Typography>
+                      
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Created Date
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.createdAt ? formatDateForDisplay(rewardToView.createdAt) : 'N/A'}
+                      </Typography>
+                    </Grid>
+                    
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Description
+                      </Typography>
+                      <Typography variant="body1" sx={{ mb: 2 }}>
+                        {rewardToView.rewardSubtitle || 'No description available'}
+                      </Typography>
+                    </Grid>
+                    
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Reward Details
+                      </Typography>
+                      {rewardToView.rewardDetails && rewardToView.rewardDetails.length > 0 ? (
+                        <Box component="ul" sx={{ pl: 2, mb: 2 }}>
+                          {rewardToView.rewardDetails.map((detail: string, index: number) => (
+                            <Typography component="li" key={index} variant="body1">
+                              {detail}
+                            </Typography>
+                          ))}
+                        </Box>
+                      ) : (
+                        <Typography variant="body1" sx={{ mb: 2 }}>
+                          No additional details available
+                        </Typography>
+                      )}
+                    </Grid>
+                    
+                    <Grid size={{ xs: 12 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        How to Claim
+                      </Typography>
+                      {rewardToView.howToClaim && rewardToView.howToClaim.length > 0 ? (
+                        <Box component="ol" sx={{ pl: 2 }}>
+                          {rewardToView.howToClaim.map((step: string, index: number) => (
+                            <Typography component="li" key={index} variant="body1">
+                              {step}
+                            </Typography>
+                          ))}
+                        </Box>
+                      ) : (
+                        <Typography variant="body1">
+                          No claim instructions available
+                        </Typography>
+                      )}
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setViewRewardOpen(false)} color="primary" variant="contained">
+                Close
               </Button>
             </DialogActions>
           </Dialog>

@@ -24,10 +24,39 @@ export const parseDateFromStorage = (dateString: string): Date => {
 
 /**
  * Formats a date for display in tables (shorter format)
+ * Handles various date formats including Firebase timestamps and ISO strings
  */
 export const formatDateForDisplay = (dateString: string): string => {
   try {
-    const date = parseDateFromStorage(dateString)
+    // If the string is empty or null, return invalid
+    if (!dateString) {
+      return 'Invalid Date'
+    }
+    
+    let date: Date
+    
+    // Try parsing as ISO date first (most common for Firebase)
+    if (dateString.includes('T') && dateString.includes('Z')) {
+      date = new Date(dateString)
+    } 
+    // Try parsing as timestamp (number)
+    else if (!isNaN(Number(dateString))) {
+      date = new Date(Number(dateString))
+    }
+    // Try parsing the custom storage format
+    else if (dateString.includes(' at ')) {
+      date = parseDateFromStorage(dateString)
+    }
+    // Fallback to regular Date parsing
+    else {
+      date = new Date(dateString)
+    }
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date'
+    }
+    
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
