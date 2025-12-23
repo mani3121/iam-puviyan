@@ -83,6 +83,31 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
     }
   }, [editingReward])
 
+  // Clear modal state when it's closed
+  useEffect(() => {
+    if (!open) {
+      // Reset all form state
+      setFormData({
+        brandName: '',
+        availableCoupons: '',
+        fullImage: '',
+        previewImage: '',
+        rewardSubtitle: '',
+        rewardTitle: '',
+        usefulnessScore: '',
+        rewardDetails: '',
+        howToClaim: '',
+        termsAndConditions: '',
+        approverEmails: []
+      })
+      setFieldErrors({})
+      setPosterImageFile(null)
+      setPreviewImageFile(null)
+      setEmailInput('')
+      setShowSuccessToast(false)
+    }
+  }, [open])
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
