@@ -590,6 +590,7 @@ export default function Signup() {
                       type="submit"
                       fullWidth
                       variant="contained"
+                      color="primary"
                       disabled={signupLoading}
                       size="large"
                       sx={{ py: 1.5, fontSize: '1rem', fontWeight: 600, color: 'white' }}
