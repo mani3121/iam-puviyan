@@ -5,21 +5,19 @@ import {
   createTheme,
   CssBaseline,
   Link,
-  InputAdornment,
   TextField,
   ThemeProvider,
   Typography,
-  Paper,
-  IconButton
+  Paper
 } from '@mui/material'
-import { Mail, ArrowLeft, CheckCircle, Eye, EyeOff } from 'lucide-react'
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logoImage from '../assets/IamPuviyanLogo.png'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import PageLayout from '../components/PageLayout'
-import { checkEmailExists, generatePasswordResetLink, updateUserPassword } from '../services/firebaseService'
+import { checkEmailExists, generatePasswordResetLink } from '../services/firebaseService'
 import { sendVerificationEmailViaEmailJS, initializeEmailJS } from '../services/emailjsConfig'
 
 // Material UI Dark Theme with Green Accents
@@ -81,39 +79,6 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false)
   const [emailFound, setEmailFound] = useState<boolean | null>(null)
   const [resetEmailSent, setResetEmailSent] = useState(false)
-  const [showPasswordFields, setShowPasswordFields] = useState(false)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [passwordError, setPasswordError] = useState(false)
-  const [confirmPasswordError, setConfirmPasswordError] = useState(false)
-
-  const getPasswordScore = (value: string) => {
-    let score = 0
-    if (!value) return 0
-    if (value.length >= 8) score += 1
-    if (/[A-Z]/.test(value)) score += 1
-    if (/[0-9]/.test(value)) score += 1
-    if (/[^A-Za-z0-9]/.test(value)) score += 1
-    return score
-  }
-
-  const getStrength = (score: number) => {
-    switch (score) {
-      case 0:
-      case 1:
-        return { label: 'Too weak', color: 'error', value: 25 }
-      case 2:
-        return { label: 'Weak', color: 'warning', value: 50 }
-      case 3:
-        return { label: 'Medium', color: 'info', value: 75 }
-      case 4:
-        return { label: 'Strong', color: 'success', value: 100 }
-      default:
-        return { label: '', color: 'inherit', value: 0 }
-    }
-  }
 
   // Initialize EmailJS on component mount
   useEffect(() => {
@@ -156,9 +121,38 @@ export default function ForgotPassword() {
       const result = await checkEmailExists(email)
       
       if (result.exists) {
-        // Email found - show password fields
+        // Email found - generate reset link and send email
         setEmailFound(true)
-        setShowPasswordFields(true)
+        
+        // Generate password reset link
+        const resetResult = await generatePasswordResetLink(email)
+        
+        if (resetResult.success && resetResult.resetLink) {
+          // Send password reset email
+          const emailResult = await sendVerificationEmailViaEmailJS(
+            email,
+            resetResult.resetLink,
+            email.split('@')[0] // Use email prefix as name
+          )
+          
+          if (emailResult.success) {
+            setResetEmailSent(true)
+          } else {
+            setPopupConfig({
+              title: 'Email Sending Failed',
+              message: 'Failed to send password reset email. Please try again.',
+              type: 'error'
+            })
+            setShowPopup(true)
+          }
+        } else {
+          setPopupConfig({
+            title: 'Reset Link Generation Failed',
+            message: 'Failed to generate reset link. Please try again.',
+            type: 'error'
+          })
+          setShowPopup(true)
+        }
       } else {
         // Email not found - show error popup with signup option
         setEmailFound(false)
@@ -180,91 +174,7 @@ export default function ForgotPassword() {
     } catch (error) {
       setPopupConfig({
         title: 'Error',
-        message: 'Failed to check email. Please try again.',
-        type: 'error'
-      })
-      setShowPopup(true)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const validatePasswords = () => {
-    let isValid = true;
-    
-    if (!password || password.length < 8) {
-      setPasswordError(true)
-      isValid = false
-    } else {
-      setPasswordError(false)
-    }
-    
-    if (!confirmPassword || confirmPassword !== password) {
-      setConfirmPasswordError(true)
-      isValid = false
-    } else {
-      setConfirmPasswordError(false)
-    }
-    
-    return isValid
-  }
-
-  const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validatePasswords()) {
-      return
-    }
-
-    setIsLoading(true)
-    try {
-      // First, update the password and set emailVerified to false
-      const updateResult = await updateUserPassword(email, password)
-      
-      if (!updateResult.success) {
-        setPopupConfig({
-          title: 'Password Update Failed',
-          message: updateResult.message,
-          type: 'error'
-        })
-        setShowPopup(true)
-        return
-      }
-
-      // Generate password reset link
-      const resetResult = await generatePasswordResetLink(email)
-      
-      if (resetResult.success && resetResult.resetLink) {
-        // Send password reset email
-        const emailResult = await sendVerificationEmailViaEmailJS(
-          email,
-          resetResult.resetLink,
-          email.split('@')[0] // Use email prefix as name
-        )
-        
-        if (emailResult.success) {
-          setResetEmailSent(true)
-          setShowPasswordFields(false)
-        } else {
-          setPopupConfig({
-            title: 'Email Sending Failed',
-            message: 'Password was updated but failed to send verification email. Please try to resend the email.',
-            type: 'error'
-          })
-          setShowPopup(true)
-        }
-      } else {
-        setPopupConfig({
-          title: 'Reset Link Generation Failed',
-          message: 'Password was updated but failed to generate reset link. Please contact support.',
-          type: 'error'
-        })
-        setShowPopup(true)
-      }
-    } catch (error) {
-      setPopupConfig({
-        title: 'Error',
-        message: 'Failed to update password and send email. Please try again.',
+        message: 'Failed to process request. Please try again.',
         type: 'error'
       })
       setShowPopup(true)
@@ -343,24 +253,19 @@ export default function ForgotPassword() {
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" sx={{ color: '#D4D4D4', fontWeight: 'bold', mb: 2, fontFamily: '"Segoe UI Variable"' }}>
                   {resetEmailSent ? 'Reset Email Sent' : 
-                   showPasswordFields ? 'Reset Your Password' :
                    emailFound === false ? 'Email Not Found' :
                    'Forgot Password?'}
                 </Typography>
                 
                 {resetEmailSent ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    Password reset instructions have been sent to your email address.
+                    Password reset link has been sent to your email address.
                     <br />
                     <Typography component="span" sx={{ color: 'primary.main', fontWeight: 'medium' }}>
                       {email}
                     </Typography>
                     <br />
-                    Please check your inbox and follow the instructions to reset your password.
-                  </Typography>
-                ) : showPasswordFields ? (
-                  <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    We found your account! Please enter your new password below.
+                    Please check your inbox and click the link to reset your password.
                   </Typography>
                 ) : emailFound === false ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
@@ -368,13 +273,13 @@ export default function ForgotPassword() {
                   </Typography>
                 ) : (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    Enter your email address and we'll help you reset your password.
+                    Enter your email address and we'll send you a link to reset your password.
                   </Typography>
                 )}
               </Box>
 
               {/* Email Input Form */}
-              {!showPasswordFields && !resetEmailSent && (
+              {!resetEmailSent && (
                 <Box component="form" onSubmit={handleCheckEmail} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   <TextField
                     fullWidth
@@ -431,148 +336,7 @@ export default function ForgotPassword() {
                       }
                     }}
                   >
-                    {isLoading ? 'Checking...' : 'Continue'}
-                  </Button>
-                </Box>
-              )}
-
-              {/* Password Fields */}
-              {showPasswordFields && (
-                <Box component="form" onSubmit={handlePasswordSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                  <TextField
-                    fullWidth
-                    id="password"
-                    label="New Password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter new password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value)
-                      setPasswordError(false)
-                    }}
-                    required
-                    error={passwordError}
-                    helperText={passwordError ? 'Password must be at least 8 characters long' : ''}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          {password && (() => {
-                            const strength = getStrength(getPasswordScore(password))
-                            const strengthColor =
-                              strength.color === 'inherit' ? 'text.secondary' : `${strength.color}.main`
-
-                            return (
-                              <Typography
-                                variant="caption"
-                                sx={{
-                                  mr: 1,
-                                  color: strengthColor,
-                                  whiteSpace: 'nowrap'
-                                }}
-                              >
-                                {strength.label}
-                              </Typography>
-                            )
-                          })()}
-                          <IconButton
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    InputLabelProps={{
-                      sx: {
-                        '& .MuiInputLabel-asterisk': {
-                          color: 'red'
-                        }
-                      }
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&.Mui-error fieldset': {
-                          borderColor: 'red'
-                        }
-                      }
-                    }}
-                    variant="outlined"
-                  />
-
-                  <TextField
-                    fullWidth
-                    id="confirmPassword"
-                    label="Confirm Password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm new password"
-                    value={confirmPassword}
-                    onChange={(e) => {
-                      setConfirmPassword(e.target.value)
-                      setConfirmPasswordError(false)
-                    }}
-                    required
-                    error={confirmPasswordError}
-                    helperText={confirmPasswordError ? 'Passwords do not match' : ''}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          {confirmPassword && password && confirmPassword === password && !confirmPasswordError && (
-                            <Box
-                              component={CheckCircle}
-                              className="tick-fade-in"
-                              sx={{
-                                color: '#4CAF50',
-                                fontSize: '20px',
-                                mr: 1
-                              }}
-                            />
-                          )}
-                          <IconButton
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            edge="end"
-                            sx={{ color: 'text.secondary' }}
-                          >
-                            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                          </IconButton>
-                        </InputAdornment>
-                      )
-                    }}
-                    InputLabelProps={{
-                      sx: {
-                        '& .MuiInputLabel-asterisk': {
-                          color: 'red'
-                        }
-                      }
-                    }}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&.Mui-error fieldset': {
-                          borderColor: 'red'
-                        }
-                      }
-                    }}
-                    variant="outlined"
-                  />
-
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    disabled={isLoading}
-                    startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
-                    sx={{
-                      py: 2,
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      '&:hover': {
-                        bgcolor: 'success.dark'
-                      }
-                    }}
-                  >
-                    {isLoading ? 'Sending...' : 'Submit'}
+                    {isLoading ? 'Sending...' : 'Send Reset Link'}
                   </Button>
                 </Box>
               )}

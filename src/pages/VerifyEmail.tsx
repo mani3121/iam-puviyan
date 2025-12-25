@@ -7,16 +7,19 @@ import {
   Link,
   ThemeProvider,
   Typography,
-  Paper
+  Paper,
+  TextField,
+  InputAdornment,
+  IconButton
 } from '@mui/material'
-import { Mail, ArrowLeft, RefreshCw } from 'lucide-react'
+import { Mail, ArrowLeft, RefreshCw, Lock, CheckCircle, X, Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import logoImage from '../assets/IamPuviyanLogo.png'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import PageLayout from '../components/PageLayout'
-import { verifyEmail } from '../services/firebaseService'
+import { verifyEmail, updateUserPassword } from '../services/firebaseService'
 
 // Material UI Dark Theme with Green Accents
 const darkTheme = createTheme({
@@ -79,16 +82,53 @@ export default function VerifyEmail() {
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
   const [isResetPassword] = useState(searchParams.get('reset') === 'true')
+  
+  // Password reset form states
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
+  const [confirmPasswordError, setConfirmPasswordError] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Handle email verification when component loads
+  // Password strength helpers
+  const getPasswordScore = (value: string) => {
+    let score = 0
+    if (!value) return 0
+    if (value.length >= 8) score += 1
+    if (/[A-Z]/.test(value)) score += 1
+    if (/[0-9]/.test(value)) score += 1
+    if (/[^A-Za-z0-9]/.test(value)) score += 1
+    return score
+  }
+
+  const getStrength = (score: number) => {
+    switch (score) {
+      case 0:
+      case 1:
+        return { label: 'Too weak', color: 'error', value: 25 }
+      case 2:
+        return { label: 'Weak', color: 'warning', value: 50 }
+      case 3:
+        return { label: 'Medium', color: 'info', value: 75 }
+      case 4:
+        return { label: 'Strong', color: 'success', value: 100 }
+      default:
+        return { label: '', color: 'inherit', value: 0 }
+    }
+  }
+
+  // Handle email verification when component loads (only for non-reset flows)
   useEffect(() => {
     const userId = searchParams.get('userId')
     const emailParam = searchParams.get('email')
     
-    if (userId && emailParam) {
+    // Only auto-verify for normal signup verification, not password reset
+    if (userId && emailParam && !isResetPassword) {
       handleEmailVerification(userId, emailParam)
     }
-  }, [searchParams])
+  }, [searchParams, isResetPassword])
 
   const handleEmailVerification = async (userId: string, email: string) => {
     setIsVerifying(true)
@@ -97,38 +137,20 @@ export default function VerifyEmail() {
       
       if (result.success) {
         setVerificationStatus('success')
-        
-        if (isResetPassword) {
-          // Password reset verification - route to login
-          setPopupConfig({
-            title: 'Password Reset Successful!',
-            message: 'Your password has been reset successfully. You can now log in with your new password.',
-            type: 'success',
-            customActions: [
-              {
-                label: 'Login',
-                onClick: () => navigate('/login'),
-                variant: 'contained',
-                color: 'primary'
-              }
-            ]
-          })
-        } else {
-          // Normal signup verification - route to dashboard with welcome toast
-          setPopupConfig({
-            title: 'Email Verified!',
-            message: result.message,
-            type: 'success',
-            customActions: [
-              {
-                label: 'OK',
-                onClick: () => navigate('/dashboard', { state: { showWelcomeToast: true } }),
-                variant: 'contained',
-                color: 'primary'
-              }
-            ]
-          })
-        }
+        // Normal signup verification - route to dashboard with welcome toast
+        setPopupConfig({
+          title: 'Email Verified!',
+          message: result.message,
+          type: 'success',
+          customActions: [
+            {
+              label: 'OK',
+              onClick: () => navigate('/dashboard', { state: { showWelcomeToast: true } }),
+              variant: 'contained',
+              color: 'primary'
+            }
+          ]
+        })
         setShowPopup(true)
       } else {
         setVerificationStatus('error')
@@ -149,6 +171,81 @@ export default function VerifyEmail() {
       setShowPopup(true)
     } finally {
       setIsVerifying(false)
+    }
+  }
+
+  // Password reset form validation and submission
+  const validatePasswords = () => {
+    let isValid = true
+    
+    if (!password || password.length < 8) {
+      setPasswordError(true)
+      isValid = false
+    } else {
+      setPasswordError(false)
+    }
+    
+    if (!confirmPassword || confirmPassword !== password) {
+      setConfirmPasswordError(true)
+      isValid = false
+    } else {
+      setConfirmPasswordError(false)
+    }
+    
+    return isValid
+  }
+
+  const handlePasswordResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!validatePasswords()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      // Update the password
+      const updateResult = await updateUserPassword(email, password)
+      
+      if (updateResult.success) {
+        // Verify email to mark as verified
+        const userId = searchParams.get('userId')
+        if (userId) {
+          await verifyEmail(userId, email)
+        }
+        
+        setVerificationStatus('success')
+        setPopupConfig({
+          title: 'Password Reset Successful!',
+          message: 'Your password has been reset successfully. You can now log in with your new password.',
+          type: 'success',
+          customActions: [
+            {
+              label: 'Login',
+              onClick: () => navigate('/login'),
+              variant: 'contained',
+              color: 'primary'
+            }
+          ]
+        })
+        setShowPopup(true)
+      } else {
+        setPopupConfig({
+          title: 'Password Reset Failed',
+          message: updateResult.message,
+          type: 'error'
+        })
+        setShowPopup(true)
+      }
+    } catch (error) {
+      setPopupConfig({
+        title: 'Error',
+        message: 'Failed to reset password. Please try again.',
+        type: 'error'
+      })
+      setShowPopup(true)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -232,7 +329,7 @@ export default function VerifyEmail() {
                 borderRadius: 3
               }}
             >
-              {/* Email Icon */}
+              {/* Icon */}
               <Box sx={{ textAlign: 'center', mb: 3 }}>
                 <Box 
                   sx={{ 
@@ -248,14 +345,14 @@ export default function VerifyEmail() {
                     mb: 2
                   }}
                 >
-                  {isVerifying ? (
+                  {isVerifying || isSubmitting ? (
                     <CircularProgress size={40} color="primary" />
                   ) : verificationStatus === 'success' ? (
-                    <Mail style={{ fontSize: 40, color: '#4CAF50' }} />
+                    isResetPassword ? <Lock style={{ fontSize: 40, color: '#4CAF50' }} /> : <Mail style={{ fontSize: 40, color: '#4CAF50' }} />
                   ) : verificationStatus === 'error' ? (
-                    <Mail style={{ fontSize: 40, color: '#CF6679' }} />
+                    isResetPassword ? <Lock style={{ fontSize: 40, color: '#CF6679' }} /> : <Mail style={{ fontSize: 40, color: '#CF6679' }} />
                   ) : (
-                    <Mail style={{ fontSize: 40, color: '#4CAF50' }} />
+                    isResetPassword ? <Lock style={{ fontSize: 40, color: '#4CAF50' }} /> : <Mail style={{ fontSize: 40, color: '#4CAF50' }} />
                   )}
                 </Box>
               </Box>
@@ -263,16 +360,16 @@ export default function VerifyEmail() {
               {/* Title and Description */}
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" sx={{ color: '#D4D4D4', fontWeight: 'bold', mb: 2, fontFamily: '"Segoe UI Variable"' }}>
-                  {isVerifying ? (isResetPassword ? 'Verifying Password Reset...' : 'Verifying Your Email...') : 
+                  {isVerifying || isSubmitting ? (isResetPassword ? 'Resetting Password...' : 'Verifying Your Email...') : 
                    verificationStatus === 'success' ? (isResetPassword ? 'Password Reset Successful!' : 'Email Verified!') :
-                   verificationStatus === 'error' ? 'Verification Failed' :
-                   (isResetPassword ? 'Reset your password' : 'Verify your email')}
+                   verificationStatus === 'error' ? (isResetPassword ? 'Reset Failed' : 'Verification Failed') :
+                   (isResetPassword ? 'Reset Your Password' : 'Verify your email')}
                 </Typography>
                 
-                {isVerifying ? (
+                {isVerifying || isSubmitting ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                     {isResetPassword 
-                      ? 'Please wait while we verify your password reset request...'
+                      ? 'Please wait while we reset your password...'
                       : 'Please wait while we verify your email address...'}
                   </Typography>
                 ) : verificationStatus === 'success' ? (
@@ -284,28 +381,199 @@ export default function VerifyEmail() {
                 ) : verificationStatus === 'error' ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                     {isResetPassword
-                      ? 'There was an issue verifying your password reset. Please try again or request a new reset link.'
+                      ? 'There was an issue resetting your password. Please try again or request a new reset link.'
                       : 'There was an issue verifying your email. Please check the verification link or request a new one.'}
+                  </Typography>
+                ) : isResetPassword ? (
+                  <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                    Enter your new password below to complete the reset.
                   </Typography>
                 ) : (
                   <>
                     <Typography variant="body1" sx={{ color: 'text.secondary', mb: 1, lineHeight: 1.6 }}>
-                      {isResetPassword ? 'We\'ve sent a password reset email to:' : 'We\'ve sent a verification email to:'}
+                      We've sent a verification email to:
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'primary.main', fontWeight: 'medium', mb: 2 }}>
                       {email}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-                      {isResetPassword
-                        ? 'Click the reset link in the email to complete your password reset. If you don\'t see the email, check your spam folder.'
-                        : 'Click the verification link in the email to complete your registration. If you don\'t see the email, check your spam folder.'}
+                      Click the verification link in the email to complete your registration. If you don't see the email, check your spam folder.
                     </Typography>
                   </>
                 )}
               </Box>
 
-              {/* Action Buttons */}
-              {verificationStatus === 'pending' && !isVerifying && (
+              {/* Password Reset Form - Only show when reset=true and not yet successful */}
+              {isResetPassword && verificationStatus === 'pending' && !isSubmitting && (
+                <Box component="form" onSubmit={handlePasswordResetSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <TextField
+                    fullWidth
+                    id="password"
+                    label="New Password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter new password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setPasswordError(false)
+                    }}
+                    required
+                    error={passwordError}
+                    helperText={passwordError ? 'Password must be at least 8 characters long' : ''}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {password && (() => {
+                            const strength = getStrength(getPasswordScore(password))
+                            const strengthColor =
+                              strength.color === 'inherit' ? 'text.secondary' : `${strength.color}.main`
+
+                            return (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  mr: 1,
+                                  color: strengthColor,
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {strength.label}
+                              </Typography>
+                            )
+                          })()}
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{ color: 'text.secondary' }}
+                          >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    InputLabelProps={{
+                      sx: {
+                        '& .MuiInputLabel-asterisk': {
+                          color: 'red'
+                        }
+                      }
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '&.Mui-error fieldset': {
+                          borderColor: 'red'
+                        }
+                      }
+                    }}
+                    variant="outlined"
+                  />
+
+                  <TextField
+                    fullWidth
+                    id="confirmPassword"
+                    label="Confirm Password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm new password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value)
+                      setConfirmPasswordError(false)
+                    }}
+                    required
+                    error={confirmPasswordError}
+                    helperText={confirmPasswordError ? 'Passwords do not match' : ''}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          {confirmPassword && password && (
+                            confirmPassword === password ? (
+                              <Box
+                                component={CheckCircle}
+                                className="tick-fade-in"
+                                sx={{
+                                  color: '#4CAF50',
+                                  fontSize: '20px',
+                                  mr: 1
+                                }}
+                              />
+                            ) : (
+                              <Box
+                                component={X}
+                                className="tick-fade-in"
+                                sx={{
+                                  color: '#CF6679',
+                                  fontSize: '20px',
+                                  mr: 1
+                                }}
+                              />
+                            )
+                          )}
+                          <IconButton
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            sx={{ color: 'text.secondary' }}
+                          >
+                            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    InputLabelProps={{
+                      sx: {
+                        '& .MuiInputLabel-asterisk': {
+                          color: 'red'
+                        }
+                      }
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '&.Mui-error fieldset': {
+                          borderColor: 'red'
+                        }
+                      }
+                    }}
+                    variant="outlined"
+                  />
+
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    size="large"
+                    disabled={isSubmitting}
+                    startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+                    sx={{
+                      py: 2,
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      textTransform: 'none',
+                      '&:hover': {
+                        bgcolor: 'success.dark'
+                      }
+                    }}
+                  >
+                    {isSubmitting ? 'Resetting...' : 'Reset Password'}
+                  </Button>
+
+                  <Button
+                    variant="text"
+                    onClick={() => navigate('/login')}
+                    startIcon={<ArrowLeft />}
+                    sx={{ 
+                      py: 1.5,
+                      color: 'text.secondary',
+                      '&:hover': {
+                        color: 'primary.main',
+                        bgcolor: 'rgba(76, 175, 80, 0.08)'
+                      }
+                    }}
+                  >
+                    Back to login
+                  </Button>
+                </Box>
+              )}
+
+              {/* Action Buttons for normal verification */}
+              {!isResetPassword && verificationStatus === 'pending' && !isVerifying && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <Button
                     variant="outlined"
@@ -352,12 +620,13 @@ export default function VerifyEmail() {
                 </Box>
               )}
 
+              {/* Error state buttons */}
               {verificationStatus === 'error' && !isVerifying && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   <Button
                     variant="outlined"
-                    onClick={handleResendEmail}
-                    disabled={!canResend || resendLoading}
+                    onClick={isResetPassword ? () => navigate('/forgot-password') : handleResendEmail}
+                    disabled={!isResetPassword && (!canResend || resendLoading)}
                     startIcon={resendLoading ? <CircularProgress size={20} color="inherit" /> : <RefreshCw />}
                     sx={{ 
                       py: 1.5,
@@ -369,17 +638,19 @@ export default function VerifyEmail() {
                       }
                     }}
                   >
-                    {resendLoading 
-                      ? 'Sending...' 
-                      : canResend 
-                        ? 'Request new verification email' 
-                        : `Request new (${countdown}s)`
+                    {isResetPassword 
+                      ? 'Request new reset link'
+                      : resendLoading 
+                        ? 'Sending...' 
+                        : canResend 
+                          ? 'Request new verification email' 
+                          : `Request new (${countdown}s)`
                     }
                   </Button>
 
                   <Button
                     variant="text"
-                    onClick={handleBackToSignup}
+                    onClick={isResetPassword ? () => navigate('/login') : handleBackToSignup}
                     startIcon={<ArrowLeft />}
                     sx={{ 
                       py: 1.5,
@@ -390,34 +661,36 @@ export default function VerifyEmail() {
                       }
                     }}
                   >
-                    Back to signup
+                    {isResetPassword ? 'Back to login' : 'Back to signup'}
                   </Button>
                 </Box>
               )}
 
-              {/* Help Text */}
-              <Box sx={{ textAlign: 'center', mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Didn't receive the email? Check your spam folder or{' '}
-                  <Link 
-                    component="button"
-                    onClick={handleResendEmail}
-                    disabled={!canResend || resendLoading}
-                    sx={{ 
-                      color: 'primary.main',
-                      '&:hover': { color: 'primary.light' },
-                      '&:disabled': { color: 'text.secondary' },
-                      cursor: 'pointer',
-                      background: 'none',
-                      border: 'none',
-                      p: 0,
-                      font: 'inherit'
-                    }}
-                  >
-                    request a new one
-                  </Link>
-                </Typography>
-              </Box>
+              {/* Help Text - only for non-reset flows */}
+              {!isResetPassword && verificationStatus !== 'success' && (
+                <Box sx={{ textAlign: 'center', mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Didn't receive the email? Check your spam folder or{' '}
+                    <Link 
+                      component="button"
+                      onClick={handleResendEmail}
+                      disabled={!canResend || resendLoading}
+                      sx={{ 
+                        color: 'primary.main',
+                        '&:hover': { color: 'primary.light' },
+                        '&:disabled': { color: 'text.secondary' },
+                        cursor: 'pointer',
+                        background: 'none',
+                        border: 'none',
+                        p: 0,
+                        font: 'inherit'
+                      }}
+                    >
+                      request a new one
+                    </Link>
+                  </Typography>
+                </Box>
+              )}
             </Paper>
 
             {/* Footer */}
