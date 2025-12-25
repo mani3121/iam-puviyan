@@ -102,13 +102,14 @@ export default function VerifyEmail() {
           type: 'success',
           customActions: [
             {
-              label: 'Login',
-              onClick: () => navigate('/login'),
+              label: 'OK',
+              onClick: () => navigate('/dashboard', { state: { showWelcomeToast: true } }),
               variant: 'contained',
               color: 'primary'
             }
           ]
         })
+        setShowPopup(true)
       } else {
         setVerificationStatus('error')
         setPopupConfig({
@@ -116,8 +117,8 @@ export default function VerifyEmail() {
           message: result.message,
           type: 'error'
         })
+        setShowPopup(true)
       }
-      setShowPopup(true)
     } catch (error) {
       setVerificationStatus('error')
       setPopupConfig({
@@ -409,6 +410,7 @@ export default function VerifyEmail() {
               title={popupConfig.title}
               message={popupConfig.message}
               type={popupConfig.type}
+              customActions={popupConfig.customActions}
             />
           </Box>
         </ContentWrapper>

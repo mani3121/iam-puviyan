@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Alert,
   Box,
   Button,
   createTheme,
@@ -12,6 +13,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Snackbar,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -23,10 +25,11 @@ import {
   LogOut,
   Menu as MenuIcon,
   // School,
+  Recycle,
   Trophy
 } from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import ContentWrapper from '../components/ContentWrapper'
 import OnboardingContent from '../components/OnboardingContent'
 import PageLayout from '../components/PageLayout'
@@ -98,6 +101,16 @@ function Dashboard() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [selectedMenu, setSelectedMenu] = useState('onboarding')
   const navigate = useNavigate()
+  const location = useLocation()
+  const [showWelcomeToast, setShowWelcomeToast] = useState(false)
+
+  useEffect(() => {
+    const state = location.state as { showWelcomeToast?: boolean } | null
+    if (state?.showWelcomeToast) {
+      setShowWelcomeToast(true)
+      navigate(location.pathname, { replace: true, state: null })
+    }
+  }, [location.pathname, location.state, navigate])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -310,6 +323,23 @@ function Dashboard() {
               {selectedComponent()}
             </Box>
           </Box>
+
+          <Snackbar
+            open={showWelcomeToast}
+            autoHideDuration={2500}
+            onClose={() => setShowWelcomeToast(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          >
+            <Alert
+              severity="success"
+              variant="filled"
+              icon={<Recycle size={18} />}
+              sx={{ width: '100%' }}
+              onClose={() => setShowWelcomeToast(false)}
+            >
+              Welcome!, start creating sustainable rewards
+            </Alert>
+          </Snackbar>
         </ContentWrapper>
       </PageLayout>
     </ThemeProvider>
