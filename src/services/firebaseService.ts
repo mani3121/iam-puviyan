@@ -338,6 +338,11 @@ export const fetchRewardsStats = async (): Promise<{
   totalClaimed: number;
   totalUnclaimed: number;
   totalExpiring: number;
+  totalViewsOrImpressions: number;
+  totalRedemptions: number;
+  redemptionRate: number;
+  totalCarbonImpact: number;
+  pendingApprovals: number;
 }> => {
   try {
     const rewardsQuery = query(collection(db, 'rewards'));
@@ -347,14 +352,53 @@ export const fetchRewardsStats = async (): Promise<{
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     
+    const totalClaimed = rewards.filter(r => r.status === 'claimed').length;
+
+    const totalViewsOrImpressions = rewards.reduce((sum, r) => {
+      const anyReward = r as any;
+      const impressions = anyReward?.impressions;
+      const views = anyReward?.views;
+      const value = typeof impressions === 'number' ? impressions : typeof views === 'number' ? views : 0;
+      return sum + value;
+    }, 0);
+
+    const totalCarbonImpact = rewards.reduce((sum, r) => {
+      const anyReward = r as any;
+      const carbonImpact = anyReward?.carbonImpact;
+      const carbonSaved = anyReward?.carbonSaved;
+      const value =
+        typeof carbonImpact === 'number'
+          ? carbonImpact
+          : typeof carbonSaved === 'number'
+            ? carbonSaved
+            : typeof r.usefulnessScore === 'number'
+              ? r.usefulnessScore
+              : 0;
+      return sum + value;
+    }, 0);
+
+    const pendingApprovals = rewards.filter(r => {
+      const status = (r.status || '').toLowerCase();
+      return status === 'pending' || status === 'pending_approval' || status === 'pending approval';
+    }).length;
+
+    const redemptionRate = totalViewsOrImpressions > 0
+      ? (totalClaimed / totalViewsOrImpressions) * 100
+      : 0;
+
     const stats = {
       totalRewards: rewards.length,
-      totalClaimed: rewards.filter(r => r.status === 'claimed').length,
+      totalClaimed,
       totalUnclaimed: rewards.filter(r => r.status === 'active').length,
       totalExpiring: rewards.filter(r => {
         const validToDate = new Date(r.validTo);
         return validToDate <= thirtyDaysFromNow && validToDate >= now;
-      }).length
+      }).length,
+      totalViewsOrImpressions,
+      totalRedemptions: totalClaimed,
+      redemptionRate,
+      totalCarbonImpact,
+      pendingApprovals
     };
     
     return stats;
@@ -364,7 +408,12 @@ export const fetchRewardsStats = async (): Promise<{
       totalRewards: 0,
       totalClaimed: 0,
       totalUnclaimed: 0,
-      totalExpiring: 0
+      totalExpiring: 0,
+      totalViewsOrImpressions: 0,
+      totalRedemptions: 0,
+      redemptionRate: 0,
+      totalCarbonImpact: 0,
+      pendingApprovals: 0
     };
   }
 };

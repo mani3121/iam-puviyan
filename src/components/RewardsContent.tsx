@@ -28,12 +28,14 @@ import {
   ThemeProvider,
   Typography
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 
 import { AlertCircle, CheckCircle, Clock, Edit, Eye, Gift, Plus, Search, Trash2 } from 'lucide-react'
 import { deleteReward, fetchRewardsPaginated, fetchRewardsStats, type PaginatedRewardsResult, type Reward } from '../services/firebaseService'
 import { formatDateForDisplay } from '../utils/dateUtils'
 import RewardModal from './RewardModal'
+
+const RewardsRedemptionsChart = lazy(() => import('./RewardsRedemptionsChart'))
 
 // Create a custom theme with enhanced scrollbar
 const theme = createTheme({
@@ -94,7 +96,12 @@ const RewardsContent = () => {
     totalRewards: 0,
     totalClaimed: 0,
     totalUnclaimed: 0,
-    totalExpiring: 0
+    totalExpiring: 0,
+    totalViewsOrImpressions: 0,
+    totalRedemptions: 0,
+    redemptionRate: 0,
+    totalCarbonImpact: 0,
+    pendingApprovals: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -267,16 +274,25 @@ const RewardsContent = () => {
   }
 
   
-  const StatCard = ({ icon: Icon, title, value, color }: { 
-    icon: any, 
-    title: string, 
-    value: number, 
-    color: string 
+  const StatCard = ({
+    icon: Icon,
+    title,
+    value,
+    color,
+    suffix,
+    badgeText
+  }: {
+    icon: any
+    title: string
+    value: number | string
+    color: string
+    suffix?: string
+    badgeText?: string
   }) => (
     <Card 
       variant="outlined"
       sx={{ 
-        backgroundColor: 'background.paper',
+        backgroundColor: '#2C2C2C',
         borderColor: 'divider',
         '&:hover': { 
           backgroundColor: 'action.hover',
@@ -293,9 +309,26 @@ const RewardsContent = () => {
           <Typography variant="h6" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
             {title}
           </Typography>
+          {badgeText && (
+            <Chip
+              label={badgeText}
+              size="small"
+              sx={{
+                ml: 'auto',
+                bgcolor: '#FABB15',
+                color: '#111827',
+                fontWeight: 700
+              }}
+            />
+          )}
         </Stack>
         <Typography variant="h4" color="text.primary" sx={{ fontWeight: 'bold' }}>
-          {value.toLocaleString()}
+          {typeof value === 'number' ? value.toLocaleString() : value}
+          {suffix ? (
+            <Typography component="span" variant="h6" sx={{ ml: 0.5, color: 'text.secondary', fontWeight: 600 }}>
+              {suffix}
+            </Typography>
+          ) : null}
         </Typography>
       </CardContent>
     </Card>
@@ -305,10 +338,6 @@ const RewardsContent = () => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box>
-        <Typography variant="h4" sx={{ mb: 4, color: '#ffffff', fontWeight: 'bold' }}>
-          Rewards Management
-        </Typography>
-
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
             <CircularProgress sx={{ color: '#4CAF50' }} />
@@ -323,39 +352,82 @@ const RewardsContent = () => {
 
       {!loading && !error && (
         <>
-          {/* ✅ FIXED: Use size={{}} instead of xs={} */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <StatCard 
-                icon={Gift} 
-                title="Total Rewards" 
-                value={statsData.totalRewards} 
-                color="#4CAF50" 
-              />
+            <Grid size={{ xs: 12, lg: 8 }}>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StatCard 
+                    icon={Eye} 
+                    title="Total Views/Impressions" 
+                    value={statsData.totalViewsOrImpressions} 
+                    color="#4CAF50" 
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StatCard 
+                    icon={CheckCircle} 
+                    title="Total Redemptions" 
+                    value={statsData.totalRedemptions} 
+                    color="#2196F3" 
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StatCard 
+                    icon={Clock} 
+                    title="Redemption Rate" 
+                    value={Number.isFinite(statsData.redemptionRate) ? Number(statsData.redemptionRate.toFixed(2)) : 0} 
+                    suffix="%"
+                    color="#FF9800" 
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StatCard 
+                    icon={AlertCircle} 
+                    title="Total Carbon Impact" 
+                    value={statsData.totalCarbonImpact} 
+                    color="#F44336" 
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StatCard 
+                    icon={Gift} 
+                    title="Pending Approvals" 
+                    value={statsData.pendingApprovals} 
+                    color="#FABB15" 
+                    badgeText="Pending"
+                  />
+                </Grid>
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <StatCard 
-                icon={CheckCircle} 
-                title="Total Rewards Claimed" 
-                value={statsData.totalClaimed} 
-                color="#2196F3" 
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <StatCard 
-                icon={Clock} 
-                title="Rewards Yet to Claim" 
-                value={statsData.totalUnclaimed} 
-                color="#FF9800" 
-              />
-            </Grid>
-            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-              <StatCard 
-                icon={AlertCircle} 
-                title="Expired Rewards" 
-                value={statsData.totalExpiring} 
-                color="#F44336" 
-              />
+
+            <Grid size={{ xs: 12, lg: 4 }}>
+              <Suspense
+                fallback={
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: '#2C2C2C',
+                      borderColor: 'divider',
+                      height: '100%'
+                    }}
+                  >
+                    <CardContent sx={{ height: '100%' }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          minHeight: 260
+                        }}
+                      >
+                        <CircularProgress sx={{ color: '#4CAF50' }} />
+                      </Box>
+                    </CardContent>
+                  </Card>
+                }
+              >
+                <RewardsRedemptionsChart />
+              </Suspense>
             </Grid>
           </Grid>
 
