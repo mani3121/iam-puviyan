@@ -47,7 +47,6 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
   const [fullImageUploading, setFullImageUploading] = useState(false)
   const [previewImageUploading, setPreviewImageUploading] = useState(false)
   const [emailInput, setEmailInput] = useState('')
-  const [showSuccessToast, setShowSuccessToast] = useState(false)
 
   // Populate form when editingReward is provided
   useEffect(() => {
@@ -104,7 +103,6 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
       setPosterImageFile(null)
       setPreviewImageFile(null)
       setEmailInput('')
-      setShowSuccessToast(false)
     }
   }, [open])
 
@@ -167,18 +165,46 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
       if (!formData.rewardTitle.trim()) {
         errors.rewardTitle = 'Reward title is required'
       }
+
+      if (!formData.rewardSubtitle.trim()) {
+        errors.rewardSubtitle = 'Reward subtitle is required'
+      }
       
       if (!formData.availableCoupons.trim()) {
         errors.availableCoupons = 'Available coupons is required'
+      }
+
+      if (!formData.usefulnessScore.trim()) {
+        errors.usefulnessScore = 'Usefulness score is required'
+      }
+
+      if (!formData.rewardDetails.trim()) {
+        errors.rewardDetails = 'Details is required'
+      }
+
+      if (!formData.howToClaim.trim()) {
+        errors.howToClaim = 'How to claim is required'
+      }
+
+      if (!formData.termsAndConditions.trim()) {
+        errors.termsAndConditions = 'Terms and conditions is required'
+      }
+
+      if (!formData.approverEmails || formData.approverEmails.length === 0) {
+        errors.approverEmails = 'At least one approver email is required'
       }
       
       // Images are already uploaded, just use the URLs from formData
       const fullImageUrl = formData.fullImage
       const previewImageUrl = formData.previewImage
       
-      // Validate that at least one image is uploaded
-      if (!fullImageUrl && !previewImageUrl) {
-        throw new Error('Please upload at least one image')
+      // Validate that both images are uploaded
+      if (!fullImageUrl) {
+        errors.fullImage = 'Full image is required'
+      }
+
+      if (!previewImageUrl) {
+        errors.previewImage = 'Preview image is required'
       }
       
       // If there are field errors, set them and stop
@@ -193,8 +219,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         availableCoupons: formData.availableCoupons,
         fullImage: fullImageUrl,
         fullImageGreyed: fullImageUrl,
-        previewImage: previewImageUrl || fullImageUrl, // Fallback to fullImage if no preview
-        previewImageGreyed: previewImageUrl || fullImageUrl, // Fallback to fullImage if no preview
+        previewImage: previewImageUrl,
+        previewImageGreyed: previewImageUrl,
         rewardSubtitle: formData.rewardSubtitle,
         rewardTitle: formData.rewardTitle,
         usefulnessScore: parseFloat(formData.usefulnessScore) || 0,
@@ -220,9 +246,6 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         
         // If publishing successfully, show toast and redirect
         if (status === 'active') {
-          // Show success toast
-          setShowSuccessToast(true)
-          
           // Call success callback if provided
           if (onPublishSuccess) {
             onPublishSuccess()
@@ -233,7 +256,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
           
           // Redirect to dashboard after a short delay
           setTimeout(() => {
-            navigate('/dashboard')
+            navigate('/dashboard', { state: { showRewardPublishedToast: true } })
           }, 1500)
         } else {
           // For draft, just close modal normally
@@ -335,8 +358,21 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
     }
   }
 
+  const handleModalClose = (_event: unknown, reason: 'backdropClick' | 'escapeKeyDown') => {
+    if (loading) {
+      return
+    }
+
+    if (reason === 'escapeKeyDown') {
+      onClose()
+      return
+    }
+
+    onClose()
+  }
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={handleModalClose}>
       <>
         <Box sx={{
         position: 'absolute',
@@ -401,6 +437,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Brand Name"
                 value={formData.brandName}
                 onChange={(e) => handleInputChange('brandName', e.target.value)}
+                required
                 error={!!fieldErrors.brandName}
                 helperText={fieldErrors.brandName}
               />
@@ -412,6 +449,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Reward Title"
                 value={formData.rewardTitle}
                 onChange={(e) => handleInputChange('rewardTitle', e.target.value)}
+                required
                 error={!!fieldErrors.rewardTitle}
                 helperText={fieldErrors.rewardTitle}
               />
@@ -423,6 +461,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Reward Subtitle"
                 value={formData.rewardSubtitle}
                 onChange={(e) => handleInputChange('rewardSubtitle', e.target.value)}
+                required
                 error={!!fieldErrors.rewardSubtitle}
                 helperText={fieldErrors.rewardSubtitle}
               />
@@ -434,11 +473,24 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Available coupons to redeem"
                 value={formData.availableCoupons}
                 onChange={(e) => handleInputChange('availableCoupons', e.target.value)}
+                required
                 error={!!fieldErrors.availableCoupons}
                 helperText={fieldErrors.availableCoupons}
               />
             </Grid>
           </Grid>
+
+          <Box mb={3}>
+            <TextField
+              fullWidth
+              label="Usefulness Score"
+              value={formData.usefulnessScore}
+              onChange={(e) => handleInputChange('usefulnessScore', e.target.value)}
+              required
+              error={!!fieldErrors.usefulnessScore}
+              helperText={fieldErrors.usefulnessScore}
+            />
+          </Box>
 
           {/* Upload Images */}
           <Typography variant="h6" fontWeight="bold" mt={3} mb={2}>
@@ -572,6 +624,9 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
               label="Details"
               value={formData.rewardDetails}
               onChange={(e) => handleInputChange('rewardDetails', e.target.value)}
+              required
+              error={!!fieldErrors.rewardDetails}
+              helperText={fieldErrors.rewardDetails}
               multiline
               rows={4}
               placeholder="Enter detailed information about the reward..."
@@ -588,6 +643,9 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
               label="How to Claim"
               value={formData.howToClaim}
               onChange={(e) => handleInputChange('howToClaim', e.target.value)}
+              required
+              error={!!fieldErrors.howToClaim}
+              helperText={fieldErrors.howToClaim}
               multiline
               rows={4}
               placeholder="Enter step-by-step instructions on how to claim this reward..."
@@ -604,6 +662,9 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
               label="Terms and Conditions"
               value={formData.termsAndConditions}
               onChange={(e) => handleInputChange('termsAndConditions', e.target.value)}
+              required
+              error={!!fieldErrors.termsAndConditions}
+              helperText={fieldErrors.termsAndConditions}
               multiline
               rows={4}
               placeholder="Enter terms and conditions for this reward..."
@@ -622,6 +683,9 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                 label="Enter email address"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
+                required
+                error={!!fieldErrors.approverEmails}
+                helperText={fieldErrors.approverEmails}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -703,20 +767,6 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         </Box>
       </Box>
       
-      {/* Success Toast */}
-      <Snackbar
-        open={showSuccessToast}
-        autoHideDuration={3000}
-        onClose={() => setShowSuccessToast(false)}
-        message="Reward published successfully!"
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        sx={{
-          '& .MuiSnackbar-content': {
-            backgroundColor: 'success.main',
-            color: 'success.contrastText'
-          }
-        }}
-      />
     </>
     </Modal>
   )

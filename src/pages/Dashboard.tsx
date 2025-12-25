@@ -30,7 +30,6 @@ import {
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ContentWrapper from '../components/ContentWrapper'
-import OnboardingContent from '../components/OnboardingContent'
 import PageLayout from '../components/PageLayout'
 import RewardsContent from '../components/RewardsContent'
 
@@ -102,11 +101,23 @@ function Dashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const [showWelcomeToast, setShowWelcomeToast] = useState(false)
+  const [showRewardPublishedToast, setShowRewardPublishedToast] = useState(false)
 
   useEffect(() => {
-    const state = location.state as { showWelcomeToast?: boolean } | null
+    const state = location.state as { showWelcomeToast?: boolean; showRewardPublishedToast?: boolean } | null
+    
+    let shouldClearState = false
     if (state?.showWelcomeToast) {
       setShowWelcomeToast(true)
+      shouldClearState = true
+    }
+
+    if (state?.showRewardPublishedToast) {
+      setShowRewardPublishedToast(true)
+      shouldClearState = true
+    }
+
+    if (shouldClearState) {
       navigate(location.pathname, { replace: true, state: null })
     }
   }, [location.pathname, location.state, navigate])
@@ -337,6 +348,23 @@ function Dashboard() {
               onClose={() => setShowWelcomeToast(false)}
             >
               Welcome!, start creating sustainable rewards
+            </Alert>
+          </Snackbar>
+
+          <Snackbar
+            open={showRewardPublishedToast}
+            autoHideDuration={2500}
+            onClose={() => setShowRewardPublishedToast(false)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Alert
+              severity="success"
+              variant="filled"
+              icon={<Leaf size={18} />}
+              sx={{ width: '100%' }}
+              onClose={() => setShowRewardPublishedToast(false)}
+            >
+              Reward published successfully
             </Alert>
           </Snackbar>
         </ContentWrapper>
