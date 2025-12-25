@@ -346,13 +346,29 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         width: '90%',
         maxWidth: 800,
         maxHeight: '90vh',
+        height: '90vh',
         bgcolor: 'background.paper',
         borderRadius: 2,
         boxShadow: 24,
-        overflow: 'auto'
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
       }}>
         {/* Header */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" p={3} borderBottom={1} borderColor="divider">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          p={3}
+          borderBottom={1}
+          borderColor="divider"
+          sx={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 1,
+            bgcolor: 'background.paper'
+          }}
+        >
           <Typography variant="h5" fontWeight="bold">
             {editingReward ? 'Edit Reward' : 'Create New Reward'}
           </Typography>
@@ -360,6 +376,8 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
             <X />
           </IconButton>
         </Stack>
+
+        <Box sx={{ flex: 1, overflow: 'auto' }}>
 
         {/* Form Content */}
         <Box sx={{ p: 3 }}>
@@ -666,9 +684,6 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
         {/* Footer Actions */}
         <Divider />
         <Stack direction="row" spacing={2} justifyContent="flex-end" p={3}>
-          <Button onClick={onClose} variant="text" disabled={loading}>
-            Cancel
-          </Button>
           <Button 
             onClick={handleSaveDraft} 
             variant="outlined" 
@@ -685,6 +700,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
             {loading ? 'Publishing...' : 'Publish Reward'}
           </Button>
         </Stack>
+        </Box>
       </Box>
       
       {/* Success Toast */}
