@@ -328,7 +328,7 @@ function Dashboard() {
             open={showWelcomeToast}
             autoHideDuration={2500}
             onClose={() => setShowWelcomeToast(false)}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
             <Alert
               severity="success"
