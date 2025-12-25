@@ -7,6 +7,7 @@ import {
   createTheme,
   CssBaseline,
   IconButton,
+  InputAdornment,
   Link,
   TextField,
   ThemeProvider,
@@ -118,6 +119,32 @@ export default function Signup() {
   const [signupLoading, setSignupLoading] = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [emailValid, setEmailValid] = useState(false)
+
+  const getPasswordScore = (value: string) => {
+    let score = 0
+    if (!value) return 0
+    if (value.length >= 8) score += 1
+    if (/[A-Z]/.test(value)) score += 1
+    if (/[0-9]/.test(value)) score += 1
+    if (/[^A-Za-z0-9]/.test(value)) score += 1
+    return score
+  }
+
+  const getStrength = (score: number) => {
+    switch (score) {
+      case 0:
+      case 1:
+        return { label: 'Too weak', color: 'error', value: 25 }
+      case 2:
+        return { label: 'Weak', color: 'warning', value: 50 }
+      case 3:
+        return { label: 'Medium', color: 'info', value: 75 }
+      case 4:
+        return { label: 'Strong', color: 'success', value: 100 }
+      default:
+        return { label: '', color: 'inherit', value: 0 }
+    }
+  }
 
   // Initialize EmailJS on component mount
   useEffect(() => {
@@ -536,9 +563,32 @@ export default function Signup() {
                     InputProps={{
                       // Lock icon removed as requested
                       endAdornment: (
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                          {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
-                        </IconButton>
+                        <InputAdornment position="end">
+                          {formData.password && (() => {
+                            const strength = getStrength(getPasswordScore(formData.password))
+                            const strengthColor =
+                              strength.color === 'inherit'
+                                ? 'text.secondary'
+                                : `${strength.color}.main`
+
+                            return (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  mr: 1,
+                                  color: strengthColor,
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {strength.label}
+                              </Typography>
+                            )
+                          })()}
+
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
+                          </IconButton>
+                        </InputAdornment>
                       )
                     }}
                     InputLabelProps={{
@@ -606,7 +656,7 @@ export default function Signup() {
                     </Button>
                   </Box>
                   <br/>
-                    </Box>
+                    </Box>  
                     
                     <Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 1, maxWidth: 400, mx: 'auto', px: 0 }}>
