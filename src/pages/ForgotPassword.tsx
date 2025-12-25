@@ -5,6 +5,7 @@ import {
   createTheme,
   CssBaseline,
   Link,
+  InputAdornment,
   TextField,
   ThemeProvider,
   Typography,
@@ -87,6 +88,32 @@ export default function ForgotPassword() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordError, setPasswordError] = useState(false)
   const [confirmPasswordError, setConfirmPasswordError] = useState(false)
+
+  const getPasswordScore = (value: string) => {
+    let score = 0
+    if (!value) return 0
+    if (value.length >= 8) score += 1
+    if (/[A-Z]/.test(value)) score += 1
+    if (/[0-9]/.test(value)) score += 1
+    if (/[^A-Za-z0-9]/.test(value)) score += 1
+    return score
+  }
+
+  const getStrength = (score: number) => {
+    switch (score) {
+      case 0:
+      case 1:
+        return { label: 'Too weak', color: 'error', value: 25 }
+      case 2:
+        return { label: 'Weak', color: 'warning', value: 50 }
+      case 3:
+        return { label: 'Medium', color: 'info', value: 75 }
+      case 4:
+        return { label: 'Strong', color: 'success', value: 100 }
+      default:
+        return { label: '', color: 'inherit', value: 0 }
+    }
+  }
 
   // Initialize EmailJS on component mount
   useEffect(() => {
@@ -428,13 +455,33 @@ export default function ForgotPassword() {
                     helperText={passwordError ? 'Password must be at least 8 characters long' : ''}
                     InputProps={{
                       endAdornment: (
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          sx={{ color: 'text.secondary' }}
-                        >
-                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </IconButton>
+                        <InputAdornment position="end">
+                          {password && (() => {
+                            const strength = getStrength(getPasswordScore(password))
+                            const strengthColor =
+                              strength.color === 'inherit' ? 'text.secondary' : `${strength.color}.main`
+
+                            return (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  mr: 1,
+                                  color: strengthColor,
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {strength.label}
+                              </Typography>
+                            )
+                          })()}
+                          <IconButton
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{ color: 'text.secondary' }}
+                          >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </IconButton>
+                        </InputAdornment>
                       )
                     }}
                     InputLabelProps={{
@@ -470,13 +517,26 @@ export default function ForgotPassword() {
                     helperText={confirmPasswordError ? 'Passwords do not match' : ''}
                     InputProps={{
                       endAdornment: (
-                        <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          edge="end"
-                          sx={{ color: 'text.secondary' }}
-                        >
-                          {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </IconButton>
+                        <InputAdornment position="end">
+                          {confirmPassword && password && confirmPassword === password && !confirmPasswordError && (
+                            <Box
+                              component={CheckCircle}
+                              className="tick-fade-in"
+                              sx={{
+                                color: '#4CAF50',
+                                fontSize: '20px',
+                                mr: 1
+                              }}
+                            />
+                          )}
+                          <IconButton
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            sx={{ color: 'text.secondary' }}
+                          >
+                            {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </IconButton>
+                        </InputAdornment>
                       )
                     }}
                     InputLabelProps={{
