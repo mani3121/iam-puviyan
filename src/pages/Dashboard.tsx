@@ -24,8 +24,7 @@ import { styled } from '@mui/material/styles'
 import {
   LogOut,
   Menu as MenuIcon,
-  // School,
-  Recycle,
+  Leaf,
   Trophy
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -333,7 +332,7 @@ function Dashboard() {
             <Alert
               severity="success"
               variant="filled"
-              icon={<Recycle size={18} />}
+              icon={<Leaf size={18} />}
               sx={{ width: '100%' }}
               onClose={() => setShowWelcomeToast(false)}
             >
