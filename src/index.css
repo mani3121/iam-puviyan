@@ -1,5 +1,74 @@
 @import "tailwindcss";
 
+/* Design System CSS Variables (Sustainable Tip: Limit palette for smaller CSS files) */
+:root {
+  /* === COLORS === */
+  /* Background */
+  --md-sys-color-background: #1A1A1A;
+  /* Primary - Main actions (eco-green) */
+  --md-sys-color-primary: #48C84F;
+  --md-sys-color-on-primary: #FFFFFF;
+  /* Secondary - Highlights (light blue) */
+  --md-sys-color-secondary: #63DEF3;
+  --md-sys-color-on-secondary: #000000;
+  /* Tertiary/Accent - Alerts/CTAs (yellow) */
+  --md-sys-color-tertiary: #FABB15;
+  --md-sys-color-on-tertiary: #000000;
+  /* Surface - Elevated elements */
+  --md-sys-color-surface: #2C2C2C;
+  --md-sys-color-on-surface: #FFFFFF;
+  /* Error */
+  --md-sys-color-error: #FF5252;
+  --md-sys-color-on-error: #FFFFFF;
+  /* Success */
+  --md-sys-color-success: #48C84F;
+  --md-sys-color-on-success: #FFFFFF;
+  /* Divider */
+  --md-sys-color-divider: #424242;
+
+  /* === SPACING (M3 8px baseline grid) === */
+  /* Spacing Scale: Multiples of 8px */
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* === BORDERS/RADIUS === */
+  /* 8px default, 16px for cards */
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-xl: 16px;
+
+  /* === ICONS === */
+  /* Sizes: 24px default, 48px touch */
+  --icon-size-default: 24px;
+  --icon-size-touch: 48px;
+
+  /* === MOTION === */
+  /* Subtle: Ease-in-out 200-300ms for hovers/ripples */
+  --motion-duration-fast: 150ms;
+  --motion-duration-normal: 200ms;
+  --motion-duration-slow: 300ms;
+  --motion-easing: ease-in-out;
+
+  /* === RESPONSIVE BREAKPOINTS === */
+  /* XS: 0px - Mobile portrait, single-column stacked */
+  /* SM: 640px - Mobile landscape, 2-column grids */
+  /* MD: 768px - Tablets, image + form side-by-side */
+  /* LG: 1024px - Desktops, sidebar + content */
+  /* XL: 1280px - Large screens, expanded metrics */
+  /* 2XL: 1536px - Ultra-wide, centered content */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
 html, body {
   height: 100%;
 }
@@ -10,9 +79,15 @@ html, body {
 
 body {
   margin: 0;
-  min-height:n 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #1a1a1a;
+  min-height: 100vh;
+  /* System fonts for zero-download (sustainable) */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Body Large: 16px / 400 / 24px - Paragraphs */
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
 }
 
 @keyframes float {
@@ -69,4 +144,155 @@ body {
 
 .tick-fade-in {
   animation: tickFadeIn 0.3s ease-in-out forwards;
+}
+
+/* === MOTION UTILITIES === */
+/* Subtle transitions for hovers/ripples: 200-300ms ease-in-out */
+.transition-default {
+  transition: all var(--motion-duration-normal) var(--motion-easing);
+}
+
+.transition-fast {
+  transition: all var(--motion-duration-fast) var(--motion-easing);
+}
+
+.transition-slow {
+  transition: all var(--motion-duration-slow) var(--motion-easing);
+}
+
+/* === ACCESSIBILITY === */
+/* Sustainable Tip: Disable animations on prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .slide-in-left-behind,
+  .coin-float-1,
+  .coin-float-2,
+  .tick-fade-in {
+    animation: none !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible styles for keyboard navigation */
+.focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --md-sys-color-background: #000000;
+    --md-sys-color-surface: #1a1a1a;
+    --md-sys-color-on-surface: #ffffff;
+    --md-sys-color-primary: #00ff00;
+    --md-sys-color-on-primary: #000000;
+  }
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 9999;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* === SKELETON ANIMATION === */
+@keyframes skeleton-pulse {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* === CONTAINER UTILITIES === */
+/* Default 16px padding for containers */
+.container-padding {
+  padding: var(--spacing-m);
+}
+
+/* === CARD UTILITIES === */
+/* Border-radius: 16px for cards */
+.card-radius {
+  border-radius: var(--radius-xl);
+}
+
+/* === RESPONSIVE GRID LAYOUTS === */
+/* 12-column flexible grid */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--spacing-m);
+}
+
+/* Responsive layouts per breakpoints */
+@media (min-width: 640px) {
+  /* SM: Mobile landscape - 2-column grids */
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  /* MD: Tablets - Image + form side-by-side */
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  /* LG: Desktops - Sidebar + content */
+  .lg\:sidebar-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+@media (min-width: 1280px) {
+  /* XL: Large screens - Expanded metrics */
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1536px) {
+  /* 2XL: Ultra-wide - Centered content */
+  .xxl\:max-width {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
