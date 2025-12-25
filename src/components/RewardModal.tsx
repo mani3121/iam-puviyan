@@ -407,7 +407,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
           <Typography variant="h5" fontWeight="bold">
             {editingReward ? 'Edit Reward' : 'Create New Reward'}
           </Typography>
-          <IconButton onClick={onClose}>
+          <IconButton aria-label="Close" onClick={onClose}>
             <X />
           </IconButton>
         </Stack>
@@ -722,6 +722,7 @@ const RewardModal = ({ open, onClose, onSave, onPublishSuccess, editingReward }:
                   {email}
                   <IconButton
                     size="small"
+                    aria-label="Remove email"
                     onClick={() => removeApproverEmail(index)}
                     sx={{ color: 'inherit', padding: 0.5 }}
                   >

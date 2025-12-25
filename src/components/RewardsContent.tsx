@@ -6,8 +6,6 @@ import {
   CardContent,
   Chip,
   CircularProgress,
-  createTheme,
-  CssBaseline,
   Dialog,
   DialogActions,
   DialogContent,
@@ -25,7 +23,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  ThemeProvider,
   Typography
 } from '@mui/material'
 import { Suspense, lazy, useEffect, useState } from 'react'
@@ -36,52 +33,6 @@ import { formatDateForDisplay } from '../utils/dateUtils'
 import RewardModal from './RewardModal'
 
 const RewardsRedemptionsChart = lazy(() => import('./RewardsRedemptionsChart'))
-
-// Create a custom theme with enhanced scrollbar
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#4CAF50',
-    },
-    secondary: {
-      main: '#2196F3',
-    },
-    background: {
-      default: '#1a1a1a',
-      paper: '#2a2a2a',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#b0b0b0',
-    },
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: {
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#4CAF50 #2a2a2a',
-          '&::-webkit-scrollbar': {
-            width: '8px',
-            height: '8px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#2a2a2a',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#4CAF50',
-            borderRadius: '4px',
-            '&:hover': {
-              background: '#66BB6A',
-            },
-          },
-        },
-      },
-    },
-  },
-})
 
 const RewardsContent = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -335,9 +286,7 @@ const RewardsContent = () => {
   )
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box>
+    <Box>
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
             <CircularProgress sx={{ color: '#4CAF50' }} />
@@ -495,6 +444,7 @@ const RewardsContent = () => {
                       <Stack direction="row" spacing={1}>
                         <IconButton
                           size="small"
+                          aria-label="Edit reward"
                           onClick={() => handleEdit(reward)}
                           color="primary"
                         >
@@ -502,6 +452,7 @@ const RewardsContent = () => {
                         </IconButton>
                         <IconButton
                           size="small"
+                          aria-label="Delete reward"
                           onClick={() => {
                             setRewardToDelete(reward)
                             setDeleteDialogOpen(true)
@@ -512,6 +463,7 @@ const RewardsContent = () => {
                         </IconButton>
                         <IconButton
                           size="small"
+                          aria-label="View reward"
                           color="info"
                           onClick={() => handleView(reward)}
                         >
@@ -717,7 +669,6 @@ const RewardsContent = () => {
         </>
       )}
     </Box>
-  </ThemeProvider>
   )
 }
 

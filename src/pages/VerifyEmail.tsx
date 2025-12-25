@@ -2,10 +2,7 @@ import {
   Box,
   Button,
   CircularProgress,
-  createTheme,
-  CssBaseline,
   Link,
-  ThemeProvider,
   Typography,
   Paper,
   TextField,
@@ -20,39 +17,6 @@ import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import PageLayout from '../components/PageLayout'
 import { verifyEmail, updateUserPassword } from '../services/firebaseService'
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#48C84F',
-      dark: '#3FA640',
-      light: '#5FD55F',
-    },
-    secondary: {
-      main: '#FFC107',
-    },
-    background: {
-      default: '#1A1A1A',
-      paper: '#242424',
-    },
-    error: {
-      main: '#CF6679',
-    },
-    text: {
-      primary: '#E0E0E0',
-      secondary: '#B0B0B0',
-    },
-    divider: '#424242',
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-  shape: {
-    borderRadius: 12,
-  },
-})
 
 interface PopupConfig {
   title: string
@@ -291,11 +255,9 @@ export default function VerifyEmail() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <PageLayout>
-        <ContentWrapper maxWidth="mobile">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1a1a1a', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+    <PageLayout>
+      <ContentWrapper maxWidth="mobile">
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1a1a1a', justifyContent: 'center', alignItems: 'center', py: 4 }}>
             
             {/* Logo Section */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -442,6 +404,7 @@ export default function VerifyEmail() {
                             )
                           })()}
                           <IconButton
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
                             onClick={() => setShowPassword(!showPassword)}
                             edge="end"
                             sx={{ color: 'text.secondary' }}
@@ -509,6 +472,7 @@ export default function VerifyEmail() {
                             )
                           )}
                           <IconButton
+                            aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             edge="end"
                             sx={{ color: 'text.secondary' }}
@@ -712,9 +676,8 @@ export default function VerifyEmail() {
               type={popupConfig.type}
               customActions={popupConfig.customActions}
             />
-          </Box>
-        </ContentWrapper>
-      </PageLayout>
-    </ThemeProvider>
+        </Box>
+      </ContentWrapper>
+    </PageLayout>
   )
 }

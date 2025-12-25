@@ -3,9 +3,6 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { updateDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import {
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
   Box,
   Container,
   Card,
@@ -18,35 +15,6 @@ import {
   Slide
 } from '@mui/material'
 import { CheckCircle } from 'lucide-react'
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#48C84F',
-      dark: '#388E3C',
-      light: '#66BB6A',
-    },
-    background: {
-      default: '#1a1a1a',
-      paper: '#2a2a2a',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#9ca3af',
-    },
-    success: {
-      main: '#48C84F',
-    },
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-  shape: {
-    borderRadius: 12,
-  },
-})
 export default function VerifyEmailPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
@@ -88,31 +56,29 @@ export default function VerifyEmailPage() {
   }, [searchParams, navigate])
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'background.default',
-          p: { xs: 2, sm: 3, md: 4 }
-        }}
-      >
-        <Container maxWidth="sm">
-          <Card
-            sx={{
-              bgcolor: 'background.paper',
-              borderRadius: { xs: 3, md: 4 },
-              p: { xs: 3, md: 6 },
-              boxShadow: { xs: 4, md: 10 },
-              textAlign: 'center',
-              maxWidth: { xs: 400, md: 500 },
-              mx: 'auto'
-            }}
-          >
-            <CardContent sx={{ p: 0 }}>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'background.default',
+        p: { xs: 2, sm: 3, md: 4 }
+      }}
+    >
+      <Container maxWidth="sm">
+        <Card
+          sx={{
+            bgcolor: 'background.paper',
+            borderRadius: { xs: 3, md: 4 },
+            p: { xs: 3, md: 6 },
+            boxShadow: { xs: 4, md: 10 },
+            textAlign: 'center',
+            maxWidth: { xs: 400, md: 500 },
+            mx: 'auto'
+          }}
+        >
+          <CardContent sx={{ p: 0 }}>
               {status === 'loading' && (
                 <Fade in={true} timeout={500}>
                   <Box>
@@ -220,10 +186,9 @@ export default function VerifyEmailPage() {
                   </Box>
                 </Slide>
               )}
-            </CardContent>
-          </Card>
-        </Container>
-      </Box>
-    </ThemeProvider>
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   )
 }

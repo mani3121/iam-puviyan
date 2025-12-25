@@ -3,8 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  createTheme,
-  CssBaseline,
   Divider,
   Drawer,
   IconButton,
@@ -14,7 +12,6 @@ import {
   ListItemIcon,
   ListItemText,
   Snackbar,
-  ThemeProvider,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -32,27 +29,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import ContentWrapper from '../components/ContentWrapper'
 import PageLayout from '../components/PageLayout'
 import RewardsContent from '../components/RewardsContent'
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#1a1a1a',
-      paper: '#2a2a2a',
-    },
-    primary: {
-      main: '#4CAF50',
-    },
-    secondary: {
-      main: '#81C784',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#A3A3A3',
-    },
-  },
-})
 
 const drawerWidth = 240
 
@@ -226,11 +202,9 @@ function Dashboard() {
   )
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <PageLayout>
-        <ContentWrapper maxWidth="desktop">
-          <Box sx={{ display: 'flex', minHeight: '100vh', height: { xs: '100vh', lg: 'auto' }, overflow: { xs: 'hidden', lg: 'visible' } }}>
+    <PageLayout>
+      <ContentWrapper maxWidth="desktop">
+        <Box sx={{ display: 'flex', minHeight: '100vh', height: { xs: '100vh', lg: 'auto' }, overflow: { xs: 'hidden', lg: 'visible' } }}>
             <AppBar
               position="fixed"
               sx={{
@@ -367,9 +341,8 @@ function Dashboard() {
               Reward published successfully
             </Alert>
           </Snackbar>
-        </ContentWrapper>
-      </PageLayout>
-    </ThemeProvider>
+      </ContentWrapper>
+    </PageLayout>
   )
 }
 

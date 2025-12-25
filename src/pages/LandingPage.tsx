@@ -50,11 +50,15 @@ const LandingPage = () => {
             <img 
               src={mobileImage} 
               alt="Mobile App Preview" 
+              loading="lazy"
+              decoding="async"
               className="w-auto h-[125%] object-cover object-top -mt-[12%]"
             />
             <img 
               src={downshade} 
               alt="" 
+              loading="lazy"
+              decoding="async"
               className="absolute top-[40%] left-0 w-full h-[65%] object-cover pointer-events-none" 
             />
           </div>

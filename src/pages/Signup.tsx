@@ -4,13 +4,10 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
-  createTheme,
-  CssBaseline,
   IconButton,
   InputAdornment,
   Link,
   TextField,
-  ThemeProvider,
   Typography
 } from '@mui/material'
 import { Eye, EyeOff, Linkedin, CheckCircle } from 'lucide-react'
@@ -47,39 +44,6 @@ const heroSlides = [
     subtitle: 'SUCCESS JOURNEY.',
   }
 ]
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#48C84F',
-      dark: '#3FA640',
-      light: '#5FD55F',
-    },
-    secondary: {
-      main: '#FFC107',
-    },
-    background: {
-      default: '#1A1A1A',
-      paper: '#242424',
-    },
-    error: {
-      main: '#CF6679',
-    },
-    text: {
-      primary: '#E0E0E0',
-      secondary: '#B0B0B0',
-    },
-    divider: '#424242',
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-  shape: {
-    borderRadius: 12,
-  },
-})
 
 interface PopupConfig {
   title: string
@@ -371,11 +335,9 @@ export default function Signup() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <PageLayout>
-        <ContentWrapper maxWidth="desktop">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
+    <PageLayout>
+      <ContentWrapper maxWidth="desktop">
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
             {/* Main Content */}
             <Box sx={{ flex: 1, display: 'flex' }}>
               {/* Left Side - Hero Panel */}
@@ -564,20 +526,19 @@ export default function Signup() {
                       // Lock icon removed as requested
                       endAdornment: (
                         <InputAdornment position="end">
-                          {formData.password && (() => {
-                            const strength = getStrength(getPasswordScore(formData.password))
-                            const strengthColor =
-                              strength.color === 'inherit'
-                                ? 'text.secondary'
-                                : `${strength.color}.main`
-
+                          {(() => {
+                            const score = getPasswordScore(formData.password)
+                            const strength = getStrength(score)
+                            if (!formData.password) return null
                             return (
                               <Typography
                                 variant="caption"
                                 sx={{
                                   mr: 1,
-                                  color: strengthColor,
-                                  whiteSpace: 'nowrap'
+                                  color: `${strength.color}.main`,
+                                  fontWeight: 600,
+                                  minWidth: 70,
+                                  textAlign: 'right'
                                 }}
                               >
                                 {strength.label}
@@ -585,7 +546,11 @@ export default function Signup() {
                             )
                           })()}
 
-                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                          <IconButton
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                          >
                             {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
                           </IconButton>
                         </InputAdornment>
@@ -775,9 +740,8 @@ export default function Signup() {
               type={popupConfig.type}
               customActions={popupConfig.customActions}
             />
-          </Box>
-        </ContentWrapper>
-      </PageLayout>
-    </ThemeProvider>
+        </Box>
+      </ContentWrapper>
+    </PageLayout>
   )
 }

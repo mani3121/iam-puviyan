@@ -2,12 +2,9 @@ import {
   Box,
   Button,
   CircularProgress,
-  createTheme,
-  CssBaseline,
   IconButton,
   Link,
   TextField,
-  ThemeProvider,
   Typography,
   Chip
 } from '@mui/material'
@@ -44,39 +41,6 @@ const heroSlides = [
     subtitle: 'SUCCESS JOURNEY.',
   }
 ]
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#48C84F',
-      dark: '#3FA640',
-      light: '#5FD55F',
-    },
-    secondary: {
-      main: '#FFC107',
-    },
-    background: {
-      default: '#1A1A1A',
-      paper: '#242424',
-    },
-    error: {
-      main: '#CF6679',
-    },
-    text: {
-      primary: '#E0E0E0',
-      secondary: '#B0B0B0',
-    },
-    divider: '#424242',
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-  shape: {
-    borderRadius: 12,
-  },
-})
 
 
 
@@ -270,11 +234,9 @@ export default function Login() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <PageLayout>
-        <ContentWrapper maxWidth="desktop">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
+    <PageLayout>
+      <ContentWrapper maxWidth="desktop">
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
             {/* Main Content */}
             <Box sx={{ flex: 1, display: 'flex' }}>
               {/* Left Side - Hero Panel */}
@@ -394,7 +356,11 @@ export default function Login() {
                     InputProps={{
                       // Lock icon removed as requested
                       endAdornment: (
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        <IconButton
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
                           {showPassword ? <EyeOff style={{ color: 'text.secondary' }} /> : <Eye style={{ color: 'text.secondary' }} />}
                         </IconButton>
                       )
@@ -576,9 +542,8 @@ export default function Login() {
               message={popupConfig.message}
               type={popupConfig.type}
             />
-          </Box>
-        </ContentWrapper>
-      </PageLayout>
-    </ThemeProvider>
+        </Box>
+      </ContentWrapper>
+    </PageLayout>
   )
 }

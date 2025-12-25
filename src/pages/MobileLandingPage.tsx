@@ -89,10 +89,18 @@ const MobileLandingPage = () => {
 
             {/* Mobile image at bottom */}
             <div className="w-full flex justify-center items-start flex-1 mb-0 overflow-hidden">
-              <img src={mobileImage} alt="Mobile App Preview" className="w-[90%] h-auto scale-120" /> 
+              <img
+                src={mobileImage}
+                alt="Mobile App Preview"
+                loading="lazy"
+                decoding="async"
+                className="w-[90%] h-auto scale-120"
+              /> 
               <img 
                 src={downshade} 
                 alt="" 
+                loading="lazy"
+                decoding="async"
                 className="absolute top-[69%] left-0 w-full h-[30%] object-cover pointer-events-none" 
               />
             </div>

@@ -2,11 +2,8 @@ import {
   Box,
   Button,
   CircularProgress,
-  createTheme,
-  CssBaseline,
   Link,
   TextField,
-  ThemeProvider,
   Typography,
   Paper
 } from '@mui/material'
@@ -19,39 +16,6 @@ import CustomPopup from '../components/CustomPopup'
 import PageLayout from '../components/PageLayout'
 import { checkEmailExists, generatePasswordResetLink } from '../services/firebaseService'
 import { sendVerificationEmailViaEmailJS, initializeEmailJS } from '../services/emailjsConfig'
-
-// Material UI Dark Theme with Green Accents
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#48C84F',
-      dark: '#3FA640',
-      light: '#5FD55F',
-    },
-    secondary: {
-      main: '#FFC107',
-    },
-    background: {
-      default: '#1A1A1A',
-      paper: '#242424',
-    },
-    error: {
-      main: '#CF6679',
-    },
-    text: {
-      primary: '#E0E0E0',
-      secondary: '#B0B0B0',
-    },
-    divider: '#424242',
-  },
-  typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
-  },
-  shape: {
-    borderRadius: 12,
-  },
-})
 
 interface PopupConfig {
   title: string
@@ -188,11 +152,9 @@ export default function ForgotPassword() {
   }
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <PageLayout>
-        <ContentWrapper maxWidth="mobile">
-          <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1a1a1a', justifyContent: 'center', alignItems: 'center', py: 4 }}>
+    <PageLayout>
+      <ContentWrapper maxWidth="mobile">
+        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: '#1a1a1a', justifyContent: 'center', alignItems: 'center', py: 4 }}>
             
             {/* Logo Section */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
@@ -373,9 +335,8 @@ export default function ForgotPassword() {
               type={popupConfig.type}
               customActions={popupConfig.customActions}
             />
-          </Box>
-        </ContentWrapper>
-      </PageLayout>
-    </ThemeProvider>
+        </Box>
+      </ContentWrapper>
+    </PageLayout>
   )
 }

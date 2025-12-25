@@ -81,15 +81,25 @@ const TabletLandingPage = () => {
 
           {/* Bottom section - Image */}
           <div className="flex-1 flex justify-center mt-4 md:mt-6 relative overflow-hidden">
-            <img src={mobileImage} alt="Mobile App Preview" className="w-[85%] max-h-[90vh] md:max-h-[100vh] object-contain scale-125 transition-transform duration-300 ease-out" />
+            <img
+              src={mobileImage}
+              alt="Mobile App Preview"
+              loading="lazy"
+              decoding="async"
+              className="w-[85%] max-h-[90vh] md:max-h-[100vh] object-contain scale-125 transition-transform duration-300 ease-out"
+            />
             <img
               src={downshade}
               alt=""
+              loading="lazy"
+              decoding="async"
               className="absolute top-[70%] left-0 w-full h-[30%] object-cover pointer-events-none"
             />
             <img 
               src={downshade} 
               alt="" 
+              loading="lazy"
+              decoding="async"
               className="absolute top-[40%] left-0 w-full h-[65%] object-cover pointer-events-none" 
             />
           </div>
