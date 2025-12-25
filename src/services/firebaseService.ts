@@ -549,10 +549,10 @@ export const generatePasswordResetLink = async (email: string): Promise<{ succes
       };
     }
 
-    // Generate reset link
+    // Generate reset link using verify-email route with reset parameter
     const userDoc = querySnapshot.docs[0];
     const userId = userDoc.data().userId;
-    const resetLink = `https://iam-puviyan-web.vercel.app/reset-password?userId=${userId}&email=${encodeURIComponent(trimmedEmail)}`;
+    const resetLink = `https://iam-puviyan-web.vercel.app/verify-email?userId=${userId}&email=${encodeURIComponent(trimmedEmail)}&reset=true`;
 
     // Update the user document with reset link and timestamp
     const userRef = doc(db, 'org_login_details', userDoc.id);

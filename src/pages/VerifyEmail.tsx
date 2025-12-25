@@ -78,6 +78,7 @@ export default function VerifyEmail() {
   const [canResend, setCanResend] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
+  const [isResetPassword] = useState(searchParams.get('reset') === 'true')
 
   // Handle email verification when component loads
   useEffect(() => {
@@ -96,19 +97,38 @@ export default function VerifyEmail() {
       
       if (result.success) {
         setVerificationStatus('success')
-        setPopupConfig({
-          title: 'Email Verified!',
-          message: result.message,
-          type: 'success',
-          customActions: [
-            {
-              label: 'OK',
-              onClick: () => navigate('/dashboard', { state: { showWelcomeToast: true } }),
-              variant: 'contained',
-              color: 'primary'
-            }
-          ]
-        })
+        
+        if (isResetPassword) {
+          // Password reset verification - route to login
+          setPopupConfig({
+            title: 'Password Reset Successful!',
+            message: 'Your password has been reset successfully. You can now log in with your new password.',
+            type: 'success',
+            customActions: [
+              {
+                label: 'Login',
+                onClick: () => navigate('/login'),
+                variant: 'contained',
+                color: 'primary'
+              }
+            ]
+          })
+        } else {
+          // Normal signup verification - route to dashboard with welcome toast
+          setPopupConfig({
+            title: 'Email Verified!',
+            message: result.message,
+            type: 'success',
+            customActions: [
+              {
+                label: 'OK',
+                onClick: () => navigate('/dashboard', { state: { showWelcomeToast: true } }),
+                variant: 'contained',
+                color: 'primary'
+              }
+            ]
+          })
+        }
         setShowPopup(true)
       } else {
         setVerificationStatus('error')
@@ -243,35 +263,42 @@ export default function VerifyEmail() {
               {/* Title and Description */}
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" sx={{ color: '#D4D4D4', fontWeight: 'bold', mb: 2, fontFamily: '"Segoe UI Variable"' }}>
-                  {isVerifying ? 'Verifying Your Email...' : 
-                   verificationStatus === 'success' ? 'Email Verified!' :
+                  {isVerifying ? (isResetPassword ? 'Verifying Password Reset...' : 'Verifying Your Email...') : 
+                   verificationStatus === 'success' ? (isResetPassword ? 'Password Reset Successful!' : 'Email Verified!') :
                    verificationStatus === 'error' ? 'Verification Failed' :
-                   'Verify your email'}
+                   (isResetPassword ? 'Reset your password' : 'Verify your email')}
                 </Typography>
                 
                 {isVerifying ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    Please wait while we verify your email address...
+                    {isResetPassword 
+                      ? 'Please wait while we verify your password reset request...'
+                      : 'Please wait while we verify your email address...'}
                   </Typography>
                 ) : verificationStatus === 'success' ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    Your email has been successfully verified! You can now log in to your account.
+                    {isResetPassword
+                      ? 'Your password has been reset successfully! You can now log in with your new password.'
+                      : 'Your email has been successfully verified! You can now log in to your account.'}
                   </Typography>
                 ) : verificationStatus === 'error' ? (
                   <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
-                    There was an issue verifying your email. Please check the verification link or request a new one.
+                    {isResetPassword
+                      ? 'There was an issue verifying your password reset. Please try again or request a new reset link.'
+                      : 'There was an issue verifying your email. Please check the verification link or request a new one.'}
                   </Typography>
                 ) : (
                   <>
                     <Typography variant="body1" sx={{ color: 'text.secondary', mb: 1, lineHeight: 1.6 }}>
-                      We've sent a verification email to:
+                      {isResetPassword ? 'We\'ve sent a password reset email to:' : 'We\'ve sent a verification email to:'}
                     </Typography>
                     <Typography variant="body1" sx={{ color: 'primary.main', fontWeight: 'medium', mb: 2 }}>
                       {email}
                     </Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
-                      Click the verification link in the email to complete your registration. 
-                      If you don't see the email, check your spam folder.
+                      {isResetPassword
+                        ? 'Click the reset link in the email to complete your password reset. If you don\'t see the email, check your spam folder.'
+                        : 'Click the verification link in the email to complete your registration. If you don\'t see the email, check your spam folder.'}
                     </Typography>
                   </>
                 )}
