@@ -98,7 +98,7 @@ function Dashboard() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'))
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [selectedMenu, setSelectedMenu] = useState('onboarding')
+  const [selectedMenu, setSelectedMenu] = useState('rewards')
   const navigate = useNavigate()
   const location = useLocation()
   const [showWelcomeToast, setShowWelcomeToast] = useState(false)
@@ -131,7 +131,7 @@ function Dashboard() {
     navigate('/login')
   }
 
-  const selectedComponent = menuItems.find(item => item.id === selectedMenu)?.component || (() => <OnboardingContent />)
+  const selectedComponent = menuItems.find(item => item.id === selectedMenu)?.component || (() => <RewardsContent />)
 
   const drawer = (
     <Box>
