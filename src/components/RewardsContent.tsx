@@ -245,6 +245,10 @@ const RewardsContent = () => {
       sx={{ 
         backgroundColor: '#2C2C2C',
         borderColor: 'divider',
+        overflow: 'visible',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         '&:hover': { 
           backgroundColor: 'action.hover',
           transform: 'translateY(-2px)',
@@ -252,12 +256,22 @@ const RewardsContent = () => {
         }
       }}
     >
-      <CardContent>
-        <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+      <CardContent sx={{ flex: 1 }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          mb={2}
+          sx={{ flexWrap: 'wrap', rowGap: 1, minWidth: 0 }}
+        >
           <Box sx={{ color }}>
             <Icon size={24} />
           </Box>
-          <Typography variant="h6" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+          <Typography
+            variant="h6"
+            color="text.secondary"
+            sx={{ fontSize: '0.875rem', minWidth: 0, overflowWrap: 'anywhere' }}
+          >
             {title}
           </Typography>
           {badgeText && (
@@ -268,12 +282,18 @@ const RewardsContent = () => {
                 ml: 'auto',
                 bgcolor: '#FABB15',
                 color: '#111827',
-                fontWeight: 700
+                fontWeight: 700,
+                flexShrink: 0,
+                maxWidth: '100%'
               }}
             />
           )}
         </Stack>
-        <Typography variant="h4" color="text.primary" sx={{ fontWeight: 'bold' }}>
+        <Typography
+          variant="h4"
+          color="text.primary"
+          sx={{ fontWeight: 'bold', overflowWrap: 'anywhere' }}
+        >
           {typeof value === 'number' ? value.toLocaleString() : value}
           {suffix ? (
             <Typography component="span" variant="h6" sx={{ ml: 0.5, color: 'text.secondary', fontWeight: 600 }}>
@@ -303,8 +323,8 @@ const RewardsContent = () => {
         <>
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid size={{ xs: 12, lg: 8 }}>
-              <Grid container spacing={3}>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+              <Grid container spacing={3} alignItems="stretch">
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
                   <StatCard 
                     icon={Eye} 
                     title="Total Views/Impressions" 
@@ -312,7 +332,7 @@ const RewardsContent = () => {
                     color="#4CAF50" 
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
                   <StatCard 
                     icon={CheckCircle} 
                     title="Total Redemptions" 
@@ -320,7 +340,7 @@ const RewardsContent = () => {
                     color="#2196F3" 
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
                   <StatCard 
                     icon={Clock} 
                     title="Redemption Rate" 
@@ -329,7 +349,7 @@ const RewardsContent = () => {
                     color="#FF9800" 
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
                   <StatCard 
                     icon={AlertCircle} 
                     title="Total Carbon Impact" 
@@ -337,7 +357,7 @@ const RewardsContent = () => {
                     color="#F44336" 
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} sx={{ display: 'flex' }}>
                   <StatCard 
                     icon={Gift} 
                     title="Pending Approvals" 
@@ -349,7 +369,7 @@ const RewardsContent = () => {
               </Grid>
             </Grid>
 
-            <Grid size={{ xs: 12, lg: 4 }}>
+            <Grid size={{ xs: 12, lg: 4 }} sx={{ display: 'flex' }}>
               <Suspense
                 fallback={
                   <Card
@@ -357,10 +377,13 @@ const RewardsContent = () => {
                     sx={{
                       backgroundColor: '#2C2C2C',
                       borderColor: 'divider',
-                      height: '100%'
+                      overflow: 'visible',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column'
                     }}
                   >
-                    <CardContent sx={{ height: '100%' }}>
+                    <CardContent sx={{ flex: 1 }}>
                       <Box
                         sx={{
                           display: 'flex',

@@ -150,6 +150,9 @@ export default function Login() {
 
       // Store credentials in localStorage
       localStorage.setItem('userEmail', formData.email)
+      if (verificationResult.userId) {
+        localStorage.setItem('userId', verificationResult.userId)
+      }
       localStorage.setItem('isLoggedIn', 'true')
       
       // Navigate to dashboard

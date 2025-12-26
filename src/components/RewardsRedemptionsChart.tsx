@@ -23,11 +23,14 @@ export default function RewardsRedemptionsChart() {
       sx={{
         backgroundColor: '#2C2C2C',
         borderColor: 'divider',
-        height: '100%'
+        overflow: 'visible',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
-      <CardContent sx={{ height: '100%' }}>
-        <Stack spacing={1.5} sx={{ height: '100%' }}>
+      <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Stack spacing={1.5} sx={{ minWidth: 0, height: '100%' }}>
           <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700 }}>
             Reward progress
           </Typography>
@@ -35,8 +38,8 @@ export default function RewardsRedemptionsChart() {
           <Box
             sx={{
               mt: 1,
-              flex: 1,
               minHeight: 220,
+              flex: 1,
               borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',

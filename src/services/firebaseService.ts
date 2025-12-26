@@ -1,4 +1,4 @@
-import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, updateDoc, where } from 'firebase/firestore';
+import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../firebase';
@@ -48,6 +48,189 @@ export interface PaginatedRewardsResult {
   hasMore: boolean;
   lastVisible?: DocumentSnapshot;
 }
+
+export interface OrganizationProfile {
+  id: string;
+  organizationName: string;
+  ownerUserId: string;
+  ownerEmail: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrganizationMember {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member' | 'viewer';
+  grantedAt: string;
+  grantedByUserId: string;
+  grantedByEmail: string;
+}
+
+export interface OrganizationAuditEntry {
+  id: string;
+  action: 'ORG_NAME_UPDATED' | 'ACCESS_GRANTED' | 'ACCESS_REVOKED' | 'ROLE_UPDATED';
+  actorUserId: string;
+  actorEmail: string;
+  targetUserId?: string;
+  targetEmail?: string;
+  details?: string;
+  createdAt: string;
+}
+
+const organizationsCollection = 'organizations';
+
+export const getOrCreateOrganizationProfile = async (
+  ownerUserId: string,
+  ownerEmail: string
+): Promise<{ success: boolean; message: string; profile?: OrganizationProfile }> => {
+  try {
+    const orgRef = doc(db, organizationsCollection, ownerUserId);
+    const orgSnap = await getDoc(orgRef);
+
+    const now = new Date().toISOString();
+
+    if (!orgSnap.exists()) {
+      const profile: Omit<OrganizationProfile, 'id'> = {
+        organizationName: '',
+        ownerUserId,
+        ownerEmail: ownerEmail.trim(),
+        createdAt: now,
+        updatedAt: now
+      };
+      await setDoc(orgRef, profile);
+      return { success: true, message: 'Organization profile created.', profile: { id: ownerUserId, ...profile } };
+    }
+
+    const data = orgSnap.data() as Omit<OrganizationProfile, 'id'>;
+    return { success: true, message: 'Organization profile loaded.', profile: { id: ownerUserId, ...data } };
+  } catch (error) {
+    console.error('Error loading organization profile:', error);
+    return { success: false, message: 'Failed to load organization profile.' };
+  }
+};
+
+export const updateOrganizationName = async (
+  orgId: string,
+  organizationName: string,
+  actor: { userId: string; email: string }
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const now = new Date().toISOString();
+    const orgRef = doc(db, organizationsCollection, orgId);
+
+    await updateDoc(orgRef, {
+      organizationName: organizationName.trim(),
+      updatedAt: now
+    });
+
+    await addDoc(collection(db, organizationsCollection, orgId, 'audit_log'), {
+      action: 'ORG_NAME_UPDATED',
+      actorUserId: actor.userId,
+      actorEmail: actor.email.trim(),
+      details: `Organization name updated to: ${organizationName.trim()}`,
+      createdAt: now
+    });
+
+    return { success: true, message: 'Organization name updated.' };
+  } catch (error) {
+    console.error('Error updating organization name:', error);
+    return { success: false, message: 'Failed to update organization name.' };
+  }
+};
+
+export const resolveUserIdByEmail = async (email: string): Promise<{ success: boolean; message: string; userId?: string }> => {
+  try {
+    const trimmedEmail = email.trim();
+    const emailQuery = query(collection(db, 'org_login_details'), where('email', '==', trimmedEmail));
+    const querySnapshot = await getDocs(emailQuery);
+    if (querySnapshot.empty) {
+      return { success: false, message: 'Email not found in our system.' };
+    }
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data() as { userId?: string };
+    if (!userData.userId) {
+      return { success: false, message: 'UserId missing for this user.' };
+    }
+    return { success: true, message: 'User found.', userId: userData.userId };
+  } catch (error) {
+    console.error('Error resolving userId by email:', error);
+    return { success: false, message: 'Failed to resolve user.' };
+  }
+};
+
+export const grantOrganizationAccess = async (
+  orgId: string,
+  targetEmail: string,
+  role: 'admin' | 'member' | 'viewer',
+  actor: { userId: string; email: string }
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const trimmedEmail = targetEmail.trim();
+    const userLookup = await resolveUserIdByEmail(trimmedEmail);
+    if (!userLookup.success || !userLookup.userId) {
+      return { success: false, message: userLookup.message };
+    }
+
+    const now = new Date().toISOString();
+    const member: OrganizationMember = {
+      userId: userLookup.userId,
+      email: trimmedEmail,
+      role,
+      grantedAt: now,
+      grantedByUserId: actor.userId,
+      grantedByEmail: actor.email.trim()
+    };
+
+    await setDoc(doc(db, organizationsCollection, orgId, 'members', userLookup.userId), member, { merge: true });
+
+    await addDoc(collection(db, organizationsCollection, orgId, 'audit_log'), {
+      action: 'ACCESS_GRANTED',
+      actorUserId: actor.userId,
+      actorEmail: actor.email.trim(),
+      targetUserId: userLookup.userId,
+      targetEmail: trimmedEmail,
+      details: `Granted ${role} access to ${trimmedEmail}`,
+      createdAt: now
+    });
+
+    return { success: true, message: 'Access granted.' };
+  } catch (error) {
+    console.error('Error granting organization access:', error);
+    return { success: false, message: 'Failed to grant access.' };
+  }
+};
+
+export const fetchOrganizationMembers = async (orgId: string): Promise<{ success: boolean; message: string; members: OrganizationMember[] }> => {
+  try {
+    const membersQuery = query(collection(db, organizationsCollection, orgId, 'members'), orderBy('grantedAt', 'desc'));
+    const querySnapshot = await getDocs(membersQuery);
+    const members = querySnapshot.docs.map(d => d.data() as OrganizationMember);
+    return { success: true, message: 'Members loaded.', members };
+  } catch (error) {
+    console.error('Error fetching organization members:', error);
+    return { success: false, message: 'Failed to load members.', members: [] };
+  }
+};
+
+export const fetchOrganizationAuditLog = async (
+  orgId: string,
+  pageSize: number = 25
+): Promise<{ success: boolean; message: string; entries: OrganizationAuditEntry[] }> => {
+  try {
+    const auditQuery = query(
+      collection(db, organizationsCollection, orgId, 'audit_log'),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+    const querySnapshot = await getDocs(auditQuery);
+    const entries = querySnapshot.docs.map(d => ({ id: d.id, ...(d.data() as Omit<OrganizationAuditEntry, 'id'>) }));
+    return { success: true, message: 'Audit history loaded.', entries };
+  } catch (error) {
+    console.error('Error fetching audit history:', error);
+    return { success: false, message: 'Failed to load history.', entries: [] };
+  }
+};
 
 /**
  * Submits an email to the user_notifications collection

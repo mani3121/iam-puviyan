@@ -22,13 +22,15 @@ import {
   LogOut,
   Menu as MenuIcon,
   Leaf,
-  Trophy
+  Trophy,
+  User
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ContentWrapper from '../components/ContentWrapper'
 import PageLayout from '../components/PageLayout'
 import RewardsContent from '../components/RewardsContent'
+import UserProfileContent from '../components/UserProfileContent.tsx'
 
 const drawerWidth = 240
 
@@ -65,6 +67,12 @@ const menuItems = [
     label: 'Rewards',
     icon: <Trophy />,
     component: () => <RewardsContent />
+  },
+  {
+    id: 'user-profile',
+    label: 'User Profile',
+    icon: <User />,
+    component: () => <UserProfileContent />
   }
 ]
 
@@ -113,6 +121,7 @@ function Dashboard() {
     // Clear localStorage session
     localStorage.removeItem('isLoggedIn')
     localStorage.removeItem('userEmail')
+    localStorage.removeItem('userId')
     
     // Navigate to login page
     navigate('/login')
