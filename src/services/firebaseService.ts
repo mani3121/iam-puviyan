@@ -528,6 +528,56 @@ export const getUserEmailVerificationStatus = async (email: string): Promise<{
   }
 };
 
+export const verifyUserCredentials = async (
+  email: string,
+  password: string
+): Promise<{
+  success: boolean;
+  message: string;
+  emailVerified?: boolean;
+  userId?: string;
+}> => {
+  try {
+    const trimmedEmail = email.trim();
+
+    const emailQuery = query(
+      collection(db, 'org_login_details'),
+      where('email', '==', trimmedEmail)
+    );
+    const querySnapshot = await getDocs(emailQuery);
+
+    if (querySnapshot.empty) {
+      return {
+        success: false,
+        message: 'Email not found in our system.'
+      };
+    }
+
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data() as { password?: string; emailVerified?: boolean; userId?: string };
+
+    if (userData.password !== password) {
+      return {
+        success: false,
+        message: 'Invalid credentials. Try again.'
+      };
+    }
+
+    return {
+      success: true,
+      message: 'User verified.',
+      emailVerified: userData.emailVerified || false,
+      userId: userData.userId
+    };
+  } catch (error) {
+    console.error('Error verifying user credentials:', error);
+    return {
+      success: false,
+      message: 'Failed to verify credentials. Please try again.'
+    };
+  }
+};
+
 /**
  * Updates user password and sets emailVerified to false
  * @param email - User email address

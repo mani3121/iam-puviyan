@@ -20,7 +20,7 @@ import CustomPopup from '../components/CustomPopup'
 import LeftHeroPanel from '../components/LeftHeroPanel'
 import PageLayout from '../components/PageLayout'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
-import { getUserEmailVerificationStatus } from '../services/firebaseService'
+import { verifyUserCredentials } from '../services/firebaseService'
 
 // Slides data for LeftHeroPanel
 const heroSlides = [
@@ -115,9 +115,8 @@ export default function Login() {
       return
     }
     
-    // Check if user exists and verify email status
     try {
-      const verificationResult = await getUserEmailVerificationStatus(formData.email)
+      const verificationResult = await verifyUserCredentials(formData.email, formData.password)
       
       if (!verificationResult.success) {
         const isEmailNotFound = verificationResult.message === 'Email not found in our system.'
