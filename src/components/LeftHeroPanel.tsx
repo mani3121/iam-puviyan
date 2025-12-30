@@ -46,7 +46,7 @@ const LeftHeroPanel = ({
         </h2>
 
         {/* Subtitle */}
-        <p className=" [font-family:'Segoe_UI_Variable'] text-[24px] font-light">
+        <p className="mt-3 [font-family:'Segoe_UI_Variable'] text-[24px] font-light">
           {firstSlide.subtitle}
         </p>
 
