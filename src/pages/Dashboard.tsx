@@ -31,6 +31,8 @@ import ContentWrapper from '../components/ContentWrapper'
 import PageLayout from '../components/PageLayout'
 import RewardsContent from '../components/RewardsContent'
 import UserProfileContent from '../components/UserProfileContent.tsx'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '../firebase'
 
 const drawerWidth = 240
 
@@ -86,6 +88,30 @@ function Dashboard() {
   const location = useLocation()
   const [showWelcomeToast, setShowWelcomeToast] = useState(false)
   const [showRewardPublishedToast, setShowRewardPublishedToast] = useState(false)
+  const [userName, setUserName] = useState<string>('User')
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userEmail = localStorage.getItem('userEmail')
+      if (userEmail) {
+        try {
+          const userQuery = query(
+            collection(db, 'org_login_details'),
+            where('email', '==', userEmail)
+          )
+          const querySnapshot = await getDocs(userQuery)
+          if (!querySnapshot.empty) {
+            const userData = querySnapshot.docs[0].data()
+            setUserName(userData.fullName || userData.displayName || 'User')
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+        }
+      }
+    }
+
+    fetchUserData()
+  }, [])
 
   useEffect(() => {
     const state = location.state as { showWelcomeToast?: boolean; showRewardPublishedToast?: boolean } | null
@@ -133,7 +159,7 @@ function Dashboard() {
     <Box>
       <Toolbar>
         <Typography variant="h6" noWrap component="div" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
-          Dashboard
+          Welcome {userName}
         </Typography>
       </Toolbar>
       <Divider sx={{ borderColor: '#333' }} />

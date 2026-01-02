@@ -294,9 +294,10 @@ export const submitEmail = async (email: string): Promise<EmailSubmissionResult>
  * Stores user signup data in org_login_details collection
  * @param email - User's email address
  * @param password - User's password
+ * @param fullName - User's full name
  * @returns Result object with success status and message
  */
-export const storeUserSignup = async (email: string, password: string): Promise<SignupResult> => {
+export const storeUserSignup = async (email: string, password: string, fullName: string = ''): Promise<SignupResult> => {
   try {
     const trimmedEmail = email.trim();
     const userId = uuidv4();
@@ -335,6 +336,7 @@ export const storeUserSignup = async (email: string, password: string): Promise<
     await addDoc(collection(db, 'org_login_details'), {
       userId: userId,
       email: trimmedEmail,
+      fullName: fullName.trim(),
       password: password, // Note: In production, you should hash passwords before storing
       emailVerified: false,
       createdAt: currentDateTime,

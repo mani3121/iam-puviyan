@@ -38,7 +38,7 @@ const LeftHeroPanel = ({
       {/* Content Section - Lower Portion */}
       <div className="relative w-full max-w-4xl mx-auto rounded-b-3xl bg-[#1a1a1a] shadow-[0_25px_60px_rgba(0,0,0,0.9)] p-6 md:p-10 text-center">
         {/* Title with optional highlight */}
-        <h2 className="[font-family:'Segoe_UI_Variable'] text-[32px] font-light">
+        <h2 className="[font-family:'Segoe_UI_Variable'] text-[32px]">
           {firstSlide.title}
           {firstSlide.highlight && (
             <span className="font-light"> {firstSlide.highlight}</span>
@@ -46,7 +46,7 @@ const LeftHeroPanel = ({
         </h2>
 
         {/* Subtitle */}
-        <p className="mt-3 [font-family:'Segoe_UI_Variable'] text-[24px] font-light">
+        <p className="mt-3 [font-family:'Segoe_UI_Variable'] text-[24px]">
           {firstSlide.subtitle}
         </p>
 
