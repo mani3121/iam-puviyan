@@ -198,10 +198,10 @@ const theme = createTheme({
             borderRadius: 8,
             transition: 'all 200ms ease-in-out',
             '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#48C84F'
+              borderColor: '#fefffeff'
             },
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#48C84F',
+              borderColor: '#fefffeff',
               borderWidth: 2,
               boxShadow: '0 0 0 2px rgba(72, 200, 79, 0.2)'
             },
