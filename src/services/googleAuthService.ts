@@ -1,5 +1,4 @@
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import type { UserCredential } from 'firebase/auth';
 import { collection, getDocs, query, where, addDoc, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { auth, db } from '../firebase';
@@ -19,10 +18,14 @@ export interface GoogleAuthResult {
 export class GoogleAuthService {
   private static provider = new GoogleAuthProvider();
 
-  static async signInWithGoogle(): Promise<GoogleAuthResult> {
+  static async initiateSignInWithGoogle(): Promise<GoogleAuthResult> {
     try {
-      const result: UserCredential = await signInWithPopup(auth, this.provider);
+      console.log('GoogleAuthService - Initiating signup popup');
+      const result = await signInWithPopup(auth, this.provider);
+      console.log('GoogleAuthService - Popup result:', result);
+
       const user = result.user;
+      console.log('GoogleAuthService - User from popup:', user.email);
 
       if (!user.email) {
         return {
@@ -36,8 +39,10 @@ export class GoogleAuthService {
       const photoURL = user.photoURL || undefined;
 
       const existingUser = await this.checkUserExists(trimmedEmail);
+      console.log('GoogleAuthService - Existing user check:', existingUser);
 
       if (existingUser.exists && existingUser.userId) {
+        console.log('GoogleAuthService - Existing user found, updating last login');
         await this.updateLastLogin(existingUser.docId!);
 
         return {
@@ -53,6 +58,7 @@ export class GoogleAuthService {
         };
       }
 
+      console.log('GoogleAuthService - Creating new user account');
       const newUserId = uuidv4();
       const currentDateTime = new Date().toLocaleString('en-IN', {
         timeZone: 'Asia/Kolkata',
@@ -65,6 +71,7 @@ export class GoogleAuthService {
         hour12: false
       });
 
+      console.log('GoogleAuthService - Storing new user in Firestore');
       await addDoc(collection(db, 'org_login_details'), {
         userId: newUserId,
         email: trimmedEmail,
@@ -112,16 +119,18 @@ export class GoogleAuthService {
     }
   }
 
+  // Backward compatibility with earlier API naming
+  static async signInWithGoogle(): Promise<GoogleAuthResult> {
+    return this.initiateSignInWithGoogle();
+  }
+
   private static async checkUserExists(email: string): Promise<{
     exists: boolean;
     userId?: string;
     docId?: string;
   }> {
     try {
-      const emailQuery = query(
-        collection(db, 'org_login_details'),
-        where('email', '==', email)
-      );
+      const emailQuery = query(collection(db, 'org_login_details'), where('email', '==', email));
       const querySnapshot = await getDocs(emailQuery);
 
       if (!querySnapshot.empty) {
@@ -141,10 +150,14 @@ export class GoogleAuthService {
     }
   }
 
-  static async loginWithGoogle(): Promise<GoogleAuthResult> {
+  static async initiateLoginWithGoogle(): Promise<GoogleAuthResult> {
     try {
-      const result: UserCredential = await signInWithPopup(auth, this.provider);
+      console.log('GoogleAuthService - Initiating login popup');
+      const result = await signInWithPopup(auth, this.provider);
+      console.log('GoogleAuthService - Popup result:', result);
+
       const user = result.user;
+      console.log('GoogleAuthService - User from popup:', user.email);
 
       if (!user.email) {
         return {
@@ -158,14 +171,17 @@ export class GoogleAuthService {
       const photoURL = user.photoURL || undefined;
 
       const existingUser = await this.checkUserExists(trimmedEmail);
+      console.log('GoogleAuthService - Existing user check for login:', existingUser);
 
       if (!existingUser.exists) {
+        console.log('GoogleAuthService - User not registered');
         return {
           success: false,
           message: 'Google account is not registered in our database. Please sign up first.'
         };
       }
 
+      console.log('GoogleAuthService - User found, updating last login');
       await this.updateLastLogin(existingUser.docId!);
 
       return {
@@ -201,6 +217,11 @@ export class GoogleAuthService {
         message: 'Failed to sign in with Google. Please try again.'
       };
     }
+  }
+
+  // Backward compatibility alias for the redirect-based name
+  static async loginWithGoogle(): Promise<GoogleAuthResult> {
+    return this.initiateLoginWithGoogle();
   }
 
   private static async updateLastLogin(docId: string): Promise<void> {
