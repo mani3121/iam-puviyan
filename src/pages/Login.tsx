@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import slide1Image from '../assets/1.jpg'
 import slide2Image from '../assets/2.jpg'
 import slide3Image from '../assets/3.jpg'
-import logoImage from '../assets/IamPuviyanLogo.png'
+import logoImage from '../assets/IamPuviyan_logo.png'
 import ContentWrapper from '../components/ContentWrapper'
 import CustomPopup from '../components/CustomPopup'
 import LeftHeroPanel from '../components/LeftHeroPanel'
@@ -229,16 +229,20 @@ export default function Login() {
     } else if (provider === 'Google') {
       setGoogleLoading(true)
       try {
-        const result = await GoogleAuthService.loginWithGoogle()
-        
+        const result = await GoogleAuthService.initiateLoginWithGoogle()
+        console.log('Login - Google auth result:', result)
+
         if (result.success && result.user) {
+          console.log('Login - Authentication successful, setting localStorage and navigating')
           localStorage.setItem('userEmail', result.user.email)
           localStorage.setItem('userId', result.user.userId)
           localStorage.setItem('isLoggedIn', 'true')
           
+          console.log('Login - Navigating to dashboard')
           navigate('/dashboard')
         } else {
-          const isNotRegistered = result.message.includes('not registered')
+          console.log('Login - Authentication failed:', result.message)
+          const isNotRegistered = result.message?.toLowerCase().includes('not registered')
           setPopupConfig({
             title: 'Authentication Failed',
             message: result.message,
@@ -255,10 +259,10 @@ export default function Login() {
           setShowPopup(true)
         }
       } catch (error) {
-        console.error('Google Login error:', error)
+        console.error('Google auth error:', error)
         setPopupConfig({
           title: 'Authentication Error',
-          message: 'An error occurred during Google Login. Please try again.',
+          message: 'Failed to authenticate with Google. Please try again.',
           type: 'error'
         })
         setShowPopup(true)
@@ -279,57 +283,49 @@ export default function Login() {
   return (
     <PageLayout>
       <ContentWrapper maxWidth="desktop">
-        <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a' }}>
+        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column', bgcolor:  '#1a1a1a', overflow: 'hidden' }}>
             {/* Main Content */}
-            <Box sx={{ flex: 1, display: 'flex' }}>
+            <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
               {/* Left Side - Hero Panel */}
               <Box
                 sx={{
                   display: { xs: 'none', lg: 'flex' },
                   width: { lg: '55%' },
                   flexDirection: 'column',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'center',
                   alignItems: 'center',
-                  p: 6,
-                  background: '#1a1a1a'
+                  p: 3,
+                  background: '#1a1a1a',
+                  overflow: 'hidden'
                 }}
               >
                 <LeftHeroPanel 
                   slides={heroSlides}
-                  // autoRotate={true}
-                  // intervalMs={6000}
-                  className="w-full h-full max-h-[800px]"
+                  className="w-full h-full max-h-[600px]"
                 />
               </Box>
 
               {/* Right Side - Signup Form */}
-              <Box sx={{ width: { xs: '100%', lg: '45%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center',  }}>
-                <Box sx={{ bgcolor: '#1a1a1a', textAlign: 'left', pl: 2, pr: 2, pt: 2, pb: 0 }}>
-                  <Box sx={{ mb: 1, textAlign: 'left', ml: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', mb: 3 }}>
+              <Box sx={{ width: { xs: '100%', lg: '45%' }, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'auto', py: { xs: 2, sm: 3 } }}>
+                <Box sx={{ bgcolor: '#1a1a1a', textAlign: 'left', px: { xs: 2, sm: 3 }, pt: { xs: 1, sm: 2 }, pb: 0 }}>
+                  <Box sx={{ mb: { xs: 0.5, sm: 1 }, textAlign: 'left', ml: { xs: 1, sm: 2 } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', mb: { xs: 1.5, sm: 2 } }}>
                       <Box  
                         component="img"
                         src={logoImage}
                         alt="IamPuviyan Logo"
-                        sx={{ width: 40, height: 40, mr: 2 }}
+                        sx={{ width: { xs: 110, sm: 140 }, height: 'auto', maxWidth: '100%' }}
                       />
-                      <Typography sx={{ color: '#D4D4D4', fontFamily: '"Segoe UI Variable"', fontSize: '12px', lineHeight: 1.2, textAlign: 'left' }}>
-                        IAMPUVIYAN
-                        <br />
-                        <Typography component="span" sx={{ fontSize: '14px' }}>
-                          ORGANISATION
-                        </Typography>
-                      </Typography>
                     </Box>
                     <Box >
-                      <Typography sx={{ color: '#D4D4D4', textAlign: 'left', fontFamily: '"Segoe UI Variable"', fontSize: '28px' }}>
+                      <Typography sx={{ color: '#D4D4D4', textAlign: 'left', fontFamily: '"Segoe UI Variable"', fontSize: { xs: '20px', sm: '24px' } }}>
                         Welcome back!
                       </Typography> 
                     </Box>
                 </Box>
 
                 {/* Login Form */}
-                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: 3, bgcolor: '#1a1a1a', border: '22px solid', borderColor: '#1a1a1a', alignItems: 'center' }}>
+                <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 }, bgcolor: '#1a1a1a', px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 1.5 }, alignItems: 'center' }}>
                   <TextField
                     fullWidth
                     id="email"
@@ -375,6 +371,9 @@ export default function Login() {
                         '&.Mui-error fieldset': {
                           borderColor: 'red'
                         }
+                      },
+                      '& .MuiInputBase-root': {
+                        height: { xs: '44px', sm: '48px' }
                       }
                     }}
                     variant="outlined"
@@ -415,15 +414,18 @@ export default function Login() {
                         }
                       }
                     }}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '&.Mui-error fieldset': {
-                            borderColor: 'red'
-                          }
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '&.Mui-error fieldset': {
+                          borderColor: 'red'
                         }
-                      }}
-                      variant="outlined"
-                    />
+                      },
+                      '& .MuiInputBase-root': {
+                        height: { xs: '44px', sm: '48px' }
+                      }
+                    }}
+                    variant="outlined"
+                  />
 
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -451,8 +453,7 @@ export default function Login() {
                       fullWidth
                       variant="contained"
                       disabled={loginLoading}
-                      size="large"
-                      sx={{ py: 1.5, fontSize: '1rem', fontWeight: 600, color: 'white' }}
+                      sx={{ py: { xs: 1, sm: 1.25 }, fontSize: { xs: '0.875rem', sm: '0.95rem' }, fontWeight: 600, color: 'white', height: { xs: '40px', sm: '44px' } }}
                     >
                       {loginLoading ? (
                         <>
@@ -468,15 +469,15 @@ export default function Login() {
                     </Box>
                     
                 <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mt: 3, mb: 1, maxWidth: 400, mx: 'auto', px: 0 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mt: { xs: 1.5, sm: 2 }, mb: { xs: 0.5, sm: 1 }, maxWidth: 400, mx: 'auto', px: 0 }}>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
-                    <Typography variant="body2" sx={{ px: 2, color: 'text.secondary', fontSize: '0.875rem', flexShrink: 0 }}>
+                    <Typography variant="body2" sx={{ px: 2, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' }, flexShrink: 0 }}>
                       or connect with
                     </Typography>
                     <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider', maxWidth: '150px' }} />
                   </Box>
 
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 1, sm: 1.5 }, mt: { xs: 1, sm: 1.5 }, flexWrap: 'wrap' }}>
                     <Chip
                       icon={
                         googleLoading ? (
@@ -497,7 +498,9 @@ export default function Login() {
                         bgcolor: 'background.paper', 
                         border: '1px solid',
                         borderColor: 'divider',
-                         borderRadius: '8px',
+                        borderRadius: '8px',
+                        height: { xs: '28px', sm: '32px' },
+                        '& .MuiChip-label': { fontSize: { xs: '0.75rem', sm: '0.8125rem' }, px: { xs: 0.5, sm: 1 } },
                         '&:hover': { 
                           bgcolor: 'action.hover',
                           borderColor: 'text.secondary'
@@ -522,6 +525,8 @@ export default function Login() {
                         border: '1px solid',
                         borderColor: 'divider',
                         borderRadius: '8px',
+                        height: { xs: '28px', sm: '32px' },
+                        '& .MuiChip-label': { fontSize: { xs: '0.75rem', sm: '0.8125rem' }, px: { xs: 0.5, sm: 1 } },
                         '&:hover': { 
                           bgcolor: 'action.hover',
                           borderColor: 'text.secondary'
@@ -540,6 +545,8 @@ export default function Login() {
                         border: '1px solid',
                         borderColor: 'divider',
                         borderRadius: '8px',
+                        height: { xs: '28px', sm: '32px' },
+                        '& .MuiChip-label': { fontSize: { xs: '0.75rem', sm: '0.8125rem' }, px: { xs: 0.5, sm: 1 } },
                         '&:hover': { 
                           bgcolor: 'action.hover',
                           borderColor: 'text.secondary'
@@ -551,7 +558,7 @@ export default function Login() {
                 </Box>
 
                 <Box>
-                  <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
+                  <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mt: { xs: 1.5, sm: 2 }, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                     Don't have an account?{' '}
                     <Link 
                       href="#" 
@@ -569,14 +576,14 @@ export default function Login() {
             </Box>
 
             {/* Footer */}
-            <Box component="footer" sx={{  bgcolor: '#1a1a1a', borderTop: 1, borderColor: 'divider', py: 3, px: 4 }}>
+            <Box component="footer" sx={{  bgcolor: '#1a1a1a', borderTop: 1, borderColor: 'divider', py: { xs: 1.5, sm: 2 }, px: { xs: 2, sm: 4 } }}>
               <Box sx={{ maxWidth: 'lg', mx: 'auto', display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: 'center' }}>
                 <Box sx={{ mb: { xs: 2, sm: 0 } }}>
-                  <Link href="/terms" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, mr: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Terms of Service</Link>
-                  <Typography component="span" sx={{ color: '#A3A3A3', mx: 1, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>|</Typography>
-                  <Link href="/privacy" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Privacy Policy</Link>
+                  <Link href="/terms" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, mr: 1, fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Terms of Service</Link>
+                  <Typography component="span" sx={{ color: '#A3A3A3', mx: 1, fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>|</Typography>
+                  <Link href="/privacy" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Privacy Policy</Link>
                 </Box>
-                <Typography variant="body2" sx={{ color: '#A3A3A3', fontFamily: '"Segoe UI Variable"', fontSize: '14px', fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>
+                <Typography variant="body2" sx={{ color: '#A3A3A3', fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>
                   All rights reserved © 2025 Puviyan Digital Solutions Private Limited.
                 </Typography>
               </Box>
