@@ -624,9 +624,13 @@ export default function Signup() {
                             setFormErrors({ ...formErrors, agreeToTerms: false })
                           }
                         }}
+                        size="small"
                         color={formErrors.agreeToTerms ? 'error' : 'primary'}
                         sx={{
-                          color: formErrors.agreeToTerms ? 'red' : 'inherit'
+                          color: formErrors.agreeToTerms ? 'red' : 'inherit',
+                          '& .MuiSvgIcon-root': {
+                            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+                          }
                         }}
                       />
                       <Box component="label" htmlFor="terms" sx={{ fontSize: { xs: '0.65rem', sm: '0.72rem' }, color: 'text.secondary', lineHeight: 1.3, cursor: 'pointer' }}>
