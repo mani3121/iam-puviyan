@@ -5,6 +5,7 @@ import CarbonFootprintBannerMobile from '../components/CarbonFootprintBannerMobi
 import { submitEmail } from '../services/firebaseService';
 import PageLayout from '../components/PageLayout';
 import ContentWrapper from '../components/ContentWrapper';
+import { CURRENT_YEAR } from '../utils/dateUtils';
 
 const MobileLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -146,7 +147,7 @@ const MobileLandingPage = () => {
             <span>|</span>
             <span>All rights reserved</span>
           </div>
-          <span className="text-[8px] text-white/40"> 2025 Puviyan Digital Solutions Private Limited</span>
+          <span className="text-[8px] text-white/40"> {CURRENT_YEAR} Puviyan Digital Solutions Private Limited</span>
         </div>
       </ContentWrapper>
     </footer>

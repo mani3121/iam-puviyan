@@ -5,6 +5,7 @@ import CarbonFootprintBannerMobile from '../components/CarbonFootprintBanner';
 import { submitEmail } from '../services/firebaseService';
 import PageLayout from '../components/PageLayout';
 import ContentWrapper from '../components/ContentWrapper';
+import { CURRENT_YEAR } from '../utils/dateUtils';
 
 const TabletLandingPage = () => {
   const [email, setEmail] = useState('');
@@ -118,7 +119,7 @@ const TabletLandingPage = () => {
                 <a href="/terms" className="text-[10px] md:text-xs text-white/60 hover:text-white transition-colors">Terms of Service</a>
                 <a href="/privacy" className="text-[10px] md:text-xs text-white/60 hover:text-white transition-colors">Privacy Policy</a>
               </div>
-              <span className="text-[10px] md:text-xs text-white/60 whitespace-nowrap overflow-hidden text-ellipsis">All rights reserved 2025 Puviyan Digital Solutions Private Limited</span>
+              <span className="text-[10px] md:text-xs text-white/60 whitespace-nowrap overflow-hidden text-ellipsis">All rights reserved {CURRENT_YEAR} Puviyan Digital Solutions Private Limited</span>
             </div>
 
             <div className="flex gap-3 md:gap-4 whitespace-nowrap">

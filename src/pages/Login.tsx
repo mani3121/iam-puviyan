@@ -22,6 +22,7 @@ import PageLayout from '../components/PageLayout'
 import { LinkedInAuthService } from '../services/linkedInAuthService'
 import { verifyUserCredentials } from '../services/firebaseService'
 import { GoogleAuthService } from '../services/googleAuthService'
+import { CURRENT_YEAR } from '../utils/dateUtils'
 
 // Slides data for LeftHeroPanel
 const heroSlides = [
@@ -584,7 +585,7 @@ export default function Login() {
                   <Link href="/privacy" sx={{ color: '#A3A3A3', '&:hover': { color: 'text.primary' }, fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px', textDecoration: 'none' }}>Privacy Policy</Link>
                 </Box>
                 <Typography variant="body2" sx={{ color: '#A3A3A3', fontFamily: '"Segoe UI Variable"', fontSize: { xs: '11px', sm: '12px' }, fontStyle: 'normal', fontWeight: 400, lineHeight: '17.5px' }}>
-                  All rights reserved © 2025 Puviyan Digital Solutions Private Limited.
+                  All rights reserved © {CURRENT_YEAR} Puviyan Digital Solutions Private Limited.
                 </Typography>
               </Box>
             </Box>

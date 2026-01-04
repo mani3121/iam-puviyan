@@ -5,6 +5,7 @@ import { submitEmail } from '../services/firebaseService';
 import CarbonFootprintBanner from '../components/CarbonFootprintBanner';
 import PageLayout from '../components/PageLayout';
 import ContentWrapper from '../components/ContentWrapper';
+import { CURRENT_YEAR } from '../utils/dateUtils';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
@@ -131,7 +132,7 @@ const LandingPage = () => {
           </div>
           <div className="flex justify-center items-center gap-1">
             <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>All rights reserved</span>
-            <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>© 2025 Puviyan Digital Solutions Private Limited</span>
+            <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>© {CURRENT_YEAR} Puviyan Digital Solutions Private Limited</span>
           </div>
           
           <div className="flex gap-4 sm:gap-5">

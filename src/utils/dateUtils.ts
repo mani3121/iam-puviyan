@@ -111,3 +111,5 @@ export const formatDateForDetailedDisplay = (dateString: string): string => {
     return 'Invalid Date'
   }
 }
+
+export const CURRENT_YEAR = new Date().getFullYear()

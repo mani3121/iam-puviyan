@@ -112,7 +112,7 @@ export const EMAILJS_TEMPLATE = {
         
         <div class="footer">
           <p>This email was sent to {{to_email}} because you created an account with Puviyan.</p>
-          <p>&copy; 2025 Puviyan Digital Solutions Private Limited. All rights reserved.</p>
+          <p>&copy; {{current_year}} Puviyan Digital Solutions Private Limited. All rights reserved.</p>
           <p>If you have any questions, please contact our support team at support@puviyan.com</p>
         </div>
       </div>
@@ -136,7 +136,7 @@ export const EMAILJS_TEMPLATE = {
     
     This email was sent to {{to_email}} because you created an account with Puviyan.
     
-    © 2025 Puviyan Digital Solutions Private Limited. All rights reserved.
+    © {{current_year}} Puviyan Digital Solutions Private Limited. All rights reserved.
     If you have any questions, please contact our support team at support@puviyan.com
   `
 };
@@ -145,7 +145,8 @@ export const EMAILJS_TEMPLATE = {
 export const EMAILJS_VARIABLES = {
   to_name: 'User', // This will be replaced with the actual user's name or email
   to_email: '{{to_email}}', // This will be replaced with the recipient's email
-  verification_link: '{{verification_link}}' // This will be replaced with the verification link
+  verification_link: '{{verification_link}}', // This will be replaced with the verification link
+  current_year: '{{current_year}}'
 };
 
 // Initialize EmailJS
@@ -166,8 +167,9 @@ export const sendVerificationEmailViaEmailJS = async (
   try {
     const templateParams = {
       to_name: userName || toEmail.split('@')[0], // Use email prefix as name if not provided
-      email: toEmail,
-      verification_link: verificationLink
+      to_email: toEmail,
+      verification_link: verificationLink,
+      current_year: new Date().getFullYear()
     };
 
     const response = await emailjs.send(
