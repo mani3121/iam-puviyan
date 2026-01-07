@@ -92,31 +92,13 @@ const RewardsContent = () => {
   const fetchPage = async (page: number) => {
     try {
       setLoading(true)
-      let rewardsResult: PaginatedRewardsResult | undefined
+      const offset = (page - 1) * pageSize
+      const rewardsResult = await fetchRewardsPaginated(pageSize, offset)
       
-      if (page === 1) {
-        // First page - no lastVisible
-        rewardsResult = await fetchRewardsPaginated(pageSize)
-      } else {
-        // For simplicity, we'll fetch from the beginning for now
-        // In a real app, you might want to cache previous pages
-        let currentLastVisible: any = null
-        let hasMoreData = true
-        
-        // Fetch pages until we reach the desired page
-        for (let i = 1; i <= page && hasMoreData; i++) {
-          const result = await fetchRewardsPaginated(pageSize, currentLastVisible)
-          if (i === page) {
-            rewardsResult = result
-          }
-          currentLastVisible = result.lastVisible
-          hasMoreData = result.hasMore
-        }
-      }
-      
-      if (rewardsResult) {
-        setRewards(rewardsResult.rewards)
-                setCurrentPage(page)
+      setRewards(rewardsResult.rewards)
+      setCurrentPage(page)
+      if (rewardsResult.total !== undefined) {
+        setTotalRewardsCount(rewardsResult.total)
       }
     } catch (err) {
       console.error('Error fetching page:', err)
@@ -208,13 +190,13 @@ const RewardsContent = () => {
 
   // Filter rewards based on search term (applied to current page data)
   const filteredRewards = rewards.filter(reward =>
-    reward.rewardTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reward.brandName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reward.status.toLowerCase().includes(searchTerm.toLowerCase())
+    (reward.rewardTitle ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (reward.brandName ?? '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (reward.status ?? '').toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
+  const getStatusColor = (status?: string) => {
+    switch ((status ?? '').toLowerCase()) {
       case 'available': return '#4CAF50'
       case 'claimed': return '#2196F3'
       case 'expired': return '#F44336'
@@ -581,6 +563,49 @@ const RewardsContent = () => {
                 <Box sx={{ py: 2 }}>
                   <Grid container spacing={3}>
                     <Grid size={{ xs: 12, md: 6 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                        Reward Image
+                      </Typography>
+                      <Box sx={{ mb: 2 }}>
+                        {rewardToView.fullImage ? (
+                          <Box
+                            component="img"
+                            src={rewardToView.fullImage}
+                            alt={rewardToView.rewardTitle}
+                            sx={{
+                              width: '100%',
+                              maxHeight: 200,
+                              objectFit: 'contain',
+                              borderRadius: 1,
+                              border: '1px solid',
+                              borderColor: 'divider'
+                            }}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        {!rewardToView.fullImage && (
+                          <Box
+                            sx={{
+                              width: '100%',
+                              height: 120,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: 1,
+                              border: '1px dashed',
+                              borderColor: 'divider',
+                              color: 'text.secondary',
+                              fontSize: '0.875rem'
+                            }}
+                          >
+                            No image available
+                          </Box>
+                        )}
+                      </Box>
+
                       <Typography variant="subtitle2" color="text.secondary" gutterBottom>
                         Title
                       </Typography>

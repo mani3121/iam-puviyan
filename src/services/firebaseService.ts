@@ -1,7 +1,8 @@
-import { DocumentSnapshot, addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, setDoc, startAfter, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { onAuthStateChanged, updateEmail, updateProfile, type User } from 'firebase/auth';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../firebase';
+import { auth, db } from '../firebase';
 
 interface EmailSubmissionResult {
   success: boolean;
@@ -19,7 +20,8 @@ interface SignupResult {
 
 export interface Reward {
   id: string;
-  availableCoupons:string;
+  rewardId?: string;
+  availableCoupons: string | number;
   brandName: string;
   deductPoints: number;
   dislikeCount: number;
@@ -35,18 +37,29 @@ export interface Reward {
   rewardTitle: string;
   rewardType: string;
   status: string;
-  termsAndConditions: string[];
+  termsAndConditions: string[] | string;
   usefulnessScore: number;
   validFrom: string;
   validTo: string;
   createdAt?: string;
   updatedAt?: string;
+  maxDiscountAmount?: number | null;
+  discountAmount?: number | null;
+  discountPercent?: number | null;
+  minPurchaseAmount?: number | null;
+  categories?: string[];
+  totalCoupons?: number;
+  carbonContribution?: number;
+  orgId?: string | null;
+  partnerId?: string | null;
+  createdBy?: string;
 }
 
 export interface PaginatedRewardsResult {
   rewards: Reward[];
   hasMore: boolean;
-  lastVisible?: DocumentSnapshot;
+  total?: number;
+  offset?: number;
 }
 
 export interface OrganizationProfile {
@@ -66,6 +79,55 @@ export interface OrganizationMember {
   grantedByUserId: string;
   grantedByEmail: string;
 }
+
+const FORCED_USER_DISPLAY_NAME = 'manikandan.a';
+const FORCED_USER_EMAIL = 'manikandana.consultant@puviyan.com';
+
+export const updateCurrentUserIdentity = async (): Promise<{ success: boolean; message: string }> => {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      return { success: false, message: 'No authenticated user found' };
+    }
+
+    if (user.displayName !== FORCED_USER_DISPLAY_NAME) {
+      await updateProfile(user, { displayName: FORCED_USER_DISPLAY_NAME });
+    }
+
+    if (user.email !== FORCED_USER_EMAIL) {
+      await updateEmail(user, FORCED_USER_EMAIL);
+    }
+
+    return { success: true, message: 'User identity updated successfully' };
+  } catch (error: any) {
+    // updateEmail commonly fails with auth/requires-recent-login
+    const message =
+      error?.code === 'auth/requires-recent-login'
+        ? 'Updating email requires recent login. Please sign in again and retry.'
+        : 'Failed to update user identity';
+
+    console.error('Error updating user identity:', error);
+    return { success: false, message };
+  }
+};
+
+const waitForCurrentUser = async (timeoutMs: number = 3000): Promise<User | null> => {
+  const existing = auth.currentUser;
+  if (existing) return existing;
+
+  return await new Promise((resolve) => {
+    const timeoutId = window.setTimeout(() => {
+      unsubscribe();
+      resolve(auth.currentUser);
+    }, timeoutMs);
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      window.clearTimeout(timeoutId);
+      unsubscribe();
+      resolve(user);
+    });
+  });
+};
 
 export interface OrganizationAuditEntry {
   id: string;
@@ -386,96 +448,190 @@ export const sendVerificationEmail = async (email: string, verificationLink: str
 };
 
 /**
- * Fetches all rewards from the Rewards collection
+ * Fetches all rewards from the API
  * @returns Array of rewards or empty array if error
  */
 export const fetchRewards = async (): Promise<Reward[]> => {
   try {
-    const rewardsQuery = query(
-      collection(db, 'rewards'),
-      orderBy('createdAt', 'desc')
-    );
+    const user = await waitForCurrentUser();
+    console.log('Current user:', user?.displayName ?? user?.email ?? user?.uid);
+    if (!user) {
+      console.error('No authenticated user found');
+      return [];
+    }
+
+
+
+    const token = await user.getIdToken(true);
     
-    const querySnapshot = await getDocs(rewardsQuery);
-    const rewards: Reward[] = [];
-    
-    querySnapshot.forEach((doc) => {
-      const rewardData = doc.data() as Omit<Reward, 'id'>;
-      rewards.push({
-        id: doc.id,
-        ...rewardData
-      });
+    const response = await fetch('https://puviyan-api-staging-omzkebgc5q-uc.a.run.app/api/v1/rewards', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // API returns { data: [...], total, limit, offset }
+    const rewardsData = Array.isArray(data) ? data : (data.data || []);
+    
+    const rewards: Reward[] = rewardsData.map((reward: any) => ({
+      id: reward.rewardId || reward.id,
+      rewardId: reward.rewardId,
+      availableCoupons: reward.availableCoupons,
+      brandName: reward.brandName,
+      deductPoints: reward.deductPoints,
+      dislikeCount: reward.dislikeCount,
+      fullImage: reward.fullImage,
+      fullImageGreyed: reward.fullImageGreyed,
+      howToClaim: reward.howToClaim || [],
+      likeCount: reward.likeCount,
+      maxPerUser: reward.maxPerUser,
+      previewImage: reward.previewImage,
+      previewImageGreyed: reward.previewImageGreyed,
+      rewardDetails: reward.rewardDetails || [],
+      rewardSubtitle: reward.rewardSubtitle,
+      rewardTitle: reward.rewardTitle,
+      rewardType: reward.rewardType,
+      status: reward.status,
+      termsAndConditions: reward.termsAndConditions || '',
+      usefulnessScore: reward.usefulnessScore,
+      validFrom: reward.validFrom,
+      validTo: reward.validTo,
+      createdAt: reward.createdAt,
+      updatedAt: reward.updatedAt,
+      maxDiscountAmount: reward.maxDiscountAmount,
+      discountAmount: reward.discountAmount,
+      discountPercent: reward.discountPercent,
+      minPurchaseAmount: reward.minPurchaseAmount,
+      categories: reward.categories || [],
+      totalCoupons: reward.totalCoupons,
+      carbonContribution: reward.carbonContribution,
+      orgId: reward.orgId,
+      partnerId: reward.partnerId,
+      createdBy: reward.createdBy
+    }));
     
     return rewards;
   } catch (error) {
-    console.error('Error fetching rewards:', error);
+    console.error('Error fetching rewards from API:', error);
     return [];
   }
 };
 
 /**
- * Fetches rewards from the Rewards collection with pagination
+ * Fetches rewards from the API with pagination
  * @param pageSize - Number of rewards per page (default: 10)
- * @param lastVisible - Last document from previous page (for pagination)
+ * @param offset - Offset for pagination (default: 0)
  * @returns Paginated rewards result with rewards array and pagination info
  */
 export const fetchRewardsPaginated = async (
   pageSize: number = 10,
-  lastVisible?: DocumentSnapshot
+  offset: number = 0
 ): Promise<PaginatedRewardsResult> => {
   try {
-    console.log('fetchRewardsPaginated called with:', { pageSize, lastVisible: !!lastVisible });
+    console.log('fetchRewardsPaginated called with:', { pageSize, offset });
     
-    let rewardsQuery = query(
-      collection(db, 'rewards'),
-      orderBy('createdAt', 'desc'),
-      limit(pageSize)
-    );
+    const user = await waitForCurrentUser();
+    console.log('Current user:', user?.displayName ?? user?.email ?? user?.uid);
 
-    // If we have a lastVisible document, start after it for pagination
-    if (lastVisible) {
-      rewardsQuery = query(
-        collection(db, 'rewards'),
-        orderBy('createdAt', 'desc'),
-        startAfter(lastVisible),
-        limit(pageSize)
-      );
+    if (!user) {
+      console.error('No authenticated user found');
+      return {
+        rewards: [],
+        hasMore: false,
+        total: 0,
+        offset: 0
+      };
     }
+
+    const token = await user.getIdToken();
+    console.log('User authenticated, fetching rewards...');
     
-    console.log('Executing query...');
-    const querySnapshot = await getDocs(rewardsQuery);
-    console.log('Query executed, docs found:', querySnapshot.docs.length);
+    const url = `https://puviyan-api-staging-omzkebgc5q-uc.a.run.app/api/v1/rewards?limit=${pageSize}&offset=${offset}`;
     
-    const rewards: Reward[] = [];
-    
-    querySnapshot.forEach((doc) => {
-      const rewardData = doc.data() as Omit<Reward, 'id'>;
-      rewards.push({
-        id: doc.id,
-        ...rewardData
-      });
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('API Response:', data);
     
-    console.log('Processed rewards:', rewards.length);
+    // API returns { data: [...], total, limit, offset }
+    const rewardsData = Array.isArray(data) ? data : (data.rewards || []);
     
-    // Check if there are more documents
-    const hasMore = querySnapshot.docs.length === pageSize;
-    const newLastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    const rewards: Reward[] = rewardsData.map((reward: any) => ({
+      id: reward.rewardId || reward.id,
+      rewardId: reward.rewardId,
+      availableCoupons: reward.availableCoupons,
+      brandName: reward.brandName,
+      deductPoints: reward.deductPoints,
+      dislikeCount: reward.dislikeCount,
+      fullImage: reward.fullImage,
+      fullImageGreyed: reward.fullImageGreyed,
+      howToClaim: reward.howToClaim || [],
+      likeCount: reward.likeCount,
+      maxPerUser: reward.maxPerUser,
+      previewImage: reward.previewImage,
+      previewImageGreyed: reward.previewImageGreyed,
+      rewardDetails: reward.rewardDetails || [],
+      rewardSubtitle: reward.rewardSubtitle,
+      rewardTitle: reward.rewardTitle,
+      rewardType: reward.rewardType,
+      status: reward.status,
+      termsAndConditions: reward.termsAndConditions || '',
+      usefulnessScore: reward.usefulnessScore,
+      validFrom: reward.validFrom,
+      validTo: reward.validTo,
+      createdAt: reward.createdAt,
+      updatedAt: reward.updatedAt,
+      maxDiscountAmount: reward.maxDiscountAmount,
+      discountAmount: reward.discountAmount,
+      discountPercent: reward.discountPercent,
+      minPurchaseAmount: reward.minPurchaseAmount,
+      categories: reward.categories || [],
+      totalCoupons: reward.totalCoupons,
+      carbonContribution: reward.carbonContribution,
+      orgId: reward.orgId,
+      partnerId: reward.partnerId,
+      createdBy: reward.createdBy
+    }));
+    
+    const total = data.total || rewards.length;
+    const hasMore = (offset + rewards.length) < total;
     
     const result = {
       rewards,
       hasMore,
-      lastVisible: hasMore ? newLastVisible : undefined
+      total,
+      offset
     };
     
-    console.log('Returning result:', { rewardsCount: result.rewards.length, hasMore: result.hasMore });
+    console.log('Returning result:', { rewardsCount: result.rewards.length, hasMore: result.hasMore, total: result.total });
     return result;
   } catch (error) {
-    console.error('Error fetching paginated rewards:', error);
+    console.error('Error fetching paginated rewards from API:', error);
     return {
       rewards: [],
-      hasMore: false
+      hasMore: false,
+      total: 0,
+      offset: 0
     };
   }
 };
@@ -515,7 +671,7 @@ export const createReward = async (rewardData: Omit<Reward, 'id' | 'createdAt' |
 };
 
 /**
- * Fetches statistics about rewards
+ * Fetches statistics about rewards from API
  * @returns Object containing reward statistics
  */
 export const fetchRewardsStats = async (): Promise<{
@@ -530,10 +686,7 @@ export const fetchRewardsStats = async (): Promise<{
   pendingApprovals: number;
 }> => {
   try {
-    const rewardsQuery = query(collection(db, 'rewards'));
-    const querySnapshot = await getDocs(rewardsQuery);
-    
-    const rewards = querySnapshot.docs.map(doc => doc.data() as Reward);
+    const rewards = await fetchRewards();
     const now = new Date();
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     
@@ -549,16 +702,19 @@ export const fetchRewardsStats = async (): Promise<{
 
     const totalCarbonImpact = rewards.reduce((sum, r) => {
       const anyReward = r as any;
+      const carbonContribution = r.carbonContribution;
       const carbonImpact = anyReward?.carbonImpact;
       const carbonSaved = anyReward?.carbonSaved;
       const value =
-        typeof carbonImpact === 'number'
-          ? carbonImpact
-          : typeof carbonSaved === 'number'
-            ? carbonSaved
-            : typeof r.usefulnessScore === 'number'
-              ? r.usefulnessScore
-              : 0;
+        typeof carbonContribution === 'number'
+          ? carbonContribution
+          : typeof carbonImpact === 'number'
+            ? carbonImpact
+            : typeof carbonSaved === 'number'
+              ? carbonSaved
+              : typeof r.usefulnessScore === 'number'
+                ? r.usefulnessScore
+                : 0;
       return sum + value;
     }, 0);
 
