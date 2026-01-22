@@ -28,7 +28,7 @@ import {
 import { Suspense, lazy, useEffect, useState } from 'react'
 
 import { AlertCircle, CheckCircle, Clock, Edit, Eye, Gift, Plus, Search, Trash2 } from 'lucide-react'
-import { deleteReward, fetchRewardsPaginated, fetchRewardsStats, type PaginatedRewardsResult, type Reward } from '../services/firebaseService'
+import { deleteReward, fetchRewardsPaginated, fetchRewardsStats, type Reward } from '../services/firebaseService'
 import { formatDateForDisplay } from '../utils/dateUtils'
 import RewardModal from './RewardModal'
 
