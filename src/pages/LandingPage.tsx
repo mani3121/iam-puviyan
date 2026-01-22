@@ -53,14 +53,14 @@ const LandingPage = () => {
               alt="Mobile App Preview" 
               loading="lazy"
               decoding="async"
-              className="w-auto h-[125%] object-cover object-top -mt-[12%]"
+              className="w-auto h-[90%] object-cover object-top mt-[2vh]"
             />
-            <img 
+            <img  
               src={downshade} 
               alt="" 
               loading="lazy"
               decoding="async"
-              className="absolute top-[40%] left-0 w-full h-[65%] object-cover pointer-events-none" 
+              className="absolute top-[42%] left-0 w-full h-[65%] object-cover pointer-events-none" 
             />
           </div>
 
@@ -77,7 +77,7 @@ const LandingPage = () => {
             
             <p 
               className="text-white font-extralight leading-tight mb-[2vh] tracking-wide"
-              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 50, lineHeight: 1.33, fontSize: 'clamp(0.75rem, 1.5vw, 1.5rem)' }}
+              style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontWeight: 40, lineHeight: 1.50, fontSize: 'clamp(0.75rem, 1.5vw, 1.3rem)' }}
             >
               Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, & communities everywhere.
             </p>
@@ -108,6 +108,11 @@ const LandingPage = () => {
               {status === 'success' && (
                 <p className="absolute top-full left-0 right-0 mt-2 text-sm sm:text-base text-[#5ABA52] font-light text-center lg:text-left">
                   Thank you for joining us. You'll hear from us soon.
+                </p>
+              )}
+              {status === 'error' && (
+                <p className="absolute top-full left-0 right-0 mt-2 text-sm sm:text-base text-red-500 font-light text-center lg:text-left">
+                  Please enter a valid email
                 </p>
               )}
             </div>

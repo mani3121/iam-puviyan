@@ -47,36 +47,47 @@ const TabletLandingPage = () => {
                 <span className="text-white whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(1.75rem, 5.5vw, 2.75rem)', fontStyle: 'normal', fontWeight: 100, lineHeight: 1.2, letterSpacing: '0.06em' }}>COMING SOON TO EMPOWER</span>
                 <span className="text-[#5ABA52] whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(2rem, 6.5vw, 3.25rem)', fontStyle: 'normal', fontWeight: 700, lineHeight: 1.2 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
-              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces,<br/>d  institutions, businesses, & communities everywhere.</p>
-              <div className="flex flex-row gap-3 items-stretch justify-center mt-6">
-                <input
-                  type="email"
-                  placeholder="ENTER YOUR EMAIL ID"
-                  value={email}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setEmail(v);
-                    if (v.trim().length > 0 && status === 'error') {
-                      setStatus('idle');
-                    }
-                  }}
-                  className={`w-[40%] max-w-[300px] px-4 py-3 bg-transparent border-2 rounded-lg text-white text-center placeholder:text-white/40 focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#5ABA52]'}`}
-                  style={{ fontSize: 'clamp(0.7rem, 1.8vw, 1rem)' }}
-                />
-                <button
-                  onClick={handleNotifyMe}
-                  disabled={status === 'loading'}
-                  className="px-5 py-3 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-                  style={{ fontSize: 'clamp(0.7rem, 1.8vw, 1rem)', padding: 'clamp(0.6rem, 1.5vw, 0.875rem) clamp(1rem, 2.5vw, 1.75rem)' }}
-                >
-                  {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
-                </button>
+              <p className="text-white/70 mt-4 mb-2 md:mb-3 max-w-2xl mx-auto" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: '20px', fontStyle: 'normal', fontWeight: 300, lineHeight: '28px' }}>Inviting changemakers to integrate the app into homes, workplaces,<br/> institutions, businesses, & communities everywhere.</p>
+              <div className="flex flex-col items-center mt-6 w-full">
+                <div className="flex flex-col items-center">
+                  <div className="flex flex-row gap-3 items-stretch">
+                    <input
+                      type="email"
+                      placeholder="ENTER YOUR EMAIL ID"
+                      value={email}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setEmail(v);
+                        if (v.trim().length > 0 && status === 'error') {
+                          setStatus('idle');
+                        }
+                      }}
+                      className={`w-[300px] px-4 py-3 bg-transparent border-2 rounded-lg text-white text-center placeholder:text-white/40 focus:outline-none focus:border-[#5ABA52] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#5ABA52]'}`}
+                      style={{ fontSize: 'clamp(0.7rem, 1.8vw, 1rem)' }}
+                    />
+                    <button
+                      onClick={handleNotifyMe}
+                      disabled={status === 'loading'}
+                      className="px-5 py-3 bg-[#5ABA52] hover:bg-[#4da847] border-none rounded-lg text-white font-bold tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                      style={{ fontSize: 'clamp(0.7rem, 1.8vw, 1rem)', padding: 'clamp(0.6rem, 1.5vw, 0.875rem) clamp(1rem, 2.5vw, 1.75rem)' }}
+                    >
+                      {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
+                    </button>
+                  </div>
+                  <div className="h-8 w-full mt-1">
+                    {status === 'error' && (
+                      <p className="text-sm md:text-base text-red-500 font-light text-left">
+                        Please enter a valid email
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {status === 'success' && (
+                  <p className="text-sm md:text-base text-[#5ABA52] font-light text-center">
+                    Thank you for joining us. You'll hear from us soon.
+                  </p>
+                )}
               </div>
-              {status === 'success' && (
-                <p className="mt-1 md:mt-2 text-sm md:text-base text-[#5ABA52] font-light text-center">
-                  Thank you for joining us. You'll hear from us soon.
-                </p>
-              )}
             </div>
           </div>
 
@@ -87,21 +98,14 @@ const TabletLandingPage = () => {
               alt="Mobile App Preview"
               loading="lazy"
               decoding="async"
-              className="w-[85%] max-h-[90vh] md:max-h-[100vh] object-contain scale-125 transition-transform duration-300 ease-out"
+              className="w-[80%] h-[100%] object-cover object-top mt-[2vh] scale-125 transition-transform duration-300 ease-out"
             />
             <img
               src={downshade}
               alt=""
               loading="lazy"
               decoding="async"
-              className="absolute top-[70%] left-0 w-full h-[30%] object-cover pointer-events-none"
-            />
-            <img 
-              src={downshade} 
-              alt="" 
-              loading="lazy"
-              decoding="async"
-              className="absolute top-[40%] left-0 w-full h-[65%] object-cover pointer-events-none" 
+              className="absolute top-[50%] left-0 w-full h-[75%] object-cover pointer-events-none"
             />
           </div>
         </ContentWrapper>

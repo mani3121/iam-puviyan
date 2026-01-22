@@ -57,35 +57,46 @@ const MobileLandingPage = () => {
                  <span className="text-[#48C84F] whitespace-nowrap" style={{ display: 'block', fontSize: 'clamp(1.2rem, 6.5vw, 1.75rem)', fontWeight: 700, lineHeight: 1.2 }}>A SUSTAINABLE LIFESTYLE</span>
               </h1>
                 <p className="text-white leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: 'clamp(0.65rem, 3vw, 0.875rem)', fontWeight: 100, lineHeight: 1.4 }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
-              <div className="flex flex-row gap-2 items-stretch justify-center mt-2" style={{ width: 'fit-content', margin: '0.5rem auto 0' }}>
-                <input
-                  type="email"
-                  placeholder="ENTER YOUR EMAIL ID"
-                  value={email}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setEmail(v);
-                    if (v.trim().length > 0 && status === 'error') {
-                      setStatus('idle');
-                    }
-                  }}
-                  className={`flex-1 px-3 py-2 bg-transparent border-[0.5px] rounded-md text-white text-center placeholder:text-white/80 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#48c84f]'}`}
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontSize: 'clamp(0.5rem, 2.5vw, 0.75rem)', minWidth: '70%' }}
-                />
-                <button
-                  onClick={handleNotifyMe}
-                  disabled={status === 'loading'}
-                  className="px-6 py-2 border-none rounded-md text-white font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                  style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 400, backgroundColor: '#48C84F', fontSize: 'clamp(0.45rem, 2.2vw, 0.7rem)' }}
-                >
-                  {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
-                </button>
+              <div className="flex flex-col items-center mt-2">
+                <div className="flex flex-col items-start">
+                  <div className="flex flex-row gap-2 items-stretch" style={{ width: 'fit-content' }}>
+                    <input
+                      type="email"
+                      placeholder="ENTER YOUR EMAIL ID"
+                      value={email}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setEmail(v);
+                        if (v.trim().length > 0 && status === 'error') {
+                          setStatus('idle');
+                        }
+                      }}
+                      className={`flex-1 px-3 py-2 bg-transparent border-[0.5px] rounded-md text-white text-center placeholder:text-white/80 focus:outline-none focus:border-[#48c84f] transition-all ${status === 'error' ? 'border-red-500' : 'border-[#48c84f]'}`}
+                      style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontSize: 'clamp(0.5rem, 2.5vw, 0.75rem)', minWidth: '70%' }}
+                    />
+                    <button
+                      onClick={handleNotifyMe}
+                      disabled={status === 'loading'}
+                      className="px-6 py-2 border-none rounded-md text-white font-medium tracking-wide cursor-pointer transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                      style={{ fontFamily: "'Segoe UI Variable', sans-serif", fontWeight: 400, backgroundColor: '#48C84F', fontSize: 'clamp(0.45rem, 2.2vw, 0.7rem)' }}
+                    >
+                      {status === 'loading' ? 'SAVING...' : 'GET EARLY ACCESS'}
+                    </button>
+                  </div>
+                  <div className="h-6 w-full mt-1">
+                    {status === 'error' && (
+                      <p className="text-xs text-red-500 font-light text-left">
+                        Please enter a valid email
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {status === 'success' && (
+                  <p className="text-xs text-[#5ABA52] font-light text-center">
+                    Thank you for joining us. You'll hear from us soon.
+                  </p>
+                )}
               </div>
-              {status === 'success' && (
-                <p className="mt-3 text-xs text-[#5ABA52] font-light text-center">
-                  Thank you for joining us. You'll hear from us soon.
-                </p>
-              )}
             </div>
 
             {/* Mobile image at bottom */}
@@ -95,14 +106,14 @@ const MobileLandingPage = () => {
                 alt="Mobile App Preview"
                 loading="lazy"
                 decoding="async"
-                className="w-[90%] h-auto scale-120"
+                className="w-[100%] h-[100%] object-cover object-top mt-[8vh] scale-120"
               /> 
               <img 
                 src={downshade} 
                 alt="" 
                 loading="lazy"
                 decoding="async"
-                className="absolute top-[69%] left-0 w-full h-[30%] object-cover pointer-events-none" 
+                className="absolute top-[55%] left-0 w-full h-[70%] object-cover pointer-events-none" 
               />
             </div>
           </div>
