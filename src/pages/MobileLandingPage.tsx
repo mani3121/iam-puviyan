@@ -58,7 +58,7 @@ const MobileLandingPage = () => {
               </h1>
                 <p className="text-white leading-relaxed mt-[0.5vh]" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", fontSize: 'clamp(0.65rem, 3vw, 0.875rem)', fontWeight: 100, lineHeight: 1.4 }}>Inviting changemakers to integrate the app into homes, workplaces, institutions, businesses, and communities everywhere.</p>
               <div className="flex flex-col items-center mt-2">
-                <div className="flex flex-col items-start -ml-2">
+                <div className="flex flex-col items-start">
                   <div className="flex flex-row gap-2 items-stretch" style={{ width: 'fit-content' }}>
                     <input
                       type="email"
