@@ -6,10 +6,12 @@ import CarbonFootprintBanner from '../components/CarbonFootprintBanner';
 import PageLayout from '../components/PageLayout';
 import ContentWrapper from '../components/ContentWrapper';
 import { CURRENT_YEAR } from '../utils/dateUtils';
+import ContactNowLandingPage from '../components/ContactNowLandingPage';
 
 const LandingPage = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'success' | 'error' | 'loading'>('idle');
+   const [isContactOpen, setIsContactOpen] = useState(false);
 
   const handleNotifyMe = async () => {
     if (!email || email.trim().length === 0) {
@@ -133,7 +135,20 @@ const LandingPage = () => {
               <a href="/terms" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Terms of Service</a>
               <div className="w-px h-4 bg-stone-300"></div>
               <a href="/privacy" className="text-stone-300 text-sm font-normal hover:text-white transition-colors" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>Privacy Policy</a>
+
+              <div className="w-px h-4 bg-stone-300"></div>
+
+       
+              <button
+                onClick={() => setIsContactOpen(true)}
+                className="text-stone-300 text-sm hover:text-white"
+              >
+                Contact Now
+              </button>
+            
             </div>
+
+
           </div>
           <div className="flex justify-center items-center gap-1">
             <span className="text-stone-300 text-sm font-normal" style={{ fontFamily: "'Segoe UI Variable', system-ui, sans-serif", lineHeight: '24px' }}>All rights reserved</span>
@@ -166,6 +181,11 @@ const LandingPage = () => {
           </div>
         </div>
         </ContentWrapper>
+        
+      <ContactNowLandingPage
+        isOpen={isContactOpen}
+        onClose={() => setIsContactOpen(false)}
+      />
       </footer>
     </PageLayout>
   );
